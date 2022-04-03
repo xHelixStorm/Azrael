@@ -84,7 +84,7 @@ public class URLFilter implements Runnable{
 						shortURL = matcher2.group();
 					final var fqdn = shortURL;
 					//check if the bot is in full url delete mode for this server, if not, remove urls basing a blacklist table 
-					var fullBlacklist = BotConfiguration.SQLgetBotConfigs(member.getGuild().getIdLong()).getUrlBlacklist();
+					var fullBlacklist = BotConfiguration.SQLgetBotConfigs(member.getGuild().getIdLong()).getProhibitUrlsMode();
 					if(fullBlacklist) {
 						//remove url if that fqdn had been used before
 						if(Hashes.findGlobalURLBlacklist(fqdn)) {

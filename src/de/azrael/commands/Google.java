@@ -11,9 +11,9 @@ import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -37,7 +37,7 @@ public class Google implements CommandPublic {
 		//print help message and all currently available APIs
 		if(args.length == 0) {
 			String email;
-			JSONObject credentialContent = new JSONObject(FileSetting.readFile("./files/Google/credentials.json"));
+			JSONObject credentialContent = new JSONObject(FileHandler.readFile("./files/Google/credentials.json"));
 			if(credentialContent.length() > 0)
 				email = credentialContent.getString("client_email");
 			else 

@@ -10,14 +10,14 @@ import org.slf4j.LoggerFactory;
 
 import com.vdurmont.emoji.EmojiManager;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -28,7 +28,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class ReactionMessage {
 	private final static Logger logger = LoggerFactory.getLogger(ReactionMessage.class);
 	
-	public static void print(GuildMessageReceivedEvent e, long channel_id) {
+	public static void print(GuildMessageReceivedEvent e, long channel_id, BotConfigs botConfig) {
 		EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE);
 		var reactionRoles = DiscordRoles.SQLgetReactionRoles(e.getGuild().getIdLong());
 		if(reactionRoles != null && reactionRoles.size() > 0) {
@@ -37,16 +37,16 @@ public class ReactionMessage {
 				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
 					var roles = reactionRoles.parallelStream().filter(f -> !f.isPersistent()).collect(Collectors.toList());
 					if(roles.size() > 0) {
-						String [] reactions = GuildIni.getReactions(e.getGuild());
+						String [] reactions = botConfig.getReactionEmojis();
 						StringBuilder sb = new StringBuilder();
-						var reactionEnabled = GuildIni.getReactionEnabled(e.getGuild());
+						var reactionEnabled =  botConfig.isReactionsEnabled();
 						for(int i = 0; i < roles.size(); i++) {
 							String reaction;
 							if(!reactionEnabled) {
 								reaction = getReaction(i);
 							}
 							else {
-								if(reactions[i].length() > 0) {
+								if(reactions[i] != null && reactions[i].length() > 0) {
 									try {
 										reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
 									} catch(Exception exc) {
@@ -60,7 +60,7 @@ public class ReactionMessage {
 							sb.append(reaction+" **"+roles.get(i).getRole_Name()+"**\n");
 							if(i == 8) break;
 						}
-						String reactionMessage = FileSetting.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
+						String reactionMessage = FileHandler.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
 						if(reactionMessage.length() > 0) {
 							textChannel.sendMessage(message.setDescription(reactionMessage+"\n\n"
 								+ ""+sb.toString()).build()).queue(response -> {

@@ -11,19 +11,16 @@ import org.json.JSONObject;
 import de.azrael.commands.Invites;
 import de.azrael.commands.ShutDown;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
 import de.azrael.sql.BotConfiguration;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -312,7 +309,7 @@ public class HandlerPOST {
 	}
 	
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
-		FileSetting.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
+		FileHandler.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false, false);
 		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
 			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
@@ -568,8 +565,8 @@ public class HandlerPOST {
 							if(value.length() > 0 && value.length() <= 5)
 								valid = true;
 						}
-						case "Competitive_Team1", "Competitive_Team2", "Reactions_Emoji1", "Reactions_Emoji2", "Reactions_Emoji3", "Reactions_Emoji4", "Reactions_Emoji5",
-						"Reactions_Emoji6", "Reactions_Emoji7", "Reactions_Emoji8", "Reactions_Emoji9", "Reactions_VoteThumbsUp", "Reactions_VoteThumbsDown", "Reactions_VoteShrug" -> {
+						case "Competitive_Team1Name", "Competitive_Team2Name", "Reactions_Emoji1", "Reactions_Emoji2", "Reactions_Emoji3", "Reactions_Emoji4", "Reactions_Emoji5",
+						"Reactions_Emoji6", "Reactions_Emoji7", "Reactions_Emoji8", "Reactions_Emoji9", "VoteReactionThumbsUp", "VoteReactionThumbsDown", "VoteReactionShrug" -> {
 							if(value.length() >= 0 && value.length() <= 30)
 								valid = true;
 						}
@@ -621,7 +618,8 @@ public class HandlerPOST {
 					
 					if(valid) {
 						if(!textFileEdit) {
-							if(GuildIni.saveIniOption(guild, field, value)) {
+							//TODO: rework options saving logic
+							/*if(GuildIni.saveIniOption(guild, field, value)) {
 								WebserviceUtils.return200(out, "Option updated!", true, false);
 								AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 								
@@ -636,10 +634,10 @@ public class HandlerPOST {
 							}
 							else {
 								WebserviceUtils.return500(out, "An internal error occurred! Value couldn't be saved!", true);
-							}
+							}*/
 						}
 						else {
-							FileSetting.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
+							FileHandler.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
 							WebserviceUtils.return200(out, "Option updated!", true, false);
 							AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 						}

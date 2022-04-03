@@ -1,18 +1,15 @@
 package de.azrael.listeners;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.core.Hashes;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.timerTask.ParseSubscription;
+import de.azrael.util.FileHandler;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -52,12 +49,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		//insert all channels into table
 		Azrael.SQLBulkInsertChannels(e.getGuild().getTextChannels());
 		
-		FileSetting.createGuildDirectory(e.getGuild());
-		//check if guild ini file exists, else create a new one or verify content
-		if(!new File("./ini/"+e.getJDA().getSelfUser().getName()+"_"+guild_id+".ini").exists())
-			GuildIni.createIni(e.getGuild());
-		else
-			GuildIni.verifyIni(e.getGuild());
+		FileHandler.createGuildDirectory(e.getGuild());
 		
 		//run server specific timers
 		ParseSubscription.runTask(e.getJDA());

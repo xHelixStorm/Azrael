@@ -24,7 +24,6 @@ import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
@@ -378,10 +377,10 @@ public class Join implements CommandPublic {
 								team2Out.append("`"+elo+"` "+team2[i].getUsername()+"\n");
 							}
 						}
-						final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild());
-						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild());
-						message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
-						message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
+						final String teamName1 = botConfig.getCompetitiveTeam1Name();
+						final String teamName2 = botConfig.getCompetitiveTeam2Name();
+						message.addField((teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
+						message.addField((teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
 						if(master != null)
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
 						if(room.getMapID() != 0)
@@ -459,10 +458,10 @@ public class Join implements CommandPublic {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ROOM)+"#"+room.getRoomID()+(server != null ? " - "+server : ""));
 						if(map != null)
 							message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_MAP)+"*"+map.getName()+"*").setThumbnail(map.getImage());
-						final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild());
-						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild());
-						message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), ":crown: "+finalCaptain1.getUsername(), false);
-						message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), ":crown: "+finalCaptain2.getUsername(), false);
+						final String teamName1 = botConfig.getCompetitiveTeam1Name();
+						final String teamName2 = botConfig.getCompetitiveTeam2Name();
+						message.addField((teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), ":crown: "+finalCaptain1.getUsername(), false);
+						message.addField((teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), ":crown: "+finalCaptain2.getUsername(), false);
 						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICKING), finalCaptain1.getUsername(), false);
 						StringBuilder out = new StringBuilder();
 						for(int i = 0; i < pickQueue.size(); i++) {

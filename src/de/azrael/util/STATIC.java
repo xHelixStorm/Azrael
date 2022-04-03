@@ -47,8 +47,6 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -84,12 +82,12 @@ public class STATIC {
 	
 	private static final String VERSION = "8.01.591";
 	
-	private static final JSONObject eng_lang = new JSONObject(FileSetting.readFile("./files/Languages/eng_lang.json"));
-	private static final JSONObject ger_lang = new JSONObject(FileSetting.readFile("./files/Languages/ger_lang.json"));
-	private static final JSONObject spa_lang = new JSONObject(FileSetting.readFile("./files/Languages/spa_lang.json"));
-	private static final JSONObject rus_lang = new JSONObject(FileSetting.readFile("./files/Languages/rus_lang.json"));
-	private static final JSONObject por_lang = new JSONObject(FileSetting.readFile("./files/Languages/por_lang.json"));
-	private static final JSONObject fre_lang = new JSONObject(FileSetting.readFile("./files/Languages/fre_lang.json"));
+	private static final JSONObject eng_lang = new JSONObject(FileHandler.readFile("./files/Languages/eng_lang.json"));
+	private static final JSONObject ger_lang = new JSONObject(FileHandler.readFile("./files/Languages/ger_lang.json"));
+	private static final JSONObject spa_lang = new JSONObject(FileHandler.readFile("./files/Languages/spa_lang.json"));
+	private static final JSONObject rus_lang = new JSONObject(FileHandler.readFile("./files/Languages/rus_lang.json"));
+	private static final JSONObject por_lang = new JSONObject(FileHandler.readFile("./files/Languages/por_lang.json"));
+	private static final JSONObject fre_lang = new JSONObject(FileHandler.readFile("./files/Languages/fre_lang.json"));
 	
 	private static final String TWITTER_CONSUMER_KEY = "TWITTER_CONSUMER_KEY";
 	private static final String TWITTER_CONSUMER_KEY_SECRET = "TWITTER_CONSUMER_KEY_SECRET";
@@ -522,7 +520,7 @@ public class STATIC {
 		};
 	}
 	
-	public static boolean spamDetected(GuildMessageReceivedEvent e) {
+	public static boolean spamDetected(GuildMessageReceivedEvent e, BotConfigs botConfigs) {
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 			final long user_id = e.getMember().getUser().getIdLong();
 			final long guild_id = e.getGuild().getIdLong();
@@ -530,11 +528,11 @@ public class STATIC {
 			final String message = e.getMessage().getContentRaw();
 			
 			//verify if the current user is spamming
-			if(GuildIni.getSpamDetection(e.getGuild())) {
+			if(botConfigs.isSpamDetectionEnabled()) {
 				//User doesn't have to be an admin, moderator or bot user and they are only allowed to spam in a bot channel
 				if(!e.getMember().getUser().isBot() && !UserPrivs.isUserMod(e.getMember()) && !UserPrivs.isUserAdmin(e.getMember()) && Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_ID() == channel_id && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.BOT.getType()) || f.getChannel_Type().equals(Channel.QUI.getType()))).findAny().orElse(null) == null) {
-					final int messagesLimit = GuildIni.getMessagesLimit(e.getGuild());
-					final int messagesOverChannelsLimit = GuildIni.getMessageOverChannelsLimit(e.getGuild());
+					final int channelLimit = botConfigs.getSpamDetectionChannelLimit();
+					final int allChannelsLimit = botConfigs.getSpamDetectionAllChannelsLimit();
 					final var cache = Hashes.getTempCache("spamDetection_gu"+guild_id+"us"+user_id);
 					if(cache != null && cache.getExpiration() - System.currentTimeMillis() > 0) {
 						if(cache.getAdditionalInfo().equalsIgnoreCase(message)) {
@@ -568,7 +566,7 @@ public class STATIC {
 					final String lcMessage = message.toLowerCase();
 					var spamMessages = Hashes.getSpamDetection(user_id+"_"+guild_id);
 					if(spamMessages == null) {
-						spamMessages = new SpamDetection(GuildIni.getMessageExpires(e.getGuild()));
+						spamMessages = new SpamDetection(botConfigs.getSpamDetectionExpires());
 						spamMessages.put(lcMessage, e.getMessageIdLong(), channel_id);
 					}
 					else if(!spamMessages.isExpired()) {
@@ -585,12 +583,12 @@ public class STATIC {
 					}
 					
 					//warn the user if the messages limit has been hit or directly mute if the user starts to spam a different message
-					if(messagesLimit != 0 && spamMessages.size() == messagesLimit) {
+					if(channelLimit != 0 && spamMessages.size() == channelLimit) {
 						Hashes.removeSpamDetection(user_id+"_"+guild_id);
 						if(cache == null) {
 							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 								e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(e.getGuild()), lcMessage).setObject(spamMessages));
+							Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(botConfigs.getSpamDetectionExpires(), lcMessage).setObject(spamMessages));
 						}
 						else {
 							if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -622,12 +620,12 @@ public class STATIC {
 							if(!channels.contains(spamMessage.getChannelID()))
 								channels.add(spamMessage.getChannelID());
 						}
-						if(messagesOverChannelsLimit != 0 && channels.size() == messagesOverChannelsLimit) {
+						if(allChannelsLimit != 0 && channels.size() == allChannelsLimit) {
 							Hashes.removeSpamDetection(user_id+"_"+guild_id);
 							if(cache == null) {
 								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE)))
 									e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation2(e.getGuild(), Translation.CENSOR_SPAM)).queue();
-								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(GuildIni.getMessageExpires(e.getGuild()), lcMessage).setObject(spamMessages));
+								Hashes.addTempCache("spamDetection_gu"+guild_id+"us"+user_id, new Cache(botConfigs.getSpamDetectionExpires(), lcMessage).setObject(spamMessages));
 							}
 							else {
 								if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
@@ -653,7 +651,7 @@ public class STATIC {
 								}
 							}
 						}
-						else if(messagesLimit != 0 || messagesOverChannelsLimit != 0)
+						else if(channelLimit != 0 || allChannelsLimit != 0)
 							Hashes.addSpamMessage(user_id+"_"+guild_id, spamMessages);
 					}
 				}

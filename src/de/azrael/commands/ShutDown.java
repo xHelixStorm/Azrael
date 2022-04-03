@@ -13,11 +13,11 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
@@ -39,7 +39,7 @@ public class ShutDown implements CommandPublic {
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		if(BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-			FileSetting.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
+			FileHandler.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
 			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
 			for(final Guild guild : e.getJDA().getGuilds()) {
 				saveCache(guild, botConfig);

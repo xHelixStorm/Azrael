@@ -15,8 +15,8 @@ import de.azrael.core.CommandParser;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
 import de.azrael.sql.Azrael;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message.Attachment;
@@ -145,7 +145,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			for(Attachment attch : e.getMessage().getAttachments()) {
 				image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
 			}
-			FileSetting.appendFile("./message_log/privChannel.txt", "["+LocalDateTime.now().toString()+" - "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+" ("+e.getAuthor().getId()+")]: "+e.getMessage().getContentRaw()+image_url.toString()+"\n");
+			FileHandler.appendFile("./message_log/privChannel.txt", "["+LocalDateTime.now().toString()+" - "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+" ("+e.getAuthor().getId()+")]: "+e.getMessage().getContentRaw()+image_url.toString()+"\n");
 		});
 	}
 }

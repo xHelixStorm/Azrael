@@ -5,12 +5,12 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.Competitive;
@@ -36,30 +36,30 @@ public class RoomExecution {
 		}
 	}
 	
-	public static void runWinnerHelp(GuildMessageReceivedEvent e, Cache cache) {
+	public static void runWinnerHelp(GuildMessageReceivedEvent e, Cache cache, BotConfigs botConfig) {
 		if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.ROOM_WINNER)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-			final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild());
-			final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild());
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER_HELP).replaceFirst("\\{\\}", (iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1).toLowerCase())).replace("{}", (iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2).toLowerCase()))).build()).queue();
+			final String teamName1 = botConfig.getCompetitiveTeam1Name();
+			final String teamName2 = botConfig.getCompetitiveTeam2Name();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER_HELP).replaceFirst("\\{\\}", (teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1).toLowerCase())).replace("{}", (teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2).toLowerCase()))).build()).queue();
 			Hashes.addTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.ROOM.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
 	
-	public static void runWinner(GuildMessageReceivedEvent e, String [] args, Cache cache, boolean clan) {
+	public static void runWinner(GuildMessageReceivedEvent e, String [] args, Cache cache, boolean clan, BotConfigs botConfig) {
 		if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.ROOM_WINNER)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 			if(args.length == 2) {
 				if(args[1].replaceAll("[0-9]*", "").length() == 0) {
 					final int team = Integer.parseInt(args[1]);
 					final int room_id = Integer.parseInt(cache.getAdditionalInfo2());
 					if(Competitive.SQLsetWinner(e.getGuild().getIdLong(), room_id, team, clan) > 0) {
-						final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild());
-						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild());
+						final String teamName1 = botConfig.getCompetitiveTeam1Name();
+						final String teamName2 = botConfig.getCompetitiveTeam2Name();
 						String teamName = "";
 						if(team == 1)
-							teamName = (iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1));
+							teamName = (teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1));
 						else
-							teamName = (iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2));
+							teamName = (teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2));
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER_DECIDED).replaceFirst("\\{\\}", teamName).replace("{}", ""+room_id)).build()).queue();
 						logger.info("User {} has selected team {} as winners of room {} in guild {}", e.getMember().getUser().getId(), team, room_id, e.getGuild().getId());
 						Hashes.clearTempCache("room_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());

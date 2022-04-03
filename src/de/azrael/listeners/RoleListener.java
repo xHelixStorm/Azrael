@@ -18,14 +18,13 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.RoleTimer;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -155,6 +154,7 @@ public class RoleListener extends ListenerAdapter {
 				}
 				//for manual mutes without command and which isn't permanent and for users that can be interacted with
 				else if(e.getGuild().getSelfMember().canInteract(e.getMember())) {
+					BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
 					Object [] object = getReporterFromAuditLog(e);
 					long from_user = (long)object[0];
 					
@@ -190,7 +190,7 @@ public class RoleListener extends ListenerAdapter {
 						//send a private message to the user
 						e.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", hour_add+and_add+minute_add)
-									+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+									+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 										//success callback not required
 										channel.close().queue();
 									}, error -> {
@@ -239,7 +239,7 @@ public class RoleListener extends ListenerAdapter {
 							//send a private message
 							e.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_2).replaceFirst("\\{\\}", e.getGuild().getName()).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", "**"+(warning_id+1)+"**/**"+max_warning+"**")
-										+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+										+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 											//success callback not required
 											channel.close().queue();
 										}, error -> {
@@ -259,13 +259,12 @@ public class RoleListener extends ListenerAdapter {
 						//ban or perm mute if the current warning exceeded the max allowed warning
 						else if((warning_id+1) > max_warning) {
 							//execute this block if perm mute is disabled
-							BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
 							if(!botConfig.getOverrideBan()) {
 								if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 									//send a private message to the user
 									e.getUser().openPrivateChannel().queue(channel -> {
 										channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM).replace("{}", e.getGuild().getName())
-												+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+												+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 													//ban the user
 													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
@@ -293,7 +292,7 @@ public class RoleListener extends ListenerAdapter {
 								//send a private message
 								e.getUser().openPrivateChannel().queue(channel -> {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_3).replace("{}", e.getGuild().getName())
-											+ (GuildIni.getMuteSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
+											+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 												//no callback required
 												channel.close().queue();
 											}, error -> {
@@ -343,7 +342,7 @@ public class RoleListener extends ListenerAdapter {
 						if(Azrael.SQLMarkGiveawayAsUsed(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), reward) > 0) {
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
 								String submit = null;
-								final String content = FileSetting.readFile("files/Guilds/"+e.getGuild().getId()+"/assignmessage.txt");
+								final String content = FileHandler.readFile("files/Guilds/"+e.getGuild().getId()+"/assignmessage.txt");
 								if(content != null && content.trim().length() > 0) {
 									submit = content.trim()+"\n**"+reward+"**";
 								}

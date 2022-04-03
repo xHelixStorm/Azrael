@@ -11,7 +11,6 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -73,9 +72,9 @@ public class Room implements CommandPublic {
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.ROOM_TYPE), (room.getType() == 1 ? STATIC.getTranslation(e.getMember(), Translation.ROOM_REGULAR) : (room.getType() == 2 ? STATIC.getTranslation(e.getMember(), Translation.ROOM_PICKING) : STATIC.getTranslation(e.getMember(), Translation.ROOM_CLAN_WAR))), true);
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.ROOM_MAP), (map.getMapID() != 0 ? map.getName() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)), true);
 							if(room.getType() != 3) {
-								final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild());
-								final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild());
-								message.addField(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER), (room.getWinner() == 1 ? (iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.ROOM_TEAM_1)) : (room.getWinner() == 2 ? (iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.ROOM_TEAM_2)) : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))), true);
+								final String teamName1 = botConfig.getCompetitiveTeam1Name();
+								final String teamName2 = botConfig.getCompetitiveTeam2Name();
+								message.addField(STATIC.getTranslation(e.getMember(), Translation.ROOM_WINNER), (room.getWinner() == 1 ? (teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.ROOM_TEAM_1)) : (room.getWinner() == 2 ? (teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.ROOM_TEAM_2)) : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))), true);
 							}
 							else {
 								final String clanName1 = Competitive.SQLgetClanName(e.getGuild().getIdLong(), room.getClanID1());

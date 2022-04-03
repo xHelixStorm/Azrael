@@ -15,6 +15,7 @@ import com.vdurmont.emoji.EmojiManager;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.commandsContainer.RandomshopExecution;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Clan;
 import de.azrael.core.Hashes;
@@ -23,7 +24,6 @@ import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.inventory.InventoryBuilder;
@@ -83,15 +83,16 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								
 								//continue if a reaction name has been found
 								if(reactionName.length() > 0) {
-									//retrieve all names of the reactions from the guild ini file
-									String [] reactions = GuildIni.getReactions(e.getGuild());
 									boolean emoteFound = false;
+									BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
 									//check if the custom emote mode is enabled, else assign roles to members basing on the default emote
-									if(GuildIni.getReactionEnabled(e.getGuild())) {
+									if(botConfig.isReactionsEnabled()) {
+										//retrieve all reaction names
+										String [] reactions = botConfig.getReactionEmojis();
 										//iterate through all reaction roles in order
 										for(int i = 0; i < reactionRoles.size(); i++) {
 											//check if the reacted reaction is the same which is saved in the ini file, if yes assign role basing that reaction
-											if(reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
+											if(reactions[i] != null && reactions[i].length() > 0 && (reactionName.equals(reactions[i]) || EmojiParser.parseToAliases(reactionName).replaceAll(":", "").equals(reactions[i]))) {
 												//check if the bot has the manage roles permission
 												if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 													final Role role = e.getGuild().getRoleById(reactionRoles.get(i).getRole_ID());
@@ -338,7 +339,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				final var thisChannel = channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 				if(thisChannel != null && thisChannel.getChannel_Type() != null && (thisChannel.getChannel_Type().equals(Channel.VOT.getType()) || thisChannel.getChannel_Type().equals(Channel.VO2.getType()))) {
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE, Permission.MESSAGE_HISTORY))) {
-						final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
+						BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
+						final String [] reactions = botConfig.getVoteReactions();
 						Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 						Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 						Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
@@ -383,7 +385,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						}
 						
 						//Run google service, if enabled
-						runVoteSpreadsheetService(runSpreadsheet, e);
+						runVoteSpreadsheetService(runSpreadsheet, e, botConfig);
 					}
 					else {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
@@ -403,7 +405,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 		logger.warn("MANAGE ROLES permission required to apply reaction roles in guild {}", e.getGuild().getId());
 	}
 	
-	private static void runVoteSpreadsheetService(boolean runSpreadsheet, GuildMessageReactionAddEvent e) {
+	private static void runVoteSpreadsheetService(boolean runSpreadsheet, GuildMessageReactionAddEvent e, BotConfigs botConfig) {
 		if(runSpreadsheet && BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong()).getGoogleFunctionalities()) {
 			final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 			if(sheet != null && !sheet[0].equals("empty")) {
@@ -445,7 +447,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									if(columnUpVote != 0 || columnDownVote != 0 || columnShrugVote != 0) {
 										//build update array
 										ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-										final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
+										final String [] reactions = botConfig.getVoteReactions();
 										Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 										Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 										Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
@@ -488,7 +490,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 						}
 					} catch(SocketTimeoutException e1) {
 						if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
-							runVoteSpreadsheetService(runSpreadsheet, e);
+							runVoteSpreadsheetService(runSpreadsheet, e, botConfig);
 						}
 					} catch (Exception e1) {
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());

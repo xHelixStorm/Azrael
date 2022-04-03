@@ -24,8 +24,6 @@ import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.filter.LanguageFilter;
 import de.azrael.filter.URLFilter;
 import de.azrael.google.GoogleSheets;
@@ -33,6 +31,7 @@ import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.threads.DelayedGoogleUpdate;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -138,7 +137,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					collectedMessage.setIsUserBot(e.getMessage().getMember().getUser().isBot());
 					
 					if(botConfig.getChannelLog())
-						FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+						FileHandler.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(botConfig.getCacheLog()) {
 						if(messages != null) {
 							messages.add(collectedMessage);
@@ -209,7 +208,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 				
 				if(botConfig.getGoogleFunctionalities()) {
 					//Run google service, if enabled
-					runVoteSpreadsheetService(e, allChannels);
+					runVoteSpreadsheetService(e, allChannels, botConfig);
 					
 					//Run google service, if enabled
 					runCommentSpreadsheetService(e);
@@ -218,7 +217,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 		}).start();
 	}
 	
-	private static void runVoteSpreadsheetService(GuildMessageUpdateEvent e, ArrayList<Channels> allChannels) {
+	private static void runVoteSpreadsheetService(GuildMessageUpdateEvent e, ArrayList<Channels> allChannels, BotConfigs botConfig) {
 		if(allChannels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong() && f.getChannel_Type() != null && (f.getChannel_Type().equals(Channel.VOT.getType()) || f.getChannel_Type().equals(Channel.VO2.getType()))).findAny().orElse(null) != null) {
 			final String [] sheet = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.VOTE.id, e.getChannel().getId());
 			if(sheet != null && !sheet[0].equals("empty")) {
@@ -264,7 +263,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 											}
 											if(columnMessage != 0) {
 												ArrayList<List<Object>> values = new ArrayList<List<Object>>();
-												final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
+												final String [] reactions = botConfig.getVoteReactions();
 												Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 												Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 												Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
@@ -310,7 +309,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 								}
 							}
 							else if(DelayedGoogleUpdate.containsMessage(e.getGuild().getId()+"_"+e.getChannel().getId()+"_"+e.getMessageId(), "add")) {
-								final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
+								final String [] reactions = botConfig.getVoteReactions();
 								Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");
 								Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 								Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
@@ -344,7 +343,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 							}
 						} catch(SocketTimeoutException e1) {
 							if(GoogleUtils.timeoutHandler(e.getGuild(), file_id, GoogleEvent.VOTE.name(), e1)) {
-								runVoteSpreadsheetService(e, allChannels);
+								runVoteSpreadsheetService(e, allChannels, botConfig);
 							}
 						} catch (Exception e1) {
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation2(e.getGuild(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage(), Channel.LOG.getType());

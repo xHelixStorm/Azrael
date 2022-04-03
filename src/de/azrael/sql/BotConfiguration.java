@@ -139,7 +139,7 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 							rs.getInt("double_experience_end"),
 							rs.getBoolean("force_reason"),
 							rs.getBoolean("override_ban"),
-							rs.getBoolean("url_blacklist"),
+							rs.getBoolean("prohibit_urls_mode"),
 							rs.getBoolean("self_deleted_messages"),
 							rs.getBoolean("edited_messages"),
 							rs.getBoolean("edited_messages_history"),
@@ -152,7 +152,38 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 							rs.getBoolean("private_patch_notes"),
 							rs.getBoolean("public_patch_notes"),
 							rs.getBoolean("google_functionalities"),
-							rs.getString("google_main_email")
+							rs.getString("google_main_email"),
+							rs.getBoolean("spam_detection_enabled"),
+							rs.getInt("spam_detection_channel_limit"),
+							rs.getInt("spam_detection_all_channels_limit"),
+							rs.getInt("spam_detection_expires"),
+							rs.getBoolean("mute_message_delete_enabled"),
+							rs.getBoolean("mute_force_message_deletion"),
+							rs.getInt("mute_auto_delete_messages"),
+							rs.getBoolean("mute_send_reason"),
+							rs.getBoolean("kick_message_delete_enabled"),
+							rs.getBoolean("kick_force_message_deletion"),
+							rs.getInt("kick_auto_delete_messages"),
+							rs.getBoolean("kick_send_reason"),
+							rs.getBoolean("ban_message_delete_enabled"),
+							rs.getBoolean("ban_force_message_deletion"),
+							rs.getInt("ban_auto_delete_messages"),
+							rs.getBoolean("ban_send_reason"),
+							rs.getString("competitive_team_1_name"),
+							rs.getString("competitive_team_2_name"),
+							rs.getBoolean("reactions_enabled"),
+							rs.getString("reactions_emoji1"),
+							rs.getString("reactions_emoji2"),
+							rs.getString("reactions_emoji3"),
+							rs.getString("reactions_emoji4"),
+							rs.getString("reactions_emoji5"),
+							rs.getString("reactions_emoji6"),
+							rs.getString("reactions_emoji7"),
+							rs.getString("reactions_emoji8"),
+							rs.getString("reactions_emoji9"),
+							rs.getString("vote_reaction_thumbs_up"),
+							rs.getString("vote_reaction_thumbs_down"),
+							rs.getString("vote_reaction_shrug")
 					);
 				}
 				if(config == null)
@@ -272,15 +303,17 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 			stmt = myConn.prepareStatement(BotConfigurationStatements.SQLgetCommand);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
-			if(rs.next()) {
+			if(rs.next() && !command.isHidden()) {
 				if(mode == 1)
 					return command.resolveResultSet(rs);
-				else if(mode == 2)
+				else if(mode == 2 && !command.isStateOnly())
 					return command.resolveResultSetLv(rs);
-				else if(mode == 3)
+				else if(mode == 3 && !command.isLevelOnly())
 					return command.resolveResultSetCm(rs);
-				else if(mode == 4)
+				else if(mode == 4 && !command.isLevelOnly())
 					return command.resolveResultSetScm(rs);
+				else if(mode == 5 && !command.isLevelOnly())
+					return command.resolveResultSetType(rs);
 			}
 			ArrayList<Object> values = new ArrayList<Object>();
 			if(mode == 1) {
@@ -322,14 +355,18 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 			rs = stmt.executeQuery();
 			if(rs.next()) {
 				for(Command command : commands) {
-					if(mode == 1)
-						values.add(command.resolveResultSet(rs));
-					else if(mode == 2)
-						values.add(command.resolveResultSetLv(rs));
-					else if(mode == 3)
-						values.add(command.resolveResultSetCm(rs));
-					else if(mode == 4)
-						values.add(command.resolveResultSetScm(rs));
+					if(!command.isHidden()) {
+						if(mode == 1)
+							values.add(command.resolveResultSet(rs));
+						else if(mode == 2 && !command.isStateOnly())
+							values.add(command.resolveResultSetLv(rs));
+						else if(mode == 3 && !command.isLevelOnly())
+							values.add(command.resolveResultSetCm(rs));
+						else if(mode == 4 && !command.isLevelOnly())
+							values.add(command.resolveResultSetScm(rs));
+						else if(mode == 5 && !command.isLevelOnly())
+							values.add(command.resolveResultSetType(rs));
+					}
 				}
 				return values;
 			}

@@ -44,8 +44,6 @@ import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.filter.LanguageFilter;
 import de.azrael.filter.URLFilter;
 import de.azrael.google.GoogleSheets;
@@ -57,6 +55,7 @@ import de.azrael.sql.RankingSystem;
 import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.threads.RunQuiz;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -100,7 +99,7 @@ public class GuildMessageListener extends ListenerAdapter {
 				//allow to run only one thread at the same time
 				ExecutorService executor = Executors.newSingleThreadExecutor();
 				executor.execute(() -> {
-					if(STATIC.spamDetected(e))
+					if(STATIC.spamDetected(e, botConfig))
 						return;
 					
 					//execute commands
@@ -283,7 +282,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
 								try {
 									final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
-									final String [] reactions = GuildIni.getVoteReactions(e.getGuild());
+									final String [] reactions = botConfig.getVoteReactions();
 									final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
 									final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
 									if(thumbsup instanceof Emote)
@@ -318,7 +317,7 @@ public class GuildMessageListener extends ListenerAdapter {
 									}
 									
 									//in rare cases some resctions are not shown below the message. In this case verify each sent message after 30 seconds and add the missing reactions.
-									validateVoteReactions(e.getMessage(), voteTwoChannel, 0);
+									validateVoteReactions(e.getMessage(), voteTwoChannel, 0, botConfig);
 								} catch(ErrorResponseException ere) {
 									logger.warn("The user {} couldn't receive any reactions in the vote channel {} because the user has blocked the bot in guild {}", user_id, channel_id, guild_id);
 								}
@@ -701,10 +700,10 @@ public class GuildMessageListener extends ListenerAdapter {
 									RoomExecution.runClose(e, Integer.parseInt(room.getAdditionalInfo2()));
 								}
 								else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WINNER))) {
-									RoomExecution.runWinnerHelp(e, room);
+									RoomExecution.runWinnerHelp(e, room, botConfig);
 								}
 								else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WINNER))) {
-									RoomExecution.runWinner(e, args, room, (room.getAdditionalInfo3().equals("1") ? true : false));
+									RoomExecution.runWinner(e, args, room, (room.getAdditionalInfo3().equals("1") ? true : false), botConfig);
 								}
 							}
 							case "3" -> {
@@ -871,7 +870,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					collectedMessage.setIsUserBot(e.getMember().getUser().isBot());
 					
 					if(botConfig.getChannelLog()) 	
-						FileSetting.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+						FileHandler.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(botConfig.getCacheLog()) {
 						ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 						cacheMessage.add(collectedMessage);
@@ -938,7 +937,7 @@ public class GuildMessageListener extends ListenerAdapter {
 		}
 	}
 	
-	private void validateVoteReactions(final Message message, boolean shrugRequired, int recursiveCount) {
+	private void validateVoteReactions(final Message message, boolean shrugRequired, int recursiveCount, BotConfigs botConfig) {
 		final int count = recursiveCount+1;
 		if(message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY)) || STATIC.setPermissions(message.getGuild(), message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 			new Thread(() -> {
@@ -948,7 +947,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					e.printStackTrace();
 				}
 				message.getChannel().retrieveMessageById(message.getIdLong()).queue(m -> {
-					final String [] reactions = GuildIni.getVoteReactions(message.getGuild());
+					final String [] reactions = botConfig.getVoteReactions();
 					final Object thumbsup = STATIC.retrieveEmoji(message.getGuild(), reactions[0], ":thumbsup:");;
 					final Object thumbsdown = STATIC.retrieveEmoji(message.getGuild(), reactions[1], ":thumbsdown:");
 					final Object shrug = STATIC.retrieveEmoji(message.getGuild(), reactions[2], ":shrug:");
@@ -998,7 +997,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//check again if this time all reactions are visible, else repeat the above logic after 20 seconds again
 					if(!thumbsUpFound || !thumbsDownFound || (shrugRequired && !shrugFound)) {
 						if(recursiveCount <= 10)
-							validateVoteReactions(message, shrugRequired, count);
+							validateVoteReactions(message, shrugRequired, count, botConfig);
 					}
 				});
 				

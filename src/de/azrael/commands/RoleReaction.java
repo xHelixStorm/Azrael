@@ -43,7 +43,7 @@ public class RoleReaction implements CommandPublic {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_REACTION_ENABLE)).build()).queue();
 					logger.info("User {} has enabled role reactions in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					var rea_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.REA.getType())).findAny().orElse(null);
-					if(rea_channel != null) ReactionMessage.print(e, rea_channel.getChannel_ID());
+					if(rea_channel != null) ReactionMessage.print(e, rea_channel.getChannel_ID(), botConfig);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

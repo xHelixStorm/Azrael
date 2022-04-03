@@ -118,10 +118,9 @@ public class Main {
 		});
 		
 		Logger logger = LoggerFactory.getLogger(Main.class);
-		boolean [] dir = new boolean[3];
+		boolean [] dir = new boolean[2];
 		dir[0] = (new File("./log")).mkdirs();
 		dir[1] = (new File("./message_log")).mkdirs();
-		dir[2] = (new File("./ini")).mkdirs();
 		
 		//Verify the passed parameters
 		if(args.length == 0) {

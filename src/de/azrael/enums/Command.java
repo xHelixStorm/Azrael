@@ -55,18 +55,18 @@ public enum Command {
 	USER_INFORMATION				("user_information", "scm"),
 	USER_DELETE_MESSAGES			("user_delete_messages", "scm"),
 	USER_WARNING					("user_warning", "scm"),
-	USER_WARNING_FORCE				("user_warning_force", "scm"),
+	USER_WARNING_FORCE				("user_warning_force", "scm", false, true),
 	USER_MUTE						("user_mute", "scm"),
 	USER_UNMUTE						("user_unmute", "scm"),
 	USER_BAN						("user_ban", "scm"),
 	USER_UNBAN						("user_unban", "scm"),
+	USER_KICK						("user_kick", "scm"),
 	USER_ASSIGN_ROLE				("user_assign_role", "scm"),
 	USER_REMOVE_ROLE				("user_remove_role", "scm"),
-	USER_KICK						("user_kick", "scm"),
 	USER_HISTORY					("user_history", "scm"),
 	USER_WATCH						("user_watch", "scm"),
 	USER_UNWATCH					("user_unwatch", "scm"),
-	USER_USE_WATCH_CHANNEL			("user_use_watch_channel", "scm"),
+	USER_USE_WATCH_CHANNEL			("user_use_watch_channel", "scm", false, true),
 	USER_GIFT_EXPERIENCE			("user_gift_experience", "scm"),
 	USER_SET_EXPERIENCE				("user_set_experience", "scm"),
 	USER_SET_LEVEL					("user_set_level", "scm"),
@@ -105,9 +105,8 @@ public enum Command {
 	DAILY							("daily", "cm"),
 	INVENTORY						("inventory", "cm"),
 	MEOW							("meow", "cm"),
-	PROFILE							("profile", "cm"),
 	PUG								("pug", "cm"),
-	PURCHASE						("purchase", "cm"),
+	PROFILE							("profile", "cm"),
 	RANK							("rank", "cm"),
 	SHOP							("shop", "cm"),
 	TOP								("top", "cm"),
@@ -118,10 +117,7 @@ public enum Command {
 	DOUBLE_EXPERIENCE				("double_experience", "cm"),
 	EQUIP							("equip", "cm"),
 	MATCHMAKING						("matchmaking", "cm"),
-	JOIN							("join", "cm"),
 	CLAN							("clan", "cm"),
-	LEAVE							("leave", "cm"), 
-	QUEUE							("queue", "cm"),
 	CW								("cw", "cm"),
 	ROOM							("room", "cm"),
 	ROOM_CLOSE						("room_close", "scm"),
@@ -129,21 +125,47 @@ public enum Command {
 	ROOM_REOPEN						("room_reopen", "scm"),
 	STATS							("stats", "cm"),
 	LEADERBOARD						("leaderboard", "cm"),
-	CHANGEMAP						("changemap", "scm"),
-	MASTER							("master", "scm"),
-	PICK							("pick", "scm"),
-	REBOOT							("reboot", "cm"),
-	RESTRICT						("restrict", "scm"),
-	SHUTDOWN						("shutdown", "cm"),
-	START							("start", "scm"),
-	WEB								("web", "cm");
+	REBOOT							("reboot", "cm", true),
+	SHUTDOWN						("shutdown", "cm", true),
+	JOIN							("join", "scm", false, false),
+	LEAVE							("leave", "scm", false, false),
+	QUEUE							("queue", "scm", false, false, true),
+	CHANGEMAP						("changemap", "scm", false, false, true),
+	MASTER							("master", "scm", false, false, true),
+	PICK							("pick", "scm", false, false, true),
+	RESTRICT						("restrict", "scm", false, false, true),
+	START							("start", "scm", false, false, true),
+	WEB								("web", "cm", false, false, true);
 	
 	private String column;
 	private String type;
+	private boolean hidden = false;
+	private boolean levelOnly = false;
+	private boolean stateOnly = false;
 	
 	private Command(String _column, String _type) {
 		this.column = _column;
 		this.type = _type;
+	}
+	
+	private Command(String _column, String _type, boolean _hidden) {
+		this.column = _column;
+		this.type = _type;
+		this.hidden = _hidden;
+	}
+	
+	private Command(String _column, String _type, boolean _hidden, boolean _levelOnly) {
+		this.column = _column;
+		this.type = _type;
+		this.hidden = _hidden;
+		this.levelOnly = _levelOnly;
+	}
+	
+	private Command(String _column, String _type, boolean _hidden, boolean _levelOnly, boolean _stateOnly) {
+		this.column = _column;
+		this.type = _type;
+		this.hidden = _hidden;
+		this.levelOnly = _levelOnly;
 	}
 	
 	public String getColumn() {
@@ -154,18 +176,28 @@ public enum Command {
 		return this.type;
 	}
 	
+	public boolean isHidden() {
+		return this.hidden;
+	}
+	
+	public boolean isLevelOnly() {
+		return this.levelOnly;
+	}
+	
+	public boolean isStateOnly() {
+		return this.stateOnly;
+	}
+	
 	public ArrayList<Object> resolveResultSet(ResultSet rs) throws SQLException {
 		ArrayList<Object> objects = new ArrayList<Object>();
 		if(this.type.equals("cm")) {
 			objects.add(rs.getBoolean(this.column+"_cm"));
-			objects.add(rs.getInt(this.column+"_lv"));
-			objects.add(this.column+":"+this.type);
 		}
 		else if(this.type.equals("scm")) {
 			objects.add(rs.getBoolean(this.column+"_scm"));
-			objects.add(rs.getInt(this.column+"_lv"));
-			objects.add(this.column+":"+this.type);
 		}
+		objects.add((this.stateOnly ? 0 : rs.getInt(this.column+"_lv")));
+		objects.add(this.column+":"+this.type);
 		return objects;
 	}
 	
@@ -179,5 +211,12 @@ public enum Command {
 	
 	public boolean resolveResultSetScm(ResultSet rs) throws SQLException {
 		return rs.getBoolean(this.column+"_scm");
+	}
+	
+	public boolean resolveResultSetType(ResultSet rs) throws SQLException {
+		if(this.type.equals("cm"))
+			return rs.getBoolean(this.column+"_cm");
+		else
+			return rs.getBoolean(this.column+"_scm");
 	}
 }

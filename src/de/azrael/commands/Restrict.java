@@ -20,7 +20,7 @@ public class Restrict implements CommandPublic {
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
-		return true;
+		return STATIC.commandValidation(e, botConfig, Command.RESTRICT);
 	}
 
 	@Override

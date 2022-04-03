@@ -30,7 +30,6 @@ import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -1190,7 +1189,7 @@ public class UserExecution {
 							e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().queue(channel -> {
 								if(warning_id == max_warning_id) {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
-										+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+										+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
@@ -1200,7 +1199,7 @@ public class UserExecution {
 								}
 								else {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-										+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+										+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_ORDER)).build()).queue();
 											e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(reason).queue();
 										}, err -> {
@@ -1244,7 +1243,7 @@ public class UserExecution {
 						e.getGuild().getMemberById(user_id).getUser().openPrivateChannel().queue(channel -> {
 							if(warning_id == max_warning_id) {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+									+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
@@ -1254,7 +1253,7 @@ public class UserExecution {
 							}
 							else {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+									+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_BAN_ORDER)).build()).queue();
 										e.getGuild().ban(e.getGuild().getMemberById(user_id), 0).reason(_message).queue();
 									}, err -> {
@@ -1363,7 +1362,7 @@ public class UserExecution {
 							Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getUser().getId(), reason));
 							member.getUser().openPrivateChannel().queue(channel -> {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
-									+ (GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
+									+ (botConfig.getKickSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(m -> {
 										e.getGuild().kick(member).reason(reason).queue();
 									}, err -> {
 										e.getGuild().kick(member).reason(reason).queue();
@@ -1402,7 +1401,7 @@ public class UserExecution {
 						Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+user_id, new Cache(e.getMember().getId(), _message));
 						member.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM)
-								+ (GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
+								+ (botConfig.getKickSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+_message : "")).queue(m -> {
 									e.getGuild().kick(member).reason(_message).queue();
 								}, err -> {
 									e.getGuild().kick(member).reason(_message).queue();
@@ -1896,11 +1895,11 @@ public class UserExecution {
 	}
 	
 	private static void checkIfDeleteMessagesAfterAction(GuildMessageReceivedEvent e, Cache cache, long user_id, String _message, EmbedBuilder message, String key, BotConfigs botConfig) {
-		if(!GuildIni.getMuteMessageDeleteEnabled(e.getGuild()))
+		if(!botConfig.isMuteMessageDeleteEnabled())
 			Hashes.clearTempCache(key);
 		else {
-			var removeMessages = GuildIni.getMuteAutoDeleteMessages(e.getGuild());
-			if(GuildIni.getMuteForceMessageDeletion(e.getGuild())) {
+			var removeMessages = botConfig.getMuteAutoDeleteMessages();
+			if(botConfig.getMuteForceMessageDeletion()) {
 				if(removeMessages > 0) {
 					deleteMessages(e, user_id, _message, removeMessages, message, key, true, botConfig);
 				}

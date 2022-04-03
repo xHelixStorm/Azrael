@@ -11,7 +11,6 @@ import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
@@ -61,7 +60,7 @@ public class Deny implements CommandPublic {
 											final String reportReason = (userReason.length() > 0 ? userReason : STATIC.getTranslation2(e.getGuild(), Translation.DENY_REASON));
 											Hashes.addTempCache("kick_gu"+e.getGuild().getId()+"us"+member.getUser().getId(), new Cache(3000, member.getUser().getId(), reportReason));
 											member.getUser().openPrivateChannel().queue(channel -> {
-												channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM).replace("{}", e.getGuild().getName())+(GuildIni.getKickSendReason(e.getGuild()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reportReason : "")).queue(m -> {
+												channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_KICK_DM).replace("{}", e.getGuild().getName())+(botConfig.getKickSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reportReason : "")).queue(m -> {
 													kickUser(e, member, textChannel, reportReason);
 												}, err -> {
 													kickUser(e, member, textChannel, reportReason);

@@ -25,8 +25,6 @@ import de.azrael.core.CommandHandler;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.rankingSystem.DoubleExperienceStart;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -39,6 +37,7 @@ import de.azrael.threads.Webserver;
 import de.azrael.timerTask.ClearHashes;
 import de.azrael.timerTask.ParseSubscription;
 import de.azrael.timerTask.VerifyMutedMembers;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -65,32 +64,27 @@ public class ReadyListener extends ListenerAdapter {
 		
 		final String tempDirectory = System.getProperty("TEMP_DIRECTORY");
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
-		FileSetting.createTemp(e);
+		FileHandler.createTemp(e);
 		File session = new File(tempDirectory+System.getProperty("SESSION_NAME")+"running.azr");
-		if(session.exists() && FileSetting.readFile(session.getAbsolutePath()).contains("1")) {
-			FileSetting.createFile(session.getAbsolutePath(), "2");
+		if(session.exists() && FileHandler.readFile(session.getAbsolutePath()).contains("1")) {
+			FileHandler.createFile(session.getAbsolutePath(), "2");
 			e.getJDA().shutdownNow();
 			return;
 		}
-		FileSetting.createFile(session.getAbsolutePath(), "1");
+		FileHandler.createFile(session.getAbsolutePath(), "1");
 		
 		//print default message + version
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		System.out.println();
 		
-		//initialize variables of ini files and login into twitter, if the keys have been provided
-		GuildIni.initialize();
+		//initialize Twitter login, if keys are available
 		STATIC.loginTwitter();
 
 		//Iterate through all joined guilds
 		for(Guild guild : e.getJDA().getGuilds()) {
-			//create a guild ini file for new servers or verify if there are any old or missing variables that need to be added or removed
-			FileSetting.createGuildDirectory(guild);
-			if(!new File("ini/"+e.getJDA().getSelfUser().getName()+"_"+guild.getId()+".ini").exists())
-				GuildIni.createIni(guild);
-			else
-				GuildIni.verifyIni(guild);
+			//Create required directory and files
+			FileHandler.createGuildDirectory(guild);
 			
 			//verify that the guild is registered in the database, if not insert the current guild into the database
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
@@ -224,7 +218,7 @@ public class ReadyListener extends ListenerAdapter {
 				if(new File(tempDirectory+"message_pool"+guild.getId()+".azr").exists()) {
 					JSONObject json = null;
 					try {
-						json = new JSONObject(STATIC.decrypt(FileSetting.readFile(tempDirectory+"message_pool"+guild.getId()+".azr")));
+						json = new JSONObject(STATIC.decrypt(FileHandler.readFile(tempDirectory+"message_pool"+guild.getId()+".azr")));
 					} catch(JSONException e1) {
 						logger.error("Error in retrieving message pool of past session in guild {}", guild.getId(), e1);
 					}
@@ -269,7 +263,7 @@ public class ReadyListener extends ListenerAdapter {
 							}
 						});
 						Hashes.setWholeMessagePool(guild.getIdLong(), message_pool);
-						FileSetting.deleteFile(tempDirectory+"message_pool"+guild.getId()+".json");
+						FileHandler.deleteFile(tempDirectory+"message_pool"+guild.getId()+".json");
 					}
 				}
 			}

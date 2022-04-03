@@ -11,11 +11,11 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Guilds;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -108,7 +108,7 @@ public class RoleExtend implements Runnable {
 													channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
 												}
 											}
-											final String verificationMessage = FileSetting.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
+											final String verificationMessage = FileHandler.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
 											channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
 										}
 									);

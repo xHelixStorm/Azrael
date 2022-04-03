@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
@@ -68,7 +69,7 @@ public class RegisterChannel {
 				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails, BotConfigs botConfig) {
 		String channel;
 		long channel_id;
 		String channel_type;
@@ -101,7 +102,7 @@ public class RegisterChannel {
 						if(channel_type.equals("rea")) {
 							//use the temp cache to append reactions after the bot sends a message
 							if(Azrael.SQLUpdateReaction(guild_id, true) > 0) {
-								ReactionMessage.print(e, channel_id);
+								ReactionMessage.print(e, channel_id, botConfig);
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

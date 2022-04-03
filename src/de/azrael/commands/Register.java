@@ -170,7 +170,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL)) {
-				return RegisterChannel.runCommand(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterChannel.runCommand(e, guild_id, args, adminPermission, thumbnails, botConfig);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL);
