@@ -17,7 +17,6 @@ import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
-import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -60,8 +59,8 @@ public class ReactionMessage {
 							sb.append(reaction+" **"+roles.get(i).getRole_Name()+"**\n");
 							if(i == 8) break;
 						}
-						String reactionMessage = FileHandler.readFile("./files/Guilds/"+e.getGuild().getId()+"/reactionmessage.txt");
-						if(reactionMessage.length() > 0) {
+						String reactionMessage = botConfig.getCustomMessageReaction();
+						if(reactionMessage != null && reactionMessage.trim().length() > 0) {
 							textChannel.sendMessage(message.setDescription(reactionMessage+"\n\n"
 								+ ""+sb.toString()).build()).queue(response -> {
 									addReactions(response, e, roles, reactionEnabled, reactions);

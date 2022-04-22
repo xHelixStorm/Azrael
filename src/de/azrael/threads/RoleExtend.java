@@ -15,7 +15,6 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
-import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -43,6 +42,7 @@ public class RoleExtend implements Runnable {
 	
 	@Override
 	public void run() {
+		BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
 		//retrieve the mute role of the current server
 		var mute_role_object = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mut")).findAny().orElse(null);
 		//do this step if a mute role is registered
@@ -74,7 +74,6 @@ public class RoleExtend implements Runnable {
 				}
 			}
 			//display the amount of users that are still muted
-			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
 			if(banHammerFound == true && botConfig.getNotifications()) {
 				logger.info("{} muted users found on startup in guild {}", i, guild.getId());
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_RECOUNT_TITLE));
@@ -108,7 +107,7 @@ public class RoleExtend implements Runnable {
 													channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
 												}
 											}
-											final String verificationMessage = FileHandler.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
+											final String verificationMessage = botConfig.getCustomMessageVerification();
 											channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
 										}
 									);

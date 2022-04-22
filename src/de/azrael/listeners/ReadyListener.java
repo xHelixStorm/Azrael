@@ -83,9 +83,6 @@ public class ReadyListener extends ListenerAdapter {
 
 		//Iterate through all joined guilds
 		for(Guild guild : e.getJDA().getGuilds()) {
-			//Create required directory and files
-			FileHandler.createGuildDirectory(guild);
-			
 			//verify that the guild is registered in the database, if not insert the current guild into the database
 			if(Azrael.SQLgetGuild(guild.getIdLong()) == 0) {
 				if(Azrael.SQLInsertGuild(guild.getIdLong(), guild.getName()) == 0) {

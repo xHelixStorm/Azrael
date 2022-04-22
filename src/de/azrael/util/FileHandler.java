@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.ReadyEvent;
 
 public class FileHandler {
@@ -142,25 +141,5 @@ public class FileHandler {
 	
 	public static void createTemp(ReadyEvent e) {
 		(new File(System.getProperty("TEMP_DIRECTORY"))).mkdirs();
-	}
-	
-	public static void createGuildDirectory(Guild guild) {
-		(new File("files/Guilds")).mkdir();
-		if(new File("files/Guilds/"+guild.getId()).mkdir()) {
-			if(!new File("files/Guilds/"+guild.getId()+"/reactionmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
-			if(!new File("files/Guilds/"+guild.getId()+"/verificationmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt", "");
-			if(!new File("files/Guilds/"+guild.getId()+"/assignmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/assignmessage.txt", "");
-		}
-		else {
-			if(!new File("files/Guilds/"+guild.getId()+"/reactionmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/reactionmessage.txt", "");
-			if(!new File("files/Guilds/"+guild.getId()+"/verificationmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt", "");
-			if(!new File("files/Guilds/"+guild.getId()+"/assignmessage.txt").exists())
-				createFile("files/Guilds/"+guild.getId()+"/assignmessage.txt", "");
-		}
 	}
 }

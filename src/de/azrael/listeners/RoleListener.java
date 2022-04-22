@@ -24,7 +24,6 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.RoleTimer;
-import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -341,8 +340,9 @@ public class RoleListener extends ListenerAdapter {
 					if(reward != null && reward.length() > 0) {
 						if(Azrael.SQLMarkGiveawayAsUsed(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), reward) > 0) {
 							e.getMember().getUser().openPrivateChannel().queue(channel -> {
+								BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(e.getGuild().getIdLong());
 								String submit = null;
-								final String content = FileHandler.readFile("files/Guilds/"+e.getGuild().getId()+"/assignmessage.txt");
+								final String content = botConfig.getCustomMessageAssign();
 								if(content != null && content.trim().length() > 0) {
 									submit = content.trim()+"\n**"+reward+"**";
 								}

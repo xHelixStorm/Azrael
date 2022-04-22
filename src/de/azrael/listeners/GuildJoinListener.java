@@ -9,7 +9,6 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.timerTask.ParseSubscription;
-import de.azrael.util.FileHandler;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -48,8 +47,6 @@ public class GuildJoinListener extends ListenerAdapter {
 		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());
 		//insert all channels into table
 		Azrael.SQLBulkInsertChannels(e.getGuild().getTextChannels());
-		
-		FileHandler.createGuildDirectory(e.getGuild());
 		
 		//run server specific timers
 		ParseSubscription.runTask(e.getJDA());

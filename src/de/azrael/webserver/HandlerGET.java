@@ -13,7 +13,6 @@ import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
-import de.azrael.util.FileHandler;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -221,9 +220,9 @@ public class HandlerGET {
 					guildObject.put("Vote_ReactionThumbsDown", botConfig.getVoteReactionThumbsDown());
 					guildObject.put("Vote_ReactionShrug", botConfig.getVoteReactionShrug());
 					
-					guildObject.put("CustomMessages_reactionmessage", FileHandler.readFile("./files/Guilds/"+guild.getId()+"/reactionmessage.txt"));
-					guildObject.put("CustomMessages_verificationmessage", FileHandler.readFile("./files/Guilds/"+guild.getId()+"/verificationmessage.txt"));
-					guildObject.put("CustomMessages_assignmessage", FileHandler.readFile("./files/Guilds/"+guild.getId()+"/assignmessage.txt"));
+					guildObject.put("CustomMessages_reactionmessage", botConfig.getCustomMessageReaction());
+					guildObject.put("CustomMessages_verificationmessage", botConfig.getCustomMessageVerification());
+					guildObject.put("CustomMessages_assignmessage", botConfig.getCustomMessageAssign());
 					
 					final Boolean[] commands = (Boolean[])BotConfiguration.SQLgetCommand(guild.getIdLong(), 5, Command.values()).toArray();
 					guildObject.put("Commands_Display", commands[0]);

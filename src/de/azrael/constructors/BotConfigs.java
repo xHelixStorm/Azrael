@@ -63,6 +63,9 @@ public class BotConfigs {
 	private String voteReactionThumbsUp = null;
 	private String voteReactionThumbsDown = null;
 	private String voteReactionShrug = null;
+	private String customMessageReaction = null;
+	private String customMessageAssign = null;
+	private String customMessageVerification = null;
 	
 	/**
 	 * Default constructor for default values
@@ -84,7 +87,7 @@ public class BotConfigs {
 	 * @param _doubleExperienceEnd
 	 * @param _forceReason
 	 * @param _overrideBan
-	 * @param _urlBlacklist
+	 * @param _prohibitUrlsMode
 	 * @param _selfDeletedMessages
 	 * @param _editedMessages
 	 * @param _editedMessagesHistory
@@ -129,6 +132,9 @@ public class BotConfigs {
 	 * @param _voteReactionThumbsUp
 	 * @param _voteReactionThumbsDown
 	 * @param _voteReactionShrug
+	 * @param _customMessageReaction
+	 * @param _customMessageAssign
+	 * @param _customMessageVerification
 	 */
 	public BotConfigs(String _commandPrefix, boolean _joinMessage, boolean _leaveMessage, boolean _channelLog
 			, boolean _cacheLog, String _doubleExperience, int _doubleExperienceStart, int _doubleExperienceEnd
@@ -145,7 +151,7 @@ public class BotConfigs {
 			, boolean _reactionsEnabled, String _reactionsEmoji1, String _reactionsEmoji2, String _reactionsEmoji3
 			, String _reactionsEmoji4, String _reactionsEmoji5, String _reactionsEmoji6, String _reactionsEmoji7
 			, String _reactionsEmoji8, String _reactionsEmoji9, String _voteReactionThumbsUp, String _voteReactionThumbsDown
-			, String _voteReactionShrug) {
+			, String _voteReactionShrug, String _customMessageReaction, String _customMessageAssign, String _customMessageVerification) {
 		
 		this.commandPrefix = _commandPrefix;
 		this.joinMessage = _joinMessage;
@@ -199,6 +205,12 @@ public class BotConfigs {
 		this.reactionsEmoji7 = _reactionsEmoji7;
 		this.reactionsEmoji8 = _reactionsEmoji8;
 		this.reactionsEmoji9 = _reactionsEmoji9;
+		this.voteReactionThumbsUp = _voteReactionThumbsUp;
+		this.voteReactionThumbsDown = _voteReactionThumbsDown;
+		this.voteReactionShrug = _voteReactionShrug;
+		this.customMessageReaction = _customMessageReaction;
+		this.customMessageAssign = _customMessageAssign;
+		this.customMessageVerification = _customMessageVerification;
 	}
 	
 	public boolean isDefault() {
@@ -393,4 +405,14 @@ public class BotConfigs {
 		reactions.add(voteReactionShrug);
 		return (String[])reactions.toArray();
 	}
+	public String getCustomMessageReaction() {
+		return customMessageReaction;
+	}
+	public String getCustomMessageAssign() {
+		return customMessageAssign;
+	}
+	public String getCustomMessageVerification() {
+		return customMessageVerification;
+	}
+	
 }

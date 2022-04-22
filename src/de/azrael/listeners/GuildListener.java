@@ -34,7 +34,6 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.DelayedGoogleUpdate;
-import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -297,7 +296,7 @@ public class GuildListener extends ListenerAdapter {
 				
 				//verify if additional verification actions are required
 				if(!excludeChannelCreation) {
-					putUserIntoWaitingRoom(e.getGuild(), e.getMember());
+					putUserIntoWaitingRoom(e.getGuild(), e.getMember(), botConfig);
 				}
 				
 				String nickname = null;
@@ -418,7 +417,7 @@ public class GuildListener extends ListenerAdapter {
 		}).start();
 	}
 	
-	public static void putUserIntoWaitingRoom(Guild guild, Member member) {
+	public static void putUserIntoWaitingRoom(Guild guild, Member member, BotConfigs botConfig) {
 		final var categories = Azrael.SQLgetCategories(guild.getIdLong());
 		if(categories != null && categories.size() > 0) {
 			final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
@@ -439,7 +438,7 @@ public class GuildListener extends ListenerAdapter {
 										channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
 									}
 								}
-								final String verificationMessage = FileHandler.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
+								final String verificationMessage = botConfig.getCustomMessageVerification();
 								channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
 							}
 						);

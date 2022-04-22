@@ -183,7 +183,10 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 							rs.getString("reactions_emoji9"),
 							rs.getString("vote_reaction_thumbs_up"),
 							rs.getString("vote_reaction_thumbs_down"),
-							rs.getString("vote_reaction_shrug")
+							rs.getString("vote_reaction_shrug"),
+							rs.getString("custom_message_reaction"),
+							rs.getString("custom_message_assign"),
+							rs.getString("custom_message_verification")
 					);
 				}
 				if(config == null)
