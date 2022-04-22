@@ -13,6 +13,7 @@ import de.azrael.commands.ShutDown;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.google.GoogleSheets;
@@ -309,7 +310,7 @@ public class HandlerPOST {
 	}
 	
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
-		FileHandler.createFile(System.getProperty("TEMP_DIRECTORY")+System.getProperty("SESSION_NAME")+"running.azr", "0");
+		FileHandler.createFile(Directory.TEMP, System.getProperty("SESSION_NAME")+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false, false);
 		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
 			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
@@ -637,8 +638,8 @@ public class HandlerPOST {
 							}*/
 						}
 						else {
-							FileHandler.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
-							WebserviceUtils.return200(out, "Option updated!", true, false);
+							/*FileHandler.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
+							WebserviceUtils.return200(out, "Option updated!", true, false);*/
 							AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 						}
 					}

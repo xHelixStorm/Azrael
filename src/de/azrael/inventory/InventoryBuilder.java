@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.InventoryContent;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,10 +31,10 @@ public class InventoryBuilder {
 	
 	public static void DrawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		String lastItem = "";
-		if(new File("./files/RankingSystem/Inventory/inventory_blank.png").exists()) {
+		if(new File(Directory.INVENTORY+"inventory_blank.png").exists()) {
 			try {
-				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_blank.png"));
-				BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
+				BufferedImage blank_inventory = ImageIO.read(new File(Directory.INVENTORY+"inventory_blank.png"));
+				BufferedImage inventory_tab = ImageIO.read(new File(Directory.INVENTORY+"inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 				
 				final int startX = guild_settings.getInventoryStartX();
 				final int startY = guild_settings.getInventoryStartY();
@@ -72,13 +73,13 @@ public class InventoryBuilder {
 					i++;
 					BufferedImage item;
 					if(inventory.getType() != null && inventory.getType().equals("ite"))
-						item = ImageIO.read(new File("./files/RankingSystem/Items/"+inventory.getDescription()+"."+inventory.getFileType()));
+						item = ImageIO.read(new File(Directory.ITEMS.getPath()+inventory.getDescription()+"."+inventory.getFileType()));
 					else if(inventory.getType() != null)
-						item = ImageIO.read(new File("./files/RankingSystem/Skins/"+inventory.getDescription()+"."+inventory.getFileType()));
+						item = ImageIO.read(new File(Directory.SKINS.getPath()+inventory.getDescription()+"."+inventory.getFileType()));
 					else if(inventory.getSkillDescription() == null)
-						item = ImageIO.read(new File("./files/RankingSystem/Weapons/"+inventory.getWeaponDescription()+".png"));
+						item = ImageIO.read(new File(Directory.WEAPONS.getPath()+inventory.getWeaponDescription()+".png"));
 					else
-						item = ImageIO.read(new File("./files/RankingSystem/Skills/"+inventory.getSkillDescription()+".png"));
+						item = ImageIO.read(new File(Directory.SKILLS.getPath()+inventory.getSkillDescription()+".png"));
 					g.drawImage(item, currentX+(boxSizeX/2)-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
 					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+" "+inventory.getStat() : inventory.getSkillDescription())), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+ " "+inventory.getStat() : inventory.getSkillDescription()), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){

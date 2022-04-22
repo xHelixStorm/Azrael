@@ -68,6 +68,7 @@ import de.azrael.commands.User;
 import de.azrael.commands.Warn;
 import de.azrael.commands.Web;
 import de.azrael.commands.Write;
+import de.azrael.enums.Directory;
 import de.azrael.listeners.AvatarUpdateListener;
 import de.azrael.listeners.BanListener;
 import de.azrael.listeners.CategoryListener;
@@ -117,10 +118,11 @@ public class Main {
 			}
 		});
 		
-		Logger logger = LoggerFactory.getLogger(Main.class);
-		boolean [] dir = new boolean[2];
-		dir[0] = (new File("./log")).mkdirs();
-		dir[1] = (new File("./message_log")).mkdirs();
+		//Create required directories
+		new File(Directory.LOG.getPath()).mkdirs();
+		new File(Directory.MESSAGE_LOG.getPath()).mkdirs();
+		new File(Directory.USER_LOG.getPath()).mkdirs();
+		new File(Directory.CACHE.getPath()).mkdirs();
 		
 		//Verify the passed parameters
 		if(args.length == 0) {
@@ -160,8 +162,12 @@ public class Main {
 						message.append(split+" ");
 					System.setProperty("STATUS_MESSAGE", message.toString());
 				}
-				if(currentArgument.startsWith("temp:"))
-					System.setProperty("TEMP_DIRECTORY", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("temp:")) {
+					var temp = argument.split(":")[1].trim();
+					if(!temp.endsWith("/"))
+						temp += "/";
+					System.setProperty("TEMP_DIRECTORY", temp);
+				}
 				if(currentArgument.startsWith("homepage:"))
 					System.setProperty("HOMEPAGE", argument.split(":")[1].trim());
 				if(currentArgument.startsWith("port:"))
@@ -268,7 +274,7 @@ public class Main {
 			if(System.getProperty("WEBSERVER_PORT") == null || !System.getProperty("WEBSERVER_PORT").matches("[0-9]{1,}"))
 				System.setProperty("WEBSERVER_PORT", prop.getProperty("WEBSERVER_PORT", "0"));
 			if(System.getProperty("TEMP_DIRECTORY") == null)
-				System.setProperty("TEMP_DIRECTORY", "./tmp");
+				System.setProperty("TEMP_DIRECTORY", "./temp");
 			if(System.getProperty("SPREADSHEET_UPDATE_DELAY") == null || (!System.getProperty("SPREADSHEET_UPDATE_DELAY").matches("[0-9]*") && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) > 60  && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) < 0))
 				System.setProperty("SPREADSHEET_UPDATE_DELAY", "0");
 			

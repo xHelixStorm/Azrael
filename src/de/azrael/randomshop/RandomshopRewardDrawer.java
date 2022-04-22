@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Weapons;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -26,8 +27,8 @@ public class RandomshopRewardDrawer {
 	
 	public static void drawReward(GuildMessageReceivedEvent e, Weapons weapon, long currency, Guilds guild_settings, long time) {
 		try {
-			BufferedImage rewardOverlay = ImageIO.read(new File("./files/RankingSystem/Randomshop/"+weapon.getOverlayName()+".png"));
-			BufferedImage drawWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
+			BufferedImage rewardOverlay = ImageIO.read(new File(Directory.RANDOMSHOP.getPath()+weapon.getOverlayName()+".png"));
+			BufferedImage drawWeapon = ImageIO.read(new File(Directory.WEAPONS.getPath()+weapon.getDescription()+".png"));
 			
 			final int overlayW = rewardOverlay.getWidth();
 			final int overlayH = rewardOverlay.getHeight();

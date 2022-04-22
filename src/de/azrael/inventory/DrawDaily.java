@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,8 +28,8 @@ public class DrawDaily {
 	
 	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
-			BufferedImage daily = ImageIO.read(new File("./files/RankingSystem/Dailies/daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File("./files/RankingSystem/Dailies/"+obtained+".png"));
+			BufferedImage daily = ImageIO.read(new File(Directory.DAILIES+"daily_blank.png"));
+			BufferedImage reward = ImageIO.read(new File(Directory.DAILIES+obtained+".png"));
 			
 			final int rewardX = guild_settings.getDailyRewardX();
 			final int rewardY = guild_settings.getDailyRewardY();

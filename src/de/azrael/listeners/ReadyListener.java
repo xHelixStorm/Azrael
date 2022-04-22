@@ -24,6 +24,7 @@ import de.azrael.constructors.Patchnote;
 import de.azrael.core.CommandHandler;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.rankingSystem.DoubleExperienceStart;
 import de.azrael.sql.Azrael;
@@ -62,16 +63,15 @@ public class ReadyListener extends ListenerAdapter {
 		//Save the time when the Bot successfully booted up
 		STATIC.initializeBootTime();
 		
-		final String tempDirectory = System.getProperty("TEMP_DIRECTORY");
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileHandler.createTemp(e);
-		File session = new File(tempDirectory+System.getProperty("SESSION_NAME")+"running.azr");
-		if(session.exists() && FileHandler.readFile(session.getAbsolutePath()).contains("1")) {
-			FileHandler.createFile(session.getAbsolutePath(), "2");
+		final String fileName = System.getProperty("SESSION_NAME")+"running.azr";
+		if(new File(Directory.TEMP.getPath()+fileName).exists() && FileHandler.readFile(Directory.TEMP, fileName).contains("1")) {
+			FileHandler.createFile(Directory.TEMP, fileName, "2");
 			e.getJDA().shutdownNow();
 			return;
 		}
-		FileHandler.createFile(session.getAbsolutePath(), "1");
+		FileHandler.createFile(Directory.TEMP, fileName, "1");
 		
 		//print default message + version
 		System.out.println();
@@ -212,10 +212,11 @@ public class ReadyListener extends ListenerAdapter {
 			//initialize Message pool cache and load saved messages, if available
 			Hashes.initializeGuildMessagePool(guild.getIdLong(), 10000);
 			if(botConfig.getCacheLog()) {
-				if(new File(tempDirectory+"message_pool"+guild.getId()+".azr").exists()) {
+				final String messagePoolFile = "message_pool"+guild.getId()+".azr";
+				if(new File(Directory.CACHE.getPath()+messagePoolFile).exists()) {
 					JSONObject json = null;
 					try {
-						json = new JSONObject(STATIC.decrypt(FileHandler.readFile(tempDirectory+"message_pool"+guild.getId()+".azr")));
+						json = new JSONObject(FileHandler.readFile(Directory.CACHE, "message_pool"+guild.getId()+".azr"));
 					} catch(JSONException e1) {
 						logger.error("Error in retrieving message pool of past session in guild {}", guild.getId(), e1);
 					}
@@ -260,7 +261,7 @@ public class ReadyListener extends ListenerAdapter {
 							}
 						});
 						Hashes.setWholeMessagePool(guild.getIdLong(), message_pool);
-						FileHandler.deleteFile(tempDirectory+"message_pool"+guild.getId()+".json");
+						FileHandler.deleteFile(Directory.CACHE, "message_pool"+guild.getId()+".azr");
 					}
 				}
 			}

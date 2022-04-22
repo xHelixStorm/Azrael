@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.util.FileHandler;
@@ -33,14 +34,14 @@ public class ShutdownListener extends ListenerAdapter {
 	@Override
 	public void onShutdown(ShutdownEvent e) {
 		final String sessionName = System.getProperty("SESSION_NAME");
-		final String fileName = System.getProperty("TEMP_DIRECTORY")+sessionName+"running.azr";
+		final String fileName = sessionName+"running.azr";
 		
 		//retrieve the file with the bot state (e.g. running / not running)
-		String filecontent = FileHandler.readFile(fileName);
+		String filecontent = FileHandler.readFile(Directory.TEMP, fileName);
 		
 		//execute if the bot is labeled as running
 		if(filecontent.contains("1")) {
-			FileHandler.createFile(fileName, "0");
+			FileHandler.createFile(Directory.TEMP, fileName, "0");
 			try {
 				Process proc;
 				//execute command to restart the bot
@@ -53,7 +54,7 @@ public class ShutdownListener extends ListenerAdapter {
 		
 		//check if a duplicate session has been started and terminate the current session, if it occurred
 		if(filecontent.contains("2")) {
-			FileHandler.createFile(fileName, "1");
+			FileHandler.createFile(Directory.TEMP, fileName, "1");
 			logger.warn("Duplicate running session shut down!");
 			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}

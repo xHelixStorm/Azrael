@@ -17,6 +17,7 @@ import de.azrael.constructors.InventoryContent;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.inventory.InventoryBuilder;
@@ -54,7 +55,7 @@ public class Inventory implements CommandPublic {
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				//print the inventory in text format, if the inventory image is not available
-				if(!new File("./files/RankingSystem/Inventory/inventory_blank.png").exists()) {
+				if(!new File(Directory.INVENTORY+"inventory_blank.png").exists()) {
 					StringBuilder out = new StringBuilder();
 					for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
 						out.append((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n");

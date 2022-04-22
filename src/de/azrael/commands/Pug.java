@@ -12,6 +12,7 @@ import de.azrael.commandsContainer.PugExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
@@ -37,7 +38,7 @@ public class Pug implements CommandPublic {
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		long guild_id = e.getGuild().getIdLong();
-		String path = "./files/Pug/";
+		String path = Directory.PUG.getPath();
 		
 		//retrieve all bot channels
 		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());

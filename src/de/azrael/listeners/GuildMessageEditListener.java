@@ -21,6 +21,7 @@ import de.azrael.constructors.Channels;
 import de.azrael.constructors.Messages;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
@@ -137,7 +138,7 @@ public class GuildMessageEditListener extends ListenerAdapter {
 					collectedMessage.setIsUserBot(e.getMessage().getMember().getUser().isBot());
 					
 					if(botConfig.getChannelLog())
-						FileHandler.appendFile("./message_log/"+e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+						FileHandler.appendFile(Directory.MESSAGE_LOG, e.getChannel().getId()+".txt", "EDIT ["+collectedMessage.getTime().toString()+" - "+e.getMessage().getMember().getUser().getName()+"#"+e.getMessage().getMember().getUser().getDiscriminator()+" ("+e.getMessage().getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(botConfig.getCacheLog()) {
 						if(messages != null) {
 							messages.add(collectedMessage);

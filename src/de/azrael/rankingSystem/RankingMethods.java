@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Ranking;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.gif.GifDecoder;
 import de.azrael.gif.GifOptimizer;
@@ -62,7 +63,7 @@ public class RankingMethods extends ListenerAdapter {
 		
 		try {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
-			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = (user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel());
@@ -95,7 +96,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage rankUp = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				BufferedImage rankUp = ImageIO.read(new File((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int rankUpW = rankUp.getWidth();
 				int rankUpH = rankUp.getHeight();
 				BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -120,7 +121,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
+				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankUpW = gif.getWidth();
@@ -242,14 +243,14 @@ public class RankingMethods extends ListenerAdapter {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experience != 0 && skin.getBarColor() > 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR+"exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -266,7 +267,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage rank = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				BufferedImage rank = ImageIO.read(new File((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int rankW = rank.getWidth();
 				int rankH = rank.getHeight();
 				BufferedImage overlay = new BufferedImage(rankW, rankH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -299,7 +300,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankW = gif.getWidth();
@@ -428,14 +429,14 @@ public class RankingMethods extends ListenerAdapter {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0 && skin.getBarColor() > 0) {
-				experienceBar = ImageIO.read(new File("./files/RankingSystem/ExperienceBar/exp"+skin.getBarColor()+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR+"exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, (experienceBar.getWidth()*_experiencePercentage)/100, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? "./files/RankingSystem/Rank/level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -453,7 +454,7 @@ public class RankingMethods extends ListenerAdapter {
 				name = name.substring(0, skin.getNameLengthLimit());
 			
 			if(!skin.getFileType().equals("gif")) {
-				BufferedImage profile = ImageIO.read(new File((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				BufferedImage profile = ImageIO.read(new File((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				int profileW = profile.getWidth();
 				int profileH = profile.getHeight();
 				BufferedImage overlay = new BufferedImage(profileW, profileH, BufferedImage.TYPE_4BYTE_ABGR);
@@ -533,7 +534,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.dispose();
 			}
 			else {
-				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? "./files/RankingSystem/Skins/"+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
+				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
 				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int profileW = gif.getWidth();

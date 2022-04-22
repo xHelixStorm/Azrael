@@ -42,6 +42,7 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.filter.LanguageFilter;
@@ -870,7 +871,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					collectedMessage.setIsUserBot(e.getMember().getUser().isBot());
 					
 					if(botConfig.getChannelLog()) 	
-						FileHandler.appendFile("./message_log/"+e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
+						FileHandler.appendFile(Directory.MESSAGE_LOG, e.getChannel().getId()+".txt", "MESSAGE ["+collectedMessage.getTime().toString()+" - "+e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()+" ("+e.getMember().getUser().getId()+")]: "+collectedMessage.getMessage());
 					if(botConfig.getCacheLog()) {
 						ArrayList<Messages> cacheMessage = new ArrayList<Messages>();
 						cacheMessage.add(collectedMessage);

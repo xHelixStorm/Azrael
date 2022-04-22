@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Weapons;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -30,7 +31,7 @@ public class RandomshopItemDrawer {
 	public static void drawItems(Member member, TextChannel channel, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
 		String traceWeapon = null;
 		try {
-			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/Randomshop/randomshop_blank.png"));
+			BufferedImage randomshop = ImageIO.read(new File(Directory.RANDOMSHOP.getPath()+"randomshop_blank.png"));
 			
 			final var startX = guild_settings.getRandomshopStartX();
 			final var startY = guild_settings.getRandomshopStartY();
@@ -57,7 +58,7 @@ public class RandomshopItemDrawer {
 			for(var weapon : weapons) {
 				traceWeapon = weapon.getDescription();
 				counter++;
-				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
+				BufferedImage currentWeapon = ImageIO.read(new File(Directory.WEAPONS.getPath()+weapon.getDescription()+".png"));
 				g.drawImage(currentWeapon, currentX+(sizeX/2)-(itemSizeX/2), currentY+(sizeY/2)-(itemSizeY/2), (itemSizeX != 0 ? itemSizeX : currentWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : currentWeapon.getHeight()), null);
 				if(counter % rowLimit != 0) {
 					currentX += moveX;

@@ -14,6 +14,7 @@ import de.azrael.core.CommandHandler;
 import de.azrael.core.CommandParser;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.util.FileHandler;
@@ -145,7 +146,7 @@ public class PrivateMessageListener extends ListenerAdapter {
 			for(Attachment attch : e.getMessage().getAttachments()) {
 				image_url.append((e.getMessage().getContentRaw().length() == 0 && image_url.length() == 0) ? "("+attch.getProxyUrl()+")" : "\n("+attch.getProxyUrl()+")");
 			}
-			FileHandler.appendFile("./message_log/privChannel.txt", "["+LocalDateTime.now().toString()+" - "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+" ("+e.getAuthor().getId()+")]: "+e.getMessage().getContentRaw()+image_url.toString()+"\n");
+			FileHandler.appendFile(Directory.MESSAGE_LOG, "privChannel.txt", "["+LocalDateTime.now().toString()+" - "+e.getAuthor().getName()+"#"+e.getAuthor().getDiscriminator()+" ("+e.getAuthor().getId()+")]: "+e.getMessage().getContentRaw()+image_url.toString()+"\n");
 		});
 	}
 }

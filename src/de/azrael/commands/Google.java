@@ -10,6 +10,7 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
@@ -37,7 +38,7 @@ public class Google implements CommandPublic {
 		//print help message and all currently available APIs
 		if(args.length == 0) {
 			String email;
-			JSONObject credentialContent = new JSONObject(FileHandler.readFile("./files/Google/credentials.json"));
+			JSONObject credentialContent = new JSONObject(FileHandler.readFile(Directory.GOOGLE, "credentials.json"));
 			if(credentialContent.length() > 0)
 				email = credentialContent.getString("client_email");
 			else 

@@ -8,135 +8,72 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.enums.Directory;
 import net.dv8tion.jda.api.events.ReadyEvent;
 
 public class FileHandler {
 	private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
 	private static PrintWriter pw;
 	
-	public static void createFile(String name, String content) {
+	public static void createFile(Directory directory, String name, String content) {
+		final String fileName = directory.getPath()+name;
 		try {
-			pw = new PrintWriter(name, "UTF-8");
-			pw.print(content);
+			pw = new PrintWriter(fileName, "UTF-8");
+			pw.print(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
 			pw.close();
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
-			logger.error("Exception on file creation: {}", name, e);
+			logger.error("File couldn't be created: {}", fileName, e);
 		}
 	}
 	
-	public static void appendFile(String name, String content){
-		try
-		{
-		    FileWriter fw = new FileWriter(name, true);
-		    fw.write(content);
+	public static void appendFile(Directory directory, String name, String content) {
+		final String fileName = directory.getPath()+name;
+		try {
+		    FileWriter fw = new FileWriter(fileName, true);
+		    fw.write(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
 		    fw.close();
-		}
-		catch(IOException ioe)
-		{
-		    System.err.println("IOException: " + ioe.getMessage());
+		} catch(IOException ioe) {
+		    logger.error("File couldn't be appended: {}", fileName, ioe);
 		}
 	}
 
-	public static String readFile(String name) {
+	public static String readFile(Directory directory, String name) {
+		final String fileName = directory.getPath()+name;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(name));
+			BufferedReader br = new BufferedReader(new FileReader(fileName));
 			try {
 				StringBuilder sb = new StringBuilder();
 				String line = br.readLine();
 				
-				while(line != null){
+				while(line != null) {
 					sb.append(line+"\n");
 					line = br.readLine();
 				}
-				String content = sb.toString();
-				return content;
+				return directory.isEncryptionEnabled() ? STATIC.decrypt(sb.toString()) : sb.toString();
 			} catch (IOException e) {
-				logger.error("Error on read line of readFile: {}", name, e);
+				logger.error("Error on reading file: {}", fileName, e);
 			}finally {
 				try {
 					br.close();
 				} catch (IOException e) {
-					logger.error("File {} couldn't be closed after reading", name, e);
+					logger.error("Error on closing file after reading: {}", fileName, e);
 				}
 			}
 		} catch (FileNotFoundException e) {
-			logger.error("File {} to read couldn't be found", name, e);
+			logger.error("File not found: {}", fileName, e);
 			return "";
 		}
 		return null;
 	}
 	
-	public static ArrayList<String> readFileIntoArray(String _name) {
-		ArrayList<String> content = new ArrayList<String>();
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(_name));
-			try {
-				StringBuilder sb = new StringBuilder();
-				String line = br.readLine();
-				
-				while(line != null){
-					content.add(line);
-					sb.append(System.lineSeparator());
-					line = br.readLine();
-				}
-				return content;
-			} catch (IOException e) {
-				logger.error("Error on read line of readFileIntoArray: {}", _name, e);
-			}finally {
-				try {
-					br.close();
-				} catch (IOException e) {
-					logger.error("File {} couldn't be closed after reading into an array", _name, e);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			logger.error("File {} to read couldn't be found", _name, e);
-		}
-		return null;
-	}
-	
-	public static String [] readFileIntoFixedArray(String _name) {
-		ArrayList<String> content = new ArrayList<String>();
-		try {
-			BufferedReader br = new BufferedReader(new FileReader(_name));
-			try {
-				StringBuilder sb = new StringBuilder();
-				String line = br.readLine();
-				
-				while(line != null){
-					content.add(line);
-					sb.append(System.lineSeparator());
-					line = br.readLine();
-				}
-				
-				String [] contentReturn = new String[content.size()];
-				for(int index = 0; index < content.size(); index++) {
-					contentReturn[index] = content.get(index);
-				}
-				return contentReturn;
-			} catch (IOException e) {
-				logger.error("Error on read line of readFileIntoFixedArray: {}", _name, e);
-			}finally {
-				try {
-					br.close();
-				} catch (IOException e) {
-					logger.error("File {} couldn't be closed after reading into a fixed array", _name, e);
-				}
-			}
-		} catch (FileNotFoundException e) {
-			logger.error("File {} to read couldn't be found", _name, e);
-		}
-		return null;
-	}
-	
-	public static void deleteFile(String name) {
-		File file = new File(name);
-		file.delete();
+	public static void deleteFile(Directory directory, String name) {
+		File file = new File(directory.getPath()+name);
+		if(file.exists())
+			file.delete();
 	}
 	
 	public static void createTemp(ReadyEvent e) {

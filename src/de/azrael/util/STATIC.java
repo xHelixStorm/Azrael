@@ -46,6 +46,7 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
@@ -82,12 +83,12 @@ public class STATIC {
 	
 	private static final String VERSION = "8.01.591";
 	
-	private static final JSONObject eng_lang = new JSONObject(FileHandler.readFile("./files/Languages/eng_lang.json"));
-	private static final JSONObject ger_lang = new JSONObject(FileHandler.readFile("./files/Languages/ger_lang.json"));
-	private static final JSONObject spa_lang = new JSONObject(FileHandler.readFile("./files/Languages/spa_lang.json"));
-	private static final JSONObject rus_lang = new JSONObject(FileHandler.readFile("./files/Languages/rus_lang.json"));
-	private static final JSONObject por_lang = new JSONObject(FileHandler.readFile("./files/Languages/por_lang.json"));
-	private static final JSONObject fre_lang = new JSONObject(FileHandler.readFile("./files/Languages/fre_lang.json"));
+	private static final JSONObject eng_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "eng_lang.json"));
+	private static final JSONObject ger_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "ger_lang.json"));
+	private static final JSONObject spa_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "spa_lang.json"));
+	private static final JSONObject rus_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "rus_lang.json"));
+	private static final JSONObject por_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "por_lang.json"));
+	private static final JSONObject fre_lang = new JSONObject(FileHandler.readFile(Directory.LANGUAGES, "fre_lang.json"));
 	
 	private static final String TWITTER_CONSUMER_KEY = "TWITTER_CONSUMER_KEY";
 	private static final String TWITTER_CONSUMER_KEY_SECRET = "TWITTER_CONSUMER_KEY_SECRET";

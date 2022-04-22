@@ -12,6 +12,7 @@ import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
@@ -69,7 +70,7 @@ public class DoubleExperience implements CommandPublic {
 					//if it has been enabled, write it in cache and print the double experience message in the bot channel
 					if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ON))) {
 						Hashes.addTempCache("doubleExp_gu"+e.getGuild().getId(), new Cache("on"));
-						File doubleEvent = new File("./files/RankingSystem/Banners/doubleweekend.jpg");
+						File doubleEvent = new File(Directory.BANNERS.getPath()+"doubleweekend.jpg");
 						var bot_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 						if(bot_channel != null) {
 							final TextChannel textChannel = e.getGuild().getTextChannelById(bot_channel.getChannel_ID());
