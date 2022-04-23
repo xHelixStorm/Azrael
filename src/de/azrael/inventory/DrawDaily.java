@@ -55,10 +55,10 @@ public class DrawDaily {
 				g.drawString(obtained, descriptionStartX+getCenteredString(obtained, fieldSizeX, g), descriptionY);
 			else if(descriptionMode == 2)
 				g.drawString(obtained, getRightString(obtained, descriptionX, g),  descriptionY);
-			ImageIO.write(overlay, "png", new File(System.getProperty("TEMP_DIRECTORY")+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png"));
 			g.dispose();
 			
-			final File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
+			final File file1 = new File(Directory.TEMP.getPath()+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
 			e.getChannel().sendFile(file1, "daily.png").queue(message -> {
 				file1.delete();
 			});

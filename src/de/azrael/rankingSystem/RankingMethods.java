@@ -117,13 +117,13 @@ public class RankingMethods extends ListenerAdapter {
 					g.setFont(new Font(font, Font.BOLD, skin.getNameFontSize()));
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
-				ImageIO.write(overlay, skin.getFileType(), new File(System.getProperty("TEMP_DIRECTORY")+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
+				ImageIO.write(overlay, skin.getFileType(), new File(Directory.TEMP.getPath()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
 				g.dispose();
 			}
 			else {
 				final GifImage gif = GifDecoder.read(new FileInputStream(skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType()));
 				var frames = gif.getFrameCount();
-				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
+				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(Directory.TEMP.getPath()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankUpW = gif.getWidth();
 				int rankUpH = gif.getHeight();
 				for(var i = 0; i < frames; i++) {
@@ -151,7 +151,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				writer.close();
 			}
-			final File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+			final File file1 = new File(Directory.TEMP.getPath()+"level_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
@@ -167,7 +167,7 @@ public class RankingMethods extends ListenerAdapter {
 								if(output == null) {
 									file1.delete();
 									message.delete().queue();
-									final File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									final File file2 = new File(Directory.TEMP.getPath()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
 										e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
 											file2.delete();
@@ -189,7 +189,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);
-					File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					File file2 = new File(Directory.TEMP.getPath()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 					OutputStream os = new FileOutputStream(file2);
 					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
 					ImageWriter writer = writers.next();
@@ -296,13 +296,13 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
 				
-				ImageIO.write(overlay, skin.getFileType(), new File(System.getProperty("TEMP_DIRECTORY")+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
+				ImageIO.write(overlay, skin.getFileType(), new File(Directory.TEMP.getPath()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
 				g.dispose();
 			}
 			else {
 				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
-				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
+				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(Directory.TEMP.getPath()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int rankW = gif.getWidth();
 				int rankH = gif.getHeight();
 				for(var i = 0; i < frames; i++) {
@@ -337,7 +337,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				writer.close();
 			}
-			final File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+			final File file1 = new File(Directory.TEMP.getPath()+"rank_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
@@ -353,7 +353,7 @@ public class RankingMethods extends ListenerAdapter {
 								if(output == null) {
 									file1.delete();
 									message.delete().queue();
-									final File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									final File file2 = new File(Directory.TEMP.getPath()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
 										e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
 											file2.delete();
@@ -375,7 +375,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);
-					File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					File file2 = new File(Directory.TEMP.getPath()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 					OutputStream os = new FileOutputStream(file2);
 					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
 					ImageWriter writer = writers.next();
@@ -530,13 +530,13 @@ public class RankingMethods extends ListenerAdapter {
 					g.drawString(name, skin.getNameX(), skin.getNameY());
 				}
 				
-				ImageIO.write(overlay, skin.getFileType(), new File(System.getProperty("TEMP_DIRECTORY")+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
+				ImageIO.write(overlay, skin.getFileType(), new File(Directory.TEMP.getPath()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType()));
 				g.dispose();
 			}
 			else {
 				final GifImage gif = GifDecoder.read(new FileInputStream((skin.getSource() == null ? Directory.SKINS.getPath()+skin.getSkinDescription()+"."+skin.getFileType() : skin.getSource()+"."+skin.getFileType())));
 				var frames = gif.getFrameCount();
-				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(System.getProperty("TEMP_DIRECTORY")+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
+				GifSequenceWriter writer = new GifSequenceWriter(new FileImageOutputStream(new File(Directory.TEMP.getPath()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType())), gif.getFrame(0).getType(), 20, true);
 				int profileW = gif.getWidth();
 				int profileH = gif.getHeight();
 				for(var i = 0; i < frames; i++) {
@@ -618,7 +618,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				writer.close();
 			}
-			final File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+			final File file1 = new File(Directory.TEMP.getPath()+"profile_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
@@ -634,7 +634,7 @@ public class RankingMethods extends ListenerAdapter {
 								if(output == null) {
 									file1.delete();
 									message.delete().queue();
-									final File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+									final File file2 = new File(Directory.TEMP.getPath()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
 										e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
 											file2.delete();
@@ -656,7 +656,7 @@ public class RankingMethods extends ListenerAdapter {
 				}
 				else {
 					BufferedImage image = ImageIO.read(file1);
-					File file2 = new File(System.getProperty("TEMP_DIRECTORY")+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
+					File file2 = new File(Directory.TEMP.getPath()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 					OutputStream os = new FileOutputStream(file2);
 					Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(skin.getFileType());
 					ImageWriter writer = writers.next();

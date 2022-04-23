@@ -70,10 +70,10 @@ public class RandomshopItemDrawer {
 			}
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalFontSize));
 			g.drawString(current_page+" / "+ last_page, pageX+getCenteredString(current_page+" / "+ last_page, 0, g), pageY);
-			ImageIO.write(overlay, "png", new File(System.getProperty("TEMP_DIRECTORY")+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(System.getProperty("TEMP_DIRECTORY")+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
+			File file1 = new File(Directory.TEMP.getPath()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
 			channel.sendFile(file1, "randomshop.png").queue(m -> {
 				file1.delete();
 			});

@@ -103,8 +103,8 @@ public class InventoryBuilder {
 					}
 				}
 				
-				ImageIO.write(overlay, "png", new File(System.getProperty("TEMP_DIRECTORY")+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
-				File upload = new File(System.getProperty("TEMP_DIRECTORY")+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
+				ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
+				File upload = new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
 				channel.sendFile(upload, "inventory.png").queue(m -> {
 					upload.delete();
 				});

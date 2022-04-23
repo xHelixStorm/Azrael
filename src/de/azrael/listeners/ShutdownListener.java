@@ -77,7 +77,7 @@ public class ShutdownListener extends ListenerAdapter {
 		params.append(" statusmessage:"+System.getProperty("STATUS_MESSAGE"));
 		params.append(" homepage:"+System.getProperty("HOMEPAGE"));
 		params.append(" port:"+System.getProperty("WEBSERVER_PORT"));
-		params.append(" temp:"+System.getProperty("TEMP_DIRECTORY"));
+		params.append(" temp:"+Directory.TEMP.getPath());
 		params.append(" spreadsheetdelay:"+System.getProperty("SPREADSHEET_UPDATE_DELAY"));
 		
 		return params.toString();
