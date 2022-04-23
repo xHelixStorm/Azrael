@@ -46,7 +46,7 @@ public class ShutdownListener extends ListenerAdapter {
 			try {
 				Process proc;
 				//execute command to restart the bot
-				proc = Runtime.getRuntime().exec("screen -dm -S "+sessionName+" java -jar Azrael.jar "+compileParameters());
+				proc = Runtime.getRuntime().exec("screen -dm -S "+sessionName+" java -Dtwitter4j.loggerFactory=twitter4j.NullLoggerFactory -jar Azrael.jar "+compileParameters());
 				proc.waitFor();
 			} catch (IOException | InterruptedException e1) {
 				logger.error("Bot couldn't be restarted!", e1);
