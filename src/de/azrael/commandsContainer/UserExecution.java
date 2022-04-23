@@ -1,6 +1,7 @@
 package de.azrael.commandsContainer;
 
 import java.awt.Color;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -28,6 +29,7 @@ import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
 import de.azrael.google.GoogleSheets;
@@ -35,6 +37,7 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.FileHandler;
 import de.azrael.util.Pastebin;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -1971,20 +1974,33 @@ public class UserExecution {
 						}
 						
 						if(collected_messages.length() > 0) {
-							try {
-								final var userMessage = messages.get(0).get(0);
-								String paste_link = Pastebin.unlistedPermanentPaste(userMessage.getUserName()+" ("+userMessage.getUserID()+") "+e.getGuild().getId(), hash_counter+" messages from "+userMessage.getUserName()+" ("+userMessage.getUserID()+") have been removed:\n\n"+collected_messages.toString());
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_REMOVED)+paste_link).build()).queue();
-								Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, e.getGuild().getIdLong(), paste_link);
-								logger.info("User {} has deleted {} messages of user {} in guild {}", e.getMember().getUser().getId(), hash_counter, userMessage.getUserID(), e.getGuild().getId());
-							} catch(IllegalStateException | LoginException | PasteException e2) {
-								logger.error("Error in creating a pastebin page in guild {}", e.getGuild().getId(), e2);
-								error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-							} catch(RuntimeException e2) {
-								logger.warn("New pastebin page couldn't be created in guild {}", e.getGuild().getId(), e2);
-								error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR_2)).build()).queue();
+							final var userMessage = messages.get(0).get(0);
+							//TODO: remember to translate required translations
+							final String content = STATIC.getTranslation2(e.getGuild(), Translation.USER_DELETE_REMOVED_2).replaceFirst("\\{\\}", ""+hash_counter).replaceFirst("\\{\\}", userMessage.getUserName()).replace("{}", ""+userMessage.getUserID())+collected_messages.toString();
+							long nextNumber = Azrael.SQLgetNextNumberDeletedMessages();
+							if(nextNumber > 0) {
+								String nextNumberKey = ""+nextNumber;
+								while(nextNumberKey.length() < 5)
+									nextNumberKey = "0"+nextNumberKey;
+								nextNumberKey = "#"+nextNumberKey+".azr";
+								
+								final String fileName = nextNumberKey;
+								if(FileHandler.createFile(Directory.TEMP, fileName, content) && FileHandler.createFile(Directory.USER_LOG, fileName, content)) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_REMOVED)+fileName).build()).queue();
+									e.getChannel().sendFile(new File(Directory.TEMP+fileName), fileName).queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, fileName);
+									});
+									Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, e.getGuild().getIdLong(), fileName);
+									logger.info("User {} has deleted {} messages of user {} in guild {}", e.getMember().getUser().getId(), hash_counter, userMessage.getUserID(), e.getGuild().getId());
+								}
+								else {
+									error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_ERR)).build()).queue();
+								}
+							}
+							else {
+								error.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_ERR)).build()).queue();
 							}
 						}
 						else {

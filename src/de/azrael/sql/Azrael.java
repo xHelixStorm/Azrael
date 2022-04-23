@@ -4624,4 +4624,39 @@ public class Azrael {
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
 	}
+	
+	@SuppressWarnings("resource")
+	public static synchronized long SQLgetNextNumberDeletedMessages() {
+		logger.trace("SQLgetNextNumberDeletedMessages launched. No params passed");
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			myConn.setAutoCommit(false);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNextNumberDeletedMessages);
+			stmt.executeUpdate();
+			
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNextNumberDeletedMessages2);
+			rs = stmt.executeQuery();
+			long value = 0;
+			if(rs.next()) {
+				value = rs.getInt(1);
+			}
+			
+			if(value > 0)
+				myConn.commit();
+			else
+				myConn.rollback();
+			
+			return value;
+		} catch (SQLException e) {
+			logger.error("SQLgetNextNumberDeletedMessages Exception", e);
+			return 0;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
 }

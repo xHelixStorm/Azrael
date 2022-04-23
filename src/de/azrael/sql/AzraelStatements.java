@@ -208,4 +208,6 @@ class AzraelStatements {
 	final static String SQLRegisterUniqueChannel2 = STATIC.decrypt("1g4ee7k4hGTR0EMiNsG6O7Ya73f9vjiP+NGLN01uLUo3n/6bmQrXjQFpQwigQoNkxJaGHoi4nFXRKRLVIGpHAuGFFhElJI32bgkrNqZix4lrJC8YyfK2ghSI1bWKbh0+dEue/N5VqKlyFbnpdwDfM6KBss0VSQSSzWfdKfDDzHJMGL/73UDQq8Oc7vE9Exr3TlvyyI8znO4E+jtGXy858HnEo9uRqUS82mKiEUr5a8uq+jq86Hd3RA3Pgn16w/jZ");
 	final static String SQLOverwriteQuizData = STATIC.decrypt("+T+jBrr1AphXWv+/PFhSL+nW3THTANnwibqJxLJKmGHSzfTqoNonDM7TbktW5SAX");
 	final static String SQLOverwriteQuizData2 = STATIC.decrypt("PwmOCb6gFy8nv33JYvBQhQO8FPEEAcYfD1jaAj+LFFT2qw1Cvg+aDrHJ4CjMb6/axPdwOt1wVq7mN42/CvWEoPUaClx76QzIhr0XPm7ZaW4/41pPLCFWRCtaRFqoiD8IR+0Z5gpAamq39KftYZWtt4Pl9T/yJbzhhU5zVs7ImH32GF+VaCkIDw1mSHQiqAm6");
+	final static String SQLgetNextNumberDeletedMessages = STATIC.decrypt("RuOP/C59xgMiQFkRIwMLTg5a3B9fCeQLkDCm+mTxijunI2eKsj02LuopKR3qIy5BTFY4e7IQ3g++AGJ+CtHFIPohm93kMQMJARfiVd8abFtXFDaRIg0owTmEyu5fYRsSv/jU61lh2MljRauaNlEW1+4Hn08oHjH6SHnlKGroC9tO4jnmP+tM6QZgUewNyhQe9ntOQORV9ioOBwDd0jCPfQ==");
+	final static String SQLgetNextNumberDeletedMessages2 = STATIC.decrypt("uDystKkT7QdPLFjfTrcCH37yjcKbajGydgPq2mk1hPX71WAQyee6x/VvKwllpcTk");
 }

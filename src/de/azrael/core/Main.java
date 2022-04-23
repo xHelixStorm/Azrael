@@ -123,7 +123,7 @@ public class Main {
 		new File(Directory.MESSAGE_LOG.getPath()).mkdirs();
 		new File(Directory.USER_LOG.getPath()).mkdirs();
 		new File(Directory.CACHE.getPath()).mkdirs();
-		
+				
 		//Verify the passed parameters
 		if(args.length == 0) {
 			//display all available parameters when no parameter has been passed

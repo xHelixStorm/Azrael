@@ -19,15 +19,17 @@ public class FileHandler {
 	private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
 	private static PrintWriter pw;
 	
-	public static void createFile(Directory directory, String name, String content) {
+	public static boolean createFile(Directory directory, String name, String content) {
 		final String fileName = directory.getPath()+name;
 		try {
 			pw = new PrintWriter(fileName, "UTF-8");
 			pw.print(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
 			pw.close();
+			return true;
 		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			logger.error("File couldn't be created: {}", fileName, e);
 		}
+		return false;
 	}
 	
 	public static void appendFile(Directory directory, String name, String content) {
