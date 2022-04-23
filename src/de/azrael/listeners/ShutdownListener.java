@@ -35,26 +35,26 @@ public class ShutdownListener extends ListenerAdapter {
 	public void onShutdown(ShutdownEvent e) {
 		final String sessionName = System.getProperty("SESSION_NAME");
 		final String fileName = sessionName+"running.azr";
+		final String pid = ""+ProcessHandle.current().pid();
 		
 		//retrieve the file with the bot state (e.g. running / not running)
-		String filecontent = FileHandler.readFile(Directory.TEMP, fileName);
+		String fileContent = FileHandler.readFile(Directory.TEMP, fileName);
 		
 		//execute if the bot is labeled as running
-		if(filecontent.contains("1")) {
-			FileHandler.createFile(Directory.TEMP, fileName, "0");
+		if(!fileContent.isBlank() && fileContent.contains(""+pid)) {
+			FileHandler.deleteFile(Directory.TEMP, fileName);
 			try {
 				Process proc;
 				//execute command to restart the bot
 				proc = Runtime.getRuntime().exec("screen -dm -S "+sessionName+" java -jar Azrael.jar "+compileParameters());
 				proc.waitFor();
 			} catch (IOException | InterruptedException e1) {
-				logger.error("Bot couldn't be restarted!");
+				logger.error("Bot couldn't be restarted!", e1);
 			}
 		}
 		
 		//check if a duplicate session has been started and terminate the current session, if it occurred
-		if(filecontent.contains("2")) {
-			FileHandler.createFile(Directory.TEMP, fileName, "1");
+		if(!fileContent.isBlank() && !fileContent.contains(""+pid)) {
 			logger.warn("Duplicate running session shut down!");
 			Azrael.SQLInsertActionLog("DUPLICATE_SESSION", e.getJDA().getSelfUser().getIdLong(), 0, "Shutdown");
 		}

@@ -66,12 +66,17 @@ public class ReadyListener extends ListenerAdapter {
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
 		FileHandler.createTemp(e);
 		final String fileName = System.getProperty("SESSION_NAME")+"running.azr";
-		if(new File(Directory.TEMP.getPath()+fileName).exists() && FileHandler.readFile(Directory.TEMP, fileName).contains("1")) {
-			FileHandler.createFile(Directory.TEMP, fileName, "2");
-			e.getJDA().shutdownNow();
-			return;
+		if(new File(Directory.TEMP.getPath()+fileName).exists()) {
+			final String fileContent = FileHandler.readFile(Directory.TEMP, fileName).trim();
+			if(!fileContent.isBlank() && fileContent.matches("[0-9]*")) {
+				final var processHandler = ProcessHandle.of(Long.parseLong(fileContent));
+				if(processHandler != null && processHandler.isPresent()) {
+					e.getJDA().shutdownNow();
+					return;
+				}
+			}
 		}
-		FileHandler.createFile(Directory.TEMP, fileName, "1");
+		FileHandler.createFile(Directory.TEMP, fileName, ""+ProcessHandle.current().pid());
 		
 		//print default message + version
 		System.out.println();
