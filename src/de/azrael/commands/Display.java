@@ -2,23 +2,17 @@ package de.azrael.commands;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vdurmont.emoji.EmojiManager;
-
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Cache;
 import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Dailies;
 import de.azrael.constructors.Roles;
-import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
-import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -28,9 +22,7 @@ import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -181,7 +173,7 @@ public class Display implements CommandPublic{
 				}
 				final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 				e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-					addReactions(e, m, maxPage, "1", roles);
+					STATIC.addPaginationReactions(e, m, maxPage, "1", roles);
 				});
 			}
 			else {
@@ -208,7 +200,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", roles);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", roles);
 					});
 				}
 				else {
@@ -237,7 +229,7 @@ public class Display implements CommandPublic{
 					if(out.length() > 0) {
 						final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-							addReactions(e, m, maxPage, "2", roles);
+							STATIC.addPaginationReactions(e, m, maxPage, "2", roles);
 						});
 					}
 					else {
@@ -268,7 +260,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", categories);
 					});
 				}
 				else {
@@ -303,7 +295,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", categories);
 					});
 				}
 				else {
@@ -330,7 +322,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (textChannels.size()/10)+(textChannels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", textChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", textChannels);
 					});
 				}
 				else {
@@ -357,7 +349,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (voiceChannels.size()/10)+(voiceChannels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", voiceChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", voiceChannels);
 					});
 				}
 				else {
@@ -397,7 +389,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (channels.size()/10)+(channels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", channels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", channels);
 					});
 				}
 				else {
@@ -424,7 +416,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (dailies.size()/10)+(dailies.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", dailies);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", dailies);
 					});
 				}
 				else {
@@ -459,7 +451,7 @@ public class Display implements CommandPublic{
 					final int maxPage = (watchedUsers.size()/10)+(watchedUsers.size()%10 > 0 ? 1 : 0);
 					final var users = watchedUsers;
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						addReactions(e, m, maxPage, "1", users);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", users);
 					});
 				}
 				else {
@@ -484,20 +476,6 @@ public class Display implements CommandPublic{
 			for(String arg : args)
 				out.append(arg+" ");
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.DISPLAY.getColumn(), out.toString().trim());
-		}
-	}
-
-	private static void addReactions(GuildMessageReceivedEvent e, Message m, int maxPage, String method, Object object) {
-		if(maxPage > 1) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
-				m.addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
-				m.addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
-				Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+m.getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1", method).setObject(object));
-			}
-			else {
-				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
-				logger.error("MESSAGE_ADD_REACTION permission required to display reactions on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
-			}
 		}
 	}
 }

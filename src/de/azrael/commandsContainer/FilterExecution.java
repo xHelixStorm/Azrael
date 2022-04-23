@@ -1,13 +1,11 @@
 package de.azrael.commandsContainer;
 
 import java.awt.Color;
-import java.net.MalformedURLException;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
-import org.jpastebin.exceptions.PasteException;
-import org.jpastebin.pastebin.exceptions.LoginException;
-import org.jpastebin.pastebin.exceptions.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,13 +13,15 @@ import de.azrael.constructors.Cache;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.util.CharacterReplacer;
-import de.azrael.util.Pastebin;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 public class FilterExecution {
@@ -229,8 +229,8 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
@@ -240,8 +240,8 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
 						StringBuilder out = new StringBuilder();
 						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
 							out.append(lang+"\n");
@@ -260,14 +260,23 @@ public class FilterExecution {
 								out.append(word.getName()+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("NAME-FILTER", out.toString());
-								message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.error("Error on creating pastebin with the name filter in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_name_filter.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_name_filter.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_name_filter.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the name filter couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -291,16 +300,17 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						//TODO: fix translation
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("add-load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), _message);
@@ -314,14 +324,23 @@ public class FilterExecution {
 								out.append(word.getName()+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("NAME-KICK", out.toString());
-								message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with the kick list in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_name_kick.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_name_kick.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_name_kick.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the name kick filter couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -345,16 +364,16 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("add-load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("NAME-KICK "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("load-name-kick").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), _message);
@@ -367,14 +386,23 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("FUNNY-NAMES", out.toString());
-								message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with funky names in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_funny_names.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_funny_names.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_funny_names.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the funny names couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -398,16 +426,16 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("add-load-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("FUNNY-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("load-funny-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), _message);
@@ -420,14 +448,23 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("STAFF-NAMES", out.toString());
-								message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with staff names in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_staff_names.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_staff_names.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_staff_names.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the staff names couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -451,16 +488,16 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("add-load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("STAFF-NAMES "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("load-staff-names").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
@@ -473,14 +510,23 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("PROHIBITED-URLS", out.toString());
-								message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with prohibited urls in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_prohibited_urls.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_prohibited_urls.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_prohibited_urls.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the prohibited urls couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -504,16 +550,17 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						//TODO: fix translation
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_FQDN)).build()).queue();
 						cache.updateDescription("add-load-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_FQDN)).build()).queue();
 						cache.updateDescription("load-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
@@ -526,14 +573,23 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("ALLOWED-URLS", out.toString());
-								message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with whitelisted urls in guild {}", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_allowed_urls.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_allowed_urls.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_allowed_urls.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the allowed urls couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -557,16 +613,16 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_FQDN)).build()).queue();
 						cache.updateDescription("add-load-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_FQDN)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("ALLOWED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_FQDN)).build()).queue();
 						cache.updateDescription("load-allowed-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
@@ -579,14 +635,23 @@ public class FilterExecution {
 							out.append(word+"\n");
 						}
 						if(out.length() > 0) {
-							try {
-								String paste_link = Pastebin.unlistedPaste("PROHIBITED-SUBS", out.toString());
-								message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-							} catch (IllegalStateException | LoginException | PasteException e2) {
-								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-								logger.warn("Error on creating pastebin with prohibited subscriptions in guild {}!", e.getGuild().getId(), e2);
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+								if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_prohibited_subs.txt", out.toString())) {
+									e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_prohibited_subs.txt"), STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS).toUpperCase()+".txt").queue(m -> {
+										FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_prohibited_subs.txt");
+									});
+								}
+								else {
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Retrieved list from the prohibited subscriptions couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+									
+								}
+							}
+							else {
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+								logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 							}
 						}
 						else {
@@ -610,16 +675,17 @@ public class FilterExecution {
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))) {
-						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
+						//TODO: fix translation
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_USERNAME)).build()).queue();
 						cache.updateDescription("add-load-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 					}
-					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))) {
-						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE_USERNAME)).build()).queue();
+					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
+						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_USERNAME)).build()).queue();
 						cache.updateDescription("load-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
@@ -663,30 +729,30 @@ public class FilterExecution {
 					var addLangLoad = _message.toLowerCase();
 					final var selectedLang = langCheck(e, message, addLangLoad, key, cache);
 					if(selectedLang != null) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_PASTEBIN)+" "+addLangLoad.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE)+" "+addLangLoad.toUpperCase());
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("lang-add-load-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
 				}
 				case "lang-add-load-word-filter" -> {
-					loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, false, cache);
+					loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, false);
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 				}
 				case "load-word-filter" -> {
 					var langLoad = _message.toLowerCase();
 					final var selectedLang = langCheck(e, message, langLoad, key, cache);
 					if(selectedLang != null) {
-						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_PASTEBIN)+" "+langLoad.toUpperCase());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTE)).build()).queue();
+						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE)+" "+langLoad.toUpperCase());
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("lang-load-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
 				}
 				case "lang-load-word-filter" -> {
-					loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, true, cache);
+					loadLangWords(e, message, key, cache.getAdditionalInfo2(), _message, true);
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 				}
 				case "insert-name-filter" -> {
@@ -723,12 +789,16 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), _message);
 				}
 				case "load-name-filter", "add-load-name-filter" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] words = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							var QueryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
 								Hashes.removeNameFilter(e.getGuild().getIdLong());
 								logger.info("User {} has inserted words with the pastebin url {} into the name filter in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
@@ -754,19 +824,15 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the name filter couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the name filter failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), fileName);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), _message);
 				}
 				case "insert-name-kick" -> {
 					if(Azrael.SQLInsertNameFilter(_message, true, e.getGuild().getIdLong()) >= 0) {
@@ -802,12 +868,16 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), _message);
 				}
 				case "load-name-kick", "add-load-name-kick" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] words = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							var QueryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
 								Hashes.removeNameFilter(e.getGuild().getIdLong());
 								logger.info("User {} has inserted words with the pastebin url {} into the name kick list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
@@ -834,19 +904,15 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the name kick list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the name kick list failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), fileName);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), _message);
 				}
 				case "insert-funny-names" -> {
 					if(Azrael.SQLInsertFunnyNames(_message, e.getGuild().getIdLong()) >= 0) {
@@ -882,12 +948,16 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), _message);
 				}
 				case "load-funny-names", "add-load-funny-names" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] words = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							var QueryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
 								Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
 								logger.info("User {} has inserted words with the pastebin url {} into the funky names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
@@ -913,19 +983,15 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the funky names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the funky names list failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), fileName);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), _message);
 				}
 				case "insert-staff-names" -> {
 					if(Azrael.SQLInsertStaffName(_message, e.getGuild().getIdLong()) >= 0) {
@@ -962,12 +1028,16 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 				}
 				case "load-staff-names", "add-load-staff-names" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] words = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							var QueryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
 								Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
 								logger.info("User {} has inserted names with the pastebin url {} into the staff names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 							}
@@ -993,19 +1063,15 @@ public class FilterExecution {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 								logger.error("Changes on the staff names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the staff names list failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), fileName);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), _message);
 				}
 				case "insert-prohibited-urls" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
@@ -1049,9 +1115,13 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 				}
 				case "add-load-prohibited-urls", "load-prohibited-urls" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] url = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							List<String> checkedURLs = new ArrayList<String>();
 							for(var link : url) {
 								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1065,7 +1135,7 @@ public class FilterExecution {
 							if(checkedURLs.size() > 0 ) {
 								var QueryResult = Azrael.SQLReplaceURLBlacklist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
 									Hashes.removeURLBlacklist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted urls with the pastebin url {} into the prohibited urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
@@ -1094,21 +1164,18 @@ public class FilterExecution {
 							}
 							else {
 								message.setColor(Color.RED);
+								//TODO: fix translation
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the prohibited urls failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
 				}
 				case "insert-allowed-urls" -> {
 					if((_message.startsWith("http://") || _message.startsWith("https://")) && !_message.matches("[\\s]")) {
@@ -1152,9 +1219,13 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 				}
 				case "add-load-allowed-urls", "load-allowed-urls" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] url = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							List<String> checkedURLs = new ArrayList<String>();
 							for(var link : url) {
 								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1168,7 +1239,7 @@ public class FilterExecution {
 							if(checkedURLs.size() > 0) {
 								var QueryResult = Azrael.SQLReplaceURLWhitelist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_URL)).build()).queue();
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted urls with the pastebin url {} into the allowed urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
@@ -1199,22 +1270,19 @@ public class FilterExecution {
 								message.setColor(Color.RED);
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for the allowed urls failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
 				}
 				case "insert-prohibited-subs" -> {
 					if(Azrael.SQLInsertSubscriptionBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
+						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.info("User {} has saved the username {} as a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -1230,13 +1298,15 @@ public class FilterExecution {
 				case "remove-prohibited-subs" -> {
 					final var result = Azrael.SQLDeleteSubscriptionBlacklist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
+						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.info("User {} has removed the username {} and is no longer a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
 						message.setColor(Color.RED);
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_TWEET_REMOVE_ERR)).build()).queue();
+						//TODO: fix translation
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_SUB_REMOVE_ERR)).build()).queue();
 					}
 					else {
 						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -1247,9 +1317,13 @@ public class FilterExecution {
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 				}
 				case "add-load-prohibited-subs", "load-prohibited-subs" -> {
-					if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-						try {
-							String [] usernames = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+					final var attachments = e.getMessage().getAttachments();
+					if(attachments.size() == 1) {
+						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+						String fileExtension = attachments.get(0).getFileExtension();
+						if(fileExtension == null || fileExtension.contains("txt")) {
+							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+							String [] usernames = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 							List<String> checkedUsernames = new ArrayList<String>();
 							for(var username : usernames) {
 								if(username.startsWith("@")) {
@@ -1263,7 +1337,8 @@ public class FilterExecution {
 							if(checkedUsernames.size() > 0) {
 								var QueryResult = Azrael.SQLReplaceTweetBlacklist(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_PASTEBIN_NICK)).build()).queue();
+									//TODO: fix translation
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_NICK)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted usernames with the pastebin url {} to prohibit subscriptions from in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 								}
@@ -1292,21 +1367,18 @@ public class FilterExecution {
 							}
 							else {
 								message.setColor(Color.RED);
+								//TODO: fix translation
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
 							}
-						} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-							logger.error("Reading pastebin url {} for updating prohibited subscriptions failed in guild {}", _message, e.getGuild().getId(), e2);
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						Hashes.clearTempCache(key);
+						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
+						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
-					else {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-						Hashes.addTempCache(key, cache.setExpiration(180000));
-					}
-					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
 				}
 			}
 		}
@@ -1339,14 +1411,24 @@ public class FilterExecution {
 					out.append(word+"\n");
 				}
 				if(out.length() > 0) {
-					try {
-						String paste_link = Pastebin.unlistedPaste(definitiveLang, out.toString());
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST)+paste_link).build()).queue();
-						logger.info("User {} has called the {} word filter in guild {}", e.getMember().getUser().getIdLong(), actualLang, e.getGuild().getId(), e.getGuild().getId());
-					} catch (IllegalStateException | LoginException | PasteException e2) {
-						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE));
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR)).build()).queue();
-						logger.error("Pastebin creation for the {} word filter failed in guild {}", actualLang, e.getGuild().getId(), e2);
+					final String finalLang = definitiveLang;
+					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+						if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_"+definitiveLang+"_word_filter.txt", out.toString())) {
+							e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_"+definitiveLang+"_word_filter.txt"), definitiveLang.toUpperCase()+STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER).toUpperCase()+".txt").queue(m -> {
+								FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_"+finalLang+"_word_filter.txt");
+							});
+						}
+						else {
+							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Retrieved list from the word filter couldn't be saved to file and uploaded in guild {}", e.getGuild().getId());
+							
+						}
+					}
+					else {
+						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES).build()).queue();
+						logger.error("MESSAGE_ATTACH_FILES permission required to display the content in guild {}", e.getGuild().getId());
 					}
 				}
 				else {
@@ -1398,15 +1480,18 @@ public class FilterExecution {
 		Hashes.clearTempCache(key);
 	}
 	
-	private static void loadLangWords(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String _message, boolean replace, Cache cache) {
-		if(_message.matches("(https|http)[:\\\\/a-zA-Z0-9-Z.?!=#%&_+-;]*") && _message.startsWith("http")) {
-			var langAbbreviation = lang;
-			String[] words;
-			try {
-				words = Pastebin.readPasteLink(_message).split("[\\r\\n]+");
+	private static void loadLangWords(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, String _message, boolean replace) {
+		var langAbbreviation = lang;
+		final var attachments = e.getMessage().getAttachments();
+		if(attachments.size() == 1) {
+			final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
+			String fileExtension = attachments.get(0).getFileExtension();
+			if(fileExtension == null || fileExtension.contains("txt")) {
+				attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+				String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
 				var QueryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
 				if(QueryResult == 0) {
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_PASTEBIN)).build()).queue();
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
 					clearHash(e, lang, false);
 					Hashes.removeQueryResult("all_"+e.getGuild().getId());
 					logger.info("User {} has inserted words with the pastebin url {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), _message, lang, e.getGuild().getId());
@@ -1433,17 +1518,14 @@ public class FilterExecution {
 					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 					logger.error("Changes on the {} word filter couldn't be rolled back on error in guild {}", lang, e.getGuild().getId());
 				}
-			} catch (MalformedURLException | RuntimeException | LoginException | ParseException e2) {
-				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_NOT_PASTE));
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-				logger.error("Reading pastebin url {} for the {} word filter failed in guild {}", _message, lang, e.getGuild().getId(), e2);
+			}
+			else {
+				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			}
 			Hashes.clearTempCache(key);
-		}
-		else {
-			message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE_READ_ERR));
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_READ_ERR)).build()).queue();
-			Hashes.addTempCache(key, cache.setExpiration(180000));
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
+			FileHandler.deleteFile(Directory.TEMP, fileName);
 		}
 	}
 	
@@ -1473,8 +1555,8 @@ public class FilterExecution {
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_PASTEBIN))
-				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_PASTEBIN))).build()).queue();
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))
+				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))).build()).queue();
 	}
 	
 	private static List<String> checkDuplicates(String [] words) {

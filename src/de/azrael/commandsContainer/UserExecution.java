@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.jpastebin.exceptions.PasteException;
-import org.jpastebin.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +36,6 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.FileHandler;
-import de.azrael.util.Pastebin;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -295,13 +292,7 @@ public class UserExecution {
 								try {
 									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
-									try {
-										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES), out.toString());
-										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(pastebin_link);
-									} catch (IllegalStateException | LoginException | PasteException e2) {
-										logger.error("Error on creating a pastebin page in guild {}", e.getGuild().getId(), e2);
-										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NAMES_ERR));
-									}
+									//TODO: use pagination logic
 								}
 								e.getChannel().sendMessage(message.build()).queue();
 								message.clear();
@@ -313,13 +304,7 @@ public class UserExecution {
 								try {
 									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(out.toString());
 								} catch(IllegalArgumentException iae2) {
-									try {
-										String pastebin_link = Pastebin.unlistedPaste(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES), out.toString());
-										message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(pastebin_link);
-									} catch (IllegalStateException | LoginException | PasteException e2) {
-										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NICKNAMES_ERR));
-										logger.error("Error on creating a pastebin page in guild {}!", e.getGuild().getId(), e2);
-									}
+									//TODO: use pagination logic
 								}
 								e.getChannel().sendMessage(message.build()).queue();
 							}

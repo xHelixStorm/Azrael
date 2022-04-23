@@ -57,6 +57,7 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
@@ -821,5 +822,19 @@ public class STATIC {
 			emoji = EmojiManager.getForAlias(defaultEmoji).getUnicode();
 		}
 		return emoji;
+	}
+	
+	public static void addPaginationReactions(GuildMessageReceivedEvent e, Message m, int maxPage, String method, Object object) {
+		if(maxPage > 1) {
+			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
+				m.addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
+				m.addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
+				Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+m.getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1", method).setObject(object));
+			}
+			else {
+				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+				logger.error("MESSAGE_ADD_REACTION permission required to display reactions on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+			}
+		}
 	}
 }

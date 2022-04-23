@@ -5,8 +5,6 @@ import java.io.File;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
-import org.jpastebin.exceptions.PasteException;
-import org.jpastebin.pastebin.exceptions.LoginException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +22,6 @@ import de.azrael.inventory.InventoryBuilder;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
-import de.azrael.util.Pastebin;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -57,20 +54,20 @@ public class Inventory implements CommandPublic {
 				//print the inventory in text format, if the inventory image is not available
 				if(!new File(Directory.INVENTORY+"inventory_blank.png").exists()) {
 					StringBuilder out = new StringBuilder();
-					for(InventoryContent inventory : RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())){
+					final var items = RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
+					int count = 1;
+					for(InventoryContent inventory : items) {
+						if(count == 10) break;
 						out.append((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n");
+						count++;
 					}
 					if(out.length() == 0)
 						out.append(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY));
-					if(out.length() <= 2000)
-						e.getChannel().sendMessage("```"+out.toString()+"```").queue();
 					else {
-						try {
-							Pastebin.GuestPaste(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_NAME), out.toString());
-						} catch (IllegalStateException | LoginException | PasteException e1) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PASTE)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PASTEBIN_PASTE_ERR_2)).build()).queue();
-							logger.error("Inventory of user {} couldn't be uploaded on pastebin in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
-						}
+						final int maxPage = (items.size()/10)+(items.size()%10 > 0 ? 1 : 0);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+							STATIC.addPaginationReactions(e, m, maxPage, "1", items);
+						});
 					}
 				}
 				//handle preparation to draw the inventory

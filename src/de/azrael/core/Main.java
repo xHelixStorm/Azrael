@@ -230,13 +230,6 @@ public class Main {
 					return;
 				}
 				
-				//Pastebin options
-				System.setProperty("PASTEBIN_API_KEY", prop.getProperty("PASTEBIN_API_KEY", "").trim());
-				final String pastebinUser = prop.getProperty("PASTEBIN_USER", "");
-				final String pastebinPass = prop.getProperty("PASTEBIN_PASS", "");
-				System.setProperty("PASTEBIN_USER", (pastebinUser.isBlank() ? pastebinUser.trim() : STATIC.decrypt(pastebinUser.trim())));
-				System.setProperty("PASTEBIN_PASS", (pastebinPass.isBlank() ? pastebinPass.trim() : STATIC.decrypt(pastebinPass.trim())));
-				
 				//Imgur options
 				System.setProperty("IMGUR_API_KEY", prop.getProperty("IMGUR_API_KEY", "").trim());
 				

@@ -55,6 +55,7 @@ public class Quiz implements CommandPublic {
 			}
 			//help command to register quiz rewards when there's just one parameter
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_REWARDS))) {
+				//TODO: fix translation
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_HELP)).build()).queue();
 			}
 			//register quiz rewards when we have 2 parameters
@@ -63,6 +64,7 @@ public class Quiz implements CommandPublic {
 			}
 			//help command to register questions
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER_QUESTIONS))) {
+				//TODO: fix translation
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_HELP)).build()).queue();
 			}
 			//register quiz questions when we have 2 parameters

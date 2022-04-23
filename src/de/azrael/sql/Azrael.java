@@ -4237,10 +4237,12 @@ public class Azrael {
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter2);
 			
 			for(String word : words) {
-				stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
-				stmt.setString(2, lang);
-				stmt.setLong(3, guild_id);
-				stmt.addBatch();
+				if(!word.isBlank()) {
+					stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
+					stmt.setString(2, lang);
+					stmt.setLong(3, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();
@@ -4278,10 +4280,12 @@ public class Azrael {
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter2);
 			
 			for(String word : words) {
-				stmt.setString(1, word);
-				stmt.setBoolean(2, kick);
-				stmt.setLong(3, guild_id);
-				stmt.addBatch();
+				if(!word.isBlank()) {
+					stmt.setString(1, word);
+					stmt.setBoolean(2, kick);
+					stmt.setLong(3, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();
@@ -4317,9 +4321,11 @@ public class Azrael {
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames2);;
 			
 			for(String word : words) {
-				stmt.setString(1, word);
-				stmt.setLong(2, guild_id);
-				stmt.addBatch();
+				if(!word.isBlank()) {
+					stmt.setString(1, word);
+					stmt.setLong(2, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();
@@ -4355,9 +4361,11 @@ public class Azrael {
 			
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist2);
 			for(String url : urls) {
-				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
-				stmt.setLong(2, guild_id);
-				stmt.addBatch();
+				if(!url.isBlank()) {
+					stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+					stmt.setLong(2, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();
@@ -4393,9 +4401,11 @@ public class Azrael {
 			
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist2);
 			for(String url : urls) {
-				stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
-				stmt.setLong(2, guild_id);
-				stmt.addBatch();
+				if(!url.isBlank()) {
+					stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+					stmt.setLong(2, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();
@@ -4431,9 +4441,11 @@ public class Azrael {
 			
 			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist2);
 			for(String username : usernames) {
-				stmt.setString(1, username);
-				stmt.setLong(2, guild_id);
-				stmt.addBatch();
+				if(!username.isBlank()) {
+					stmt.setString(1, username);
+					stmt.setLong(2, guild_id);
+					stmt.addBatch();
+				}
 			}
 			stmt.executeBatch();
 			myConn.commit();

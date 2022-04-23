@@ -21,6 +21,7 @@ import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Clan;
 import de.azrael.constructors.Dailies;
+import de.azrael.constructors.InventoryContent;
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
@@ -622,6 +623,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 			return "**"+((Dailies)item).getDescription()+"**\n"+STATIC.getTranslation(member, Translation.DISPLAY_PROBABILITY)+((Dailies)item).getWeight()+"%\n\n";
 		else if(item instanceof String)
 			return "**"+(String)item+"**\n";
+		else if(item instanceof InventoryContent)
+			return (((InventoryContent)item).getDescription() != null ? ((InventoryContent)item).getDescription() : ((InventoryContent)item).getWeaponDescription()+" "+((InventoryContent)item).getStat())+"\n";
 		return "";
 	}
 	
