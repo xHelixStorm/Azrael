@@ -914,6 +914,7 @@
 	"user_delete_nothing":			"Ничего не найдено для удаления...",
 	"user_delete_nothing_2":		"Ничего не найдено для удаления...\nПожалуйста, включите журнал кеширования!",
 	"user_delete_err":				"Deleted messages couldn't be saved!",
+	"user_delete_err_2":			"Permission {} is required to automatically upload a text file with removed messages!",
 	"user_warning_help":			"Пожалуйста, укажите числовое значение предупреждения, которое меньше или равно максимально возможному предупреждению!",
 	"user_warning_clear":			"Предупреждения этого пользователя удалены!",
 	"user_warning_updated":			"Номер предупреждения был обновлен для этого пользователя!",

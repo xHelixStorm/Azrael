@@ -914,6 +914,7 @@
 	"user_delete_nothing":			"Nothing has been found to delete...",
 	"user_delete_nothing_2":		"Nothing has been found to delete...\nPlease enable the cachelog!",
 	"user_delete_err":				"Deleted messages couldn't be saved!",
+	"user_delete_err_2":			"Permission {} is required to automatically upload a text file with removed messages!",
 	"user_warning_help":			"Please provide a numerical warning value that is lower or equal to the highest possible warning!",
 	"user_warning_clear":			"The warnings of this user have been cleared!",
 	"user_warning_updated":			"The warning value has been updated for this user!",

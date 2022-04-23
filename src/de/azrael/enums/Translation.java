@@ -919,6 +919,7 @@ public enum Translation {
 	USER_DELETE_NOTHING			("user_delete_nothing"),
 	USER_DELETE_NOTHING_2		("user_delete_nothing_2"),
 	USER_DELETE_ERR				("user_delete_err"),
+	USER_DELETE_ERR_2			("user_delete_err_2"),
 	USER_WARNING_HELP			("user_warning_help"),
 	USER_WARNING_CLEAR			("user_warning_clear"),
 	USER_WARNING_UPDATED		("user_warning_updated"),

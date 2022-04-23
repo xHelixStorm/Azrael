@@ -1932,7 +1932,6 @@ public class UserExecution {
 			}
 			else if(value > 100) {
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_HELP)).queue();
-				return;
 			}
 			else {
 				List<ArrayList<Messages>> messages = Hashes.getWholeMessagePool(e.getGuild().getIdLong()).values().parallelStream().filter(f -> f.get(0).getUserID() == user_id && f.get(0).getGuildID() == e.getGuild().getIdLong()).collect(Collectors.toList());
@@ -1987,9 +1986,16 @@ public class UserExecution {
 								final String fileName = nextNumberKey;
 								if(FileHandler.createFile(Directory.TEMP, fileName, content) && FileHandler.createFile(Directory.USER_LOG, fileName, content)) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_REMOVED)+fileName).build()).queue();
-									e.getChannel().sendFile(new File(Directory.TEMP+fileName), fileName).queue(m -> {
+									if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+										e.getChannel().sendFile(new File(Directory.TEMP+fileName), fileName).queue(m -> {
+											FileHandler.deleteFile(Directory.TEMP, fileName);
+										});
+									}
+									else {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_ERR_2).replace("{}", Permission.MESSAGE_ATTACH_FILES.getName())).build()).queue();
+										logger.warn("Permission {} is required to automatically upload a file with deleted messages in guild {}", Permission.MESSAGE_ATTACH_FILES.getName(), e.getGuild().getId());
 										FileHandler.deleteFile(Directory.TEMP, fileName);
-									});
+									}
 									Azrael.SQLInsertActionLog("MESSAGES_DELETED", user_id, e.getGuild().getIdLong(), fileName);
 									logger.info("User {} has deleted {} messages of user {} in guild {}", e.getMember().getUser().getId(), hash_counter, userMessage.getUserID(), e.getGuild().getId());
 								}
@@ -2023,7 +2029,7 @@ public class UserExecution {
 				}
 			}
 			Hashes.clearTempCache(key);
-			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_DELETE_MESSAGES.getColumn(), _message);
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.USER_DELETE_MESSAGES.getColumn(), ""+value);
 		}
 	}
 }
