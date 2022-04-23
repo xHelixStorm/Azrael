@@ -17,7 +17,11 @@ import com.vdurmont.emoji.EmojiParser;
 import de.azrael.commandsContainer.RandomshopExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
+import de.azrael.constructors.CategoryConf;
+import de.azrael.constructors.Channels;
 import de.azrael.constructors.Clan;
+import de.azrael.constructors.Dailies;
+import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
@@ -36,9 +40,13 @@ import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -218,9 +226,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 					final var randomshop = Hashes.getTempCache("randomshop_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					//clan reactions
 					final var clan = Hashes.getTempCache("clan_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
+					//pagination reactions
+					final var pagination = Hashes.getTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId());
 					
 					//execute if it's an inventory reaction
-					if(inventory != null) {
+					if(inventory != null && inventory.getExpiration() >= System.currentTimeMillis()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
 							//retrieve all inventory details
 							String cache_content = inventory.getAdditionalInfo();
@@ -258,12 +268,12 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), inventory_tab, sub_tab, RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), ((current_page-1)*maxItems), maxItems), current_page, last_page, guild_settings);
 						}
 						else {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
 							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image in channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 					//execute if it's a randomshop reaction
-					else if(randomshop != null) {
+					else if(randomshop != null && randomshop.getExpiration() >= System.currentTimeMillis()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
 							//retrieve all randomshop details
 							String cache_content = randomshop.getAdditionalInfo();
@@ -286,12 +296,12 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							RandomshopExecution.inspectItems(e.getMember(), e.getChannel(), RankingSystemItems.SQLgetWeaponAbbvs(e.getGuild().getIdLong()), RankingSystemItems.SQLgetWeaponCategories(e.getGuild().getIdLong(), false), input, current_page, true);
 						}
 						else {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_ATTACH_FILES.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
 							logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permission required to reupload a new image on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 					//execute if it's a clan reaction
-					else if(clan != null) {
+					else if(clan != null && clan.getExpiration() >= System.currentTimeMillis()) {
 						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_ADD_REACTION))) {
 							@SuppressWarnings("unchecked")
 							final var clans = (ArrayList<Clan>) clan.getObject();
@@ -328,8 +338,72 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							});
 						}
 						else {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_HISTORY.getName()+" and "+Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_HISTORY.getName()+", "+Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
 							logger.error("MESSAGE_WRITE, MESSAGE_HISTORY and MESSAGE_REACTION_ADD permissions required to display a new clan page with reactions on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+						}
+					}
+					//execute if it's a pagination reaction
+					else if(pagination != null && pagination.getExpiration() >= System.currentTimeMillis()) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_HISTORY, Permission.MESSAGE_MANAGE))) {
+							final int curPage = Integer.parseInt(pagination.getAdditionalInfo());
+							if(EmojiParser.parseToAliases(e.getReactionEmote().getName()).equals(":arrow_left:")) {
+								if(curPage == 1) {
+									e.getReaction().removeReaction(e.getMember().getUser()).queue();
+									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000));
+								}
+								else {
+									final Object object = pagination.getObject();
+									final int maxPage = (((List<?>)object).size()/10)+(((List<?>)object).size()%10 > 0 ? 1 : 0);
+									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
+										StringBuilder out = new StringBuilder();
+										Object prevItem = null;
+										int count = 1;
+										for(final Object item : (List<?>)object) {
+											if(count == (curPage-1)*10) break;
+											else if(count >= (curPage*10)-9) {
+												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
+												if(itemObjectValidation(item, prevItem))
+													count++;
+											}
+											prevItem = item;
+										}
+										//Rebuild message embed with new description
+										m.editMessage(rebuildEmbed(m.getEmbeds().get(0), out.toString(), curPage-1, maxPage).build()).queue();
+									});
+									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000).updateDescription(""+(curPage-1)));
+								}
+							}
+							else {
+								final Object object = pagination.getObject();
+								final int maxPage = (((List<?>)object).size()/10)+(((List<?>)object).size()%10 > 0 ? 1 : 0);
+								if(curPage+1 == maxPage) {
+									e.getReaction().removeReaction(e.getMember().getUser()).queue();
+									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000));
+								}
+								else {
+									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
+										StringBuilder out = new StringBuilder();
+										Object prevItem = null;
+										int count = 1;
+										for(final Object item : (List<?>)object) {
+											if(count == (curPage+1)*10) break;
+											else if(count >= (curPage*10)-9) {
+												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
+												if(itemObjectValidation(item, prevItem))
+													count++;
+											}
+											prevItem = item;
+										}
+										//Rebuild message embed with new description
+										m.editMessage(rebuildEmbed(m.getEmbeds().get(0), out.toString(), curPage+1, maxPage).build()).queue();
+									});
+									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000).updateDescription(""+(curPage+1)));
+								}
+							}
+						}
+						else {
+							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+", "+Permission.MESSAGE_HISTORY.getName()+", "+Permission.MESSAGE_MANAGE.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());
+							logger.error("MESSAGE_WRITE, MESSAGE_HISTORY and MESSAGE_MANAGE permissions required to update the embed pagination on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 						}
 					}
 				}
@@ -499,5 +573,75 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 				}
 			}
 		}
+	}
+	
+	private static String buildPaginationMessage(Member member, Object item, Object prevItem, String method) {
+		//Derived from H!display roles
+		if(item instanceof Role) 
+			return "**"+((Role)item).getName()+"** ("+((Role)item).getId()+")\n";
+		//Derived from H!display registered-roles
+		else if(item instanceof Roles && method.equals("1")) { 
+			final var role = (Roles)item;
+			return (!role.getCategory_ABV().equals("def") ?
+					"**"+role.getRole_Name()+ "**("+role.getRole_ID()+")\n"
+					+ STATIC.getTranslation(member, Translation.DISPLAY_ROLE_TYPE)+role.getCategory_Name()+"\n"
+					+ STATIC.getTranslation(member, Translation.DISPLAY_PERMISSION_LEVEL)+role.getLevel()+"\n"
+					+ STATIC.getTranslation(member, Translation.DISPLAY_PERSISTANT)+(role.isPersistent() ? STATIC.getTranslation(member, Translation.DISPLAY_IS_PERSISTANT) : STATIC.getTranslation(member, Translation.DISPLAY_IS_NOT_PERSISTANT))+"\n\n"
+					: "");
+		}
+		//Derived from H!display ranking-roles
+		else if(item instanceof Roles && method.equals("2"))
+			return "**"+((Roles)item).getRole_Name()+"** ("+ ((Roles)item).getRole_ID() +")\n"+STATIC.getTranslation(member, Translation.DISPLAY_UNLOCK_LEVEL)+((Roles)item).getLevel()+"\n";
+		//Derived from H!display categories
+		else if(item instanceof Category)
+			return "**"+((Category)item).getName()+"** ("+((Category)item).getId()+")\n";
+		//Derived from H!display registered-categories
+		else if(item instanceof CategoryConf) {
+			Category category = member.getGuild().getCategoryById(((CategoryConf)item).getCategoryID());
+			return (category != null ? "**"+category.getName()+"** ("+category.getId()+")\n"+STATIC.getTranslation(member, Translation.DISPLAY_CATEGORY_TYPE)+((CategoryConf)item).getType()+"\n\n" : "");
+		}
+		//Derived from H!display text-channels
+		else if(item instanceof TextChannel)
+			return "**"+((TextChannel)item).getName()+"** ("+((TextChannel)item).getId()+")\n";
+		//Derived from H!display voice-channels
+		else if(item instanceof VoiceChannel)
+			return "**"+((VoiceChannel)item).getName()+"** ("+((VoiceChannel)item).getId()+")\n";
+		//Derived from H!display registered-channels
+		else if(item instanceof Channels) {
+			Channels channel = (Channels)item;
+			if(itemObjectValidation(item, prevItem))
+				return (prevItem != null ? "\n\n" : "")+"**"+channel.getChannel_Name()+"** ("+channel.getChannel_ID()+")\n"
+						+ STATIC.getTranslation(member, Translation.DISPLAY_CHANNEL_TYPE)+(channel.getChannel_Type_Name() != null ? channel.getChannel_Type_Name() : STATIC.getTranslation(member, Translation.NOT_AVAILABLE))+"\n"
+						+ STATIC.getTranslation(member, Translation.DISPLAY_URL_CENSORING)+(channel.getURLCensoring() ? STATIC.getTranslation(member, Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(member, Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
+						+ STATIC.getTranslation(member, Translation.DISPLAY_TEXT_CENSORING)+(channel.getTxtRemoval() ? STATIC.getTranslation(member, Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(member, Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
+						+ STATIC.getTranslation(member, Translation.DISPLAY_LANG_CENSORING)+(channel.getLang_Filter() != null ? channel.getLang_Filter() : STATIC.getTranslation(member, Translation.NOT_AVAILABLE));
+			else
+				return ", "+channel.getLang_Filter();
+		}
+		else if(item instanceof Dailies)
+			return "**"+((Dailies)item).getDescription()+"**\n"+STATIC.getTranslation(member, Translation.DISPLAY_PROBABILITY)+((Dailies)item).getWeight()+"%\n\n";
+		else if(item instanceof String)
+			return "**"+(String)item+"**\n";
+		return "";
+	}
+	
+	private static boolean itemObjectValidation(Object item, Object prevItem) {
+		if(prevItem == null)
+			return true;
+		if(((Channels)prevItem).getChannel_ID() == ((Channels)item).getChannel_ID())
+			return false;
+		return true;
+	}
+	
+	private static EmbedBuilder rebuildEmbed(MessageEmbed embed, String out, int newPage, int maxPage) {
+		EmbedBuilder embedBuilder = new EmbedBuilder().setColor(embed.getColor()).setTitle(embed.getTitle());
+		for(final var field : embed.getFields()) {
+			embedBuilder.addField(field.getName(), field.getValue(), field.isInline());
+		}
+		if(embed.getThumbnail() != null)
+			embedBuilder.setThumbnail(embed.getThumbnail().getUrl());
+		embedBuilder.setFooter(newPage+"/"+maxPage);
+		embedBuilder.setDescription(out);
+		return embedBuilder;
 	}
 }
