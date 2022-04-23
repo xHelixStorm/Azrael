@@ -224,6 +224,8 @@ public enum Translation {
 	NO_CATEGORY					("no_category"),
 	YOUTUBE_VIDEO_NOT_FOUND		("youtube_video_not_found"),
 	ROLES_NOW_INVALID			("roles_now_invalid"),
+	CHANNEL_PERMISSION_ASSIGNED	("channel_permission_assigned"),
+	CATEGORY_PERMISSION_ASSIGNED("category_permission_assigned"),
 	
 	EMBED_TITLE_ERROR			("embed_title_error"),
 	EMBED_TITLE_ABOUT			("embed_title_about"),

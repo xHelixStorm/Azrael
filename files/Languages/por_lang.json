@@ -219,6 +219,8 @@
     "no_category":                  "Por favor, envie um ID de categoria numérica!",
     "youtube_video_not_found":      "Vídeo do YouTube não encontrado!",
     "roles_now_invalid":            "As funções a serem atribuídas não existem mais!",
+    "channel_permission_assigned":	"Permissions {} for text channel {} have been automatically assigned!",
+	"category_permission_assigned":	"Permissions {} for category {} have been automatically assigned!",
     
     "embed_title_error":            "Um erro ocorreu!",
     "embed_title_about":            "Página Sobre mim!",

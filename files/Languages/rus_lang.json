@@ -219,6 +219,8 @@
 	"no_category":					"Пожалуйста, предоставьте ID категории в цифрах!",
 	"youtube_video_not_found":		"YouTube видео не найдено!",
 	"roles_now_invalid":			"Роль/и больше не существует/ют!",
+	"channel_permission_assigned":	"Permissions {} for text channel {} have been automatically assigned!",
+	"category_permission_assigned":	"Permissions {} for category {} have been automatically assigned!",
 	
 	"embed_title_error":		 	"Произошла ошибка!",
 	"embed_title_about": 		 	"Страница обо мне!",

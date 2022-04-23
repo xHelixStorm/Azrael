@@ -219,6 +219,8 @@
     "no_category":                  "Veuillez soumettre un ID de la catégorie !",
     "youtube_video_not_found":      "La vidéo YouTube n’a pas été trouvée !",
     "roles_now_invalid":            "Le(s) rôle(s) à attribuer n’existe(nt) plus !",
+    "channel_permission_assigned":	"Permissions {} for text channel {} have been automatically assigned!",
+	"category_permission_assigned":	"Permissions {} for category {} have been automatically assigned!",
     
     "embed_title_error":            "Une erreur s’est produite !",
     "embed_title_about":            "Page “A propos de moi “ !",
