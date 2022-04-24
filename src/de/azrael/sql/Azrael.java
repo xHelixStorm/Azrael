@@ -324,17 +324,19 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertUser(long user_id, String name, String lang, String avatar) {
-		logger.trace("SQLInsertUser launched. Passed params {}, {}, {}, {}", user_id, name, lang, avatar);
+	public static int SQLInsertUser(long user_id, String name, String lang, String avatar, String creationDate) {
+		logger.trace("SQLInsertUser launched. Passed params {}, {}, {}, {}, {}", user_id, name, lang, avatar, creationDate);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
+			//TODO: adapt query with new column
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertUser);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, name);
 			stmt.setString(3, lang);
 			stmt.setString(4, avatar);
+			stmt.setString(5, creationDate);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertUser Exception", e);
@@ -352,12 +354,14 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
+			//TODO: Add creation_date
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertUsers);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
 				stmt.setString(2, member.getUser().getName()+"#"+member.getUser().getDiscriminator());
 				stmt.setString(3, STATIC.getLanguage2(member.getGuild()));
 				stmt.setString(4, member.getUser().getEffectiveAvatarUrl());
+				stmt.setString(5, member.getUser().getTimeCreated().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 				stmt.addBatch();
 			}
 			stmt.executeBatch();
@@ -490,12 +494,13 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
+			//TODO: Add column creation_date
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
 			stmt.setString(1, user_id);
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				return new User(rs.getLong(1), rs.getString(2), rs.getString(4));
+				return new User(rs.getLong(1), rs.getString(2), rs.getString(4), rs.getString(5));
 			}
 			return null;
 		} catch (SQLException e) {

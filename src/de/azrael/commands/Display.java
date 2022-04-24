@@ -173,7 +173,7 @@ public class Display implements CommandPublic{
 				}
 				final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 				e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-					STATIC.addPaginationReactions(e, m, maxPage, "1", roles);
+					STATIC.addPaginationReactions(e, m, maxPage, "1", "10", roles);
 				});
 			}
 			else {
@@ -200,7 +200,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", roles);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", roles);
 					});
 				}
 				else {
@@ -229,7 +229,7 @@ public class Display implements CommandPublic{
 					if(out.length() > 0) {
 						final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
 						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-							STATIC.addPaginationReactions(e, m, maxPage, "2", roles);
+							STATIC.addPaginationReactions(e, m, maxPage, "2", "10", roles);
 						});
 					}
 					else {
@@ -260,7 +260,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", categories);
 					});
 				}
 				else {
@@ -295,7 +295,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", categories);
 					});
 				}
 				else {
@@ -322,7 +322,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (textChannels.size()/10)+(textChannels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", textChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", textChannels);
 					});
 				}
 				else {
@@ -349,7 +349,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (voiceChannels.size()/10)+(voiceChannels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", voiceChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", voiceChannels);
 					});
 				}
 				else {
@@ -389,7 +389,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (channels.size()/10)+(channels.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", channels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", channels);
 					});
 				}
 				else {
@@ -416,7 +416,7 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (dailies.size()/10)+(dailies.size()%10 > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", dailies);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", dailies);
 					});
 				}
 				else {
@@ -451,7 +451,7 @@ public class Display implements CommandPublic{
 					final int maxPage = (watchedUsers.size()/10)+(watchedUsers.size()%10 > 0 ? 1 : 0);
 					final var users = watchedUsers;
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", users);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", users);
 					});
 				}
 				else {

@@ -897,6 +897,7 @@
 	"user_info_title_nicknames":	"NICKNAMES USADOS",
 	"user_info_deleted_messages":	"MENSAJES BORRADOS",
 	"user_info_events":				"EVENTOS",
+	"user_info_creation_date":		"CREATION DATE",
 	"user_info_err":				"No se ha podido mostrar la página de información! ¡El usuario tiene que volver a entrar en el servidor!",
 	"user_delete_help":				"Por favor, elija cuántos mensajes deben ser eliminados de 1 a 100.",
 	"user_delete_question":			"¿Desea eliminar los mensajes?",

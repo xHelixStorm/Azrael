@@ -354,14 +354,15 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 								}
 								else {
 									final Object object = pagination.getObject();
-									final int maxPage = (((List<?>)object).size()/10)+(((List<?>)object).size()%10 > 0 ? 1 : 0);
+									final int pageCount = Integer.parseInt(pagination.getAdditionalInfo3());
+									final int maxPage = (((List<?>)object).size()/pageCount)+(((List<?>)object).size()%pageCount > 0 ? 1 : 0);
 									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
 										StringBuilder out = new StringBuilder();
 										Object prevItem = null;
 										int count = 1;
 										for(final Object item : (List<?>)object) {
-											if(count == (curPage-1)*10) break;
-											else if(count >= (curPage*10)-9) {
+											if(count == (curPage-1)*pageCount) break;
+											else if(count >= (curPage*pageCount)-(pageCount-1)) {
 												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
 												if(itemObjectValidation(item, prevItem))
 													count++;
@@ -376,8 +377,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 							}
 							else {
 								final Object object = pagination.getObject();
-								final int maxPage = (((List<?>)object).size()/10)+(((List<?>)object).size()%10 > 0 ? 1 : 0);
-								if(curPage+1 == maxPage) {
+								final int pageCount = Integer.parseInt(pagination.getAdditionalInfo3());
+								final int maxPage = (((List<?>)object).size()/pageCount)+(((List<?>)object).size()%pageCount > 0 ? 1 : 0);
+								if(curPage == maxPage) {
 									e.getReaction().removeReaction(e.getMember().getUser()).queue();
 									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000));
 								}
@@ -387,8 +389,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 										Object prevItem = null;
 										int count = 1;
 										for(final Object item : (List<?>)object) {
-											if(count == (curPage+1)*10) break;
-											else if(count >= (curPage*10)-9) {
+											if(count == (curPage+1)*pageCount) break;
+											else if(count >= (curPage*pageCount)-(pageCount-1)) {
 												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
 												if(itemObjectValidation(item, prevItem))
 													count++;
@@ -619,10 +621,16 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 			else
 				return ", "+channel.getLang_Filter();
 		}
+		//Derived from H!display dailies
 		else if(item instanceof Dailies)
 			return "**"+((Dailies)item).getDescription()+"**\n"+STATIC.getTranslation(member, Translation.DISPLAY_PROBABILITY)+((Dailies)item).getWeight()+"%\n\n";
-		else if(item instanceof String)
+		//Derived from H!display watchedUsers
+		else if(item instanceof String && method.equals("1"))
 			return "**"+(String)item+"**\n";
+		//Derived from H!user information
+		else if(item instanceof String && method.equals("2"))
+			return "[`"+(String)item+"`] ";
+		//Derived from H!inventory
 		else if(item instanceof InventoryContent)
 			return (((InventoryContent)item).getDescription() != null ? ((InventoryContent)item).getDescription() : ((InventoryContent)item).getWeaponDescription()+" "+((InventoryContent)item).getStat())+"\n";
 		return "";

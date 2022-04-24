@@ -902,6 +902,7 @@ public enum Translation {
 	USER_INFO_TITLE_NICKNAMES	("user_info_title_nicknames"),
 	USER_INFO_DELETED_MESSAGES	("user_info_deleted_messages"),
 	USER_INFO_EVENTS			("user_info_events"),
+	USER_INFO_CREATION_DATE		("user_info_creation_date"),
 	USER_INFO_ERR				("user_info_err"),
 	USER_DELETE_HELP			("user_delete_help"),
 	USER_DELETE_QUESTION		("user_delete_question"),

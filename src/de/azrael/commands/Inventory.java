@@ -66,7 +66,7 @@ public class Inventory implements CommandPublic {
 					else {
 						final int maxPage = (items.size()/10)+(items.size()%10 > 0 ? 1 : 0);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-							STATIC.addPaginationReactions(e, m, maxPage, "1", items);
+							STATIC.addPaginationReactions(e, m, maxPage, "1", "10", items);
 						});
 					}
 				}

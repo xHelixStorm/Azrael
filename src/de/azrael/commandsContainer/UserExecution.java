@@ -251,6 +251,8 @@ public class UserExecution {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**0**", true);
 							else
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
+							//TODO: translation
+							message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_CREATION_DATE), (user.getCreationDate() != null && !user.getCreationDate().isBlank() ? user.getCreationDate() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)), true);
 							message.addBlankField(false);
 							Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
 							if(guild_settings != null && guild_settings.getRankingState() == true && user_details != null) {
@@ -267,46 +269,38 @@ public class UserExecution {
 								message.addBlankField(true);
 							}
 							StringBuilder out = new StringBuilder();
-							try {
-								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**"+STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)+"**") : out;
-								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NAMES), out.toString(), false);
-								out.setLength(0);
-								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**"+STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)+"**") : out;
-								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_NICKNAMES), out.toString(), false);
-								out.setLength(0);
-								e.getChannel().sendMessage(message.build()).queue();
-							} catch(IllegalArgumentException iae) {
-								e.getChannel().sendMessage(message.build()).queue();
-								message.clear();
-								out.setLength(0);
-								for(String description : Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**"+STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)+"**") : out;
-								try {
-									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setDescription(out.toString());
-								} catch(IllegalArgumentException iae2) {
-									//TODO: use pagination logic
-								}
-								e.getChannel().sendMessage(message.build()).queue();
-								message.clear();
-								out.setLength(0);
-								for(String description : Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong())) {
-									out.append("[`"+description+"`] ");
-								}
-								out = out.toString().replaceAll("[\\s]*", "").length() == 0 ? out.append("**"+STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)+"**") : out;
-								try {
-									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setDescription(out.toString());
-								} catch(IllegalArgumentException iae2) {
-									//TODO: use pagination logic
-								}
-								e.getChannel().sendMessage(message.build()).queue();
+							message.clear();
+							//TODO: remove limit
+							final var names = Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, e.getGuild().getIdLong());
+							int count = 1;
+							for(String description : names) {
+								if(count == 30) break;
+								out.append("[`"+description+"`] ");
+								count++;
+							}
+							if(out.length() > 0) {
+								final int maxPage = (names.size()/30)+(names.size()%30 > 0 ? 1 : 0);
+								message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NAMES)).setFooter("1/"+maxPage).setDescription(out.toString());
+								e.getChannel().sendMessage(message.build()).queue(m -> {
+									STATIC.addPaginationReactions(e, m, maxPage, "2", "30", names);
+								});
+							}
+							message.clear();
+							out.setLength(0);
+							//TODO: remove limit
+							final var nicknames = Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong());
+							count = 1;
+							for(String description : nicknames) {
+								if(count == 30) break;
+								out.append("[`"+description+"`] ");
+								count++;
+							}
+							if(out.length() > 0) {
+								final int maxPage = (nicknames.size()/30)+(nicknames.size()%30 > 0 ? 1 : 0);
+								message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TITLE_NICKNAMES)).setFooter("1/"+maxPage).setDescription(out.toString());
+								e.getChannel().sendMessage(message.build()).queue(m -> {
+									STATIC.addPaginationReactions(e, m, maxPage, "2", "30", nicknames);
+								});
 							}
 							if(System.getProperty("ACTION_LOG").equals("true")) {
 								message.clear();
@@ -327,7 +321,7 @@ public class UserExecution {
 								message.setDescription(out);
 								if(out.length() > 0)e.getChannel().sendMessage(message.build()).queue();
 							}
-							logger.info("User {} has displayed server information of user {}", e.getMember().getUser().getId(), cache.getAdditionalInfo());
+							logger.info("User {} has displayed server information of user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo(), e.getGuild().getId());
 						}
 						else {
 							e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_ERR)).build()).queue();

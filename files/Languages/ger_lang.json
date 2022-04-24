@@ -897,6 +897,7 @@
 	"user_info_title_nicknames":	"BENUTZTE NICKNAMEN",
 	"user_info_deleted_messages":	"GELÖSCHTE NACHRICHTEN",
 	"user_info_events":				"EREIGNISSE",
+	"user_info_creation_date":		"ERSTELLDATUM",
 	"user_info_err":				"Informationsseite konnte nicht angezeigt werden! Der Benutzer muss erneut auf den Server zugreifen!",
 	"user_delete_help":				"Bitte wählen Sie, wie viele Nachrichten von 1-100 entfernt werden müssen!",
 	"user_delete_question":			"Möchten Sie Nachrichten löschen?",

@@ -897,6 +897,7 @@
     "user_info_title_nicknames":    "SURNOMS UTILISÉS",
     "user_info_deleted_messages":   "MESSAGES SUPPRIMES",
     "user_info_events":             "EVENTS",
+    "user_info_creation_date":		"CREATION DATE",
     "user_info_err":                "La page d'information n'a pas pu être affichée ! L'utilisateur doit rejoindre le serveur !",
     "user_delete_help":             "Veuillez choisir le nombre de messages à supprimer entre 1 et 100 !",
     "user_delete_question":         "Souhaitez-vous supprimer des messages ?",

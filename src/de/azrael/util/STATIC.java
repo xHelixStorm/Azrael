@@ -824,12 +824,12 @@ public class STATIC {
 		return emoji;
 	}
 	
-	public static void addPaginationReactions(GuildMessageReceivedEvent e, Message m, int maxPage, String method, Object object) {
+	public static void addPaginationReactions(GuildMessageReceivedEvent e, Message m, int maxPage, String method, String pageCount, Object object) {
 		if(maxPage > 1) {
 			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ADD_REACTION))) {
 				m.addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
 				m.addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
-				Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+m.getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1", method).setObject(object));
+				Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+m.getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "1", method, pageCount).setObject(object));
 			}
 			else {
 				STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+"<#"+e.getChannel().getId()+">", Channel.LOG.getType());

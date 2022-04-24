@@ -897,6 +897,7 @@
 	"user_info_title_nicknames":	"USED NICKNAMES",
 	"user_info_deleted_messages":	"DELETED MESSAGES",
 	"user_info_events":				"EVENTS",
+	"user_info_creation_date":		"CREATION DATE",
 	"user_info_err":				"Information page couldn't be displayed! The user has to rejoin the server!",
 	"user_delete_help":				"Please choose how many messages have to be removed from 1-100!",
 	"user_delete_question":			"Do you wish to delete messages?",

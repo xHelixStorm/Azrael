@@ -897,6 +897,7 @@
 	"user_info_title_nicknames":	"ИСПОЛЬЗУЕМЫЕ НИКИ",
 	"user_info_deleted_messages":	"УДАЛЕННЫЕ СООБЩЕНИЯ",
 	"user_info_events":				"СОБЫТИЯ",
+	"user_info_creation_date":		"CREATION DATE",
 	"user_info_err":				"Информационная страница не может быть отображена! Пользователь должен повторно присоединиться к серверу!",
 	"user_delete_help":				"Пожалуйста, выберите, сколько сообщений нужно удалить от 1 до 100!",
 	"user_delete_question":			"Вы хотите удалить сообщения?",

@@ -81,7 +81,7 @@ public class GuildListener extends ListenerAdapter {
 			boolean muted;
 			
 			//insert or update the name of the user into Azrael.users
-			if(Azrael.SQLInsertUser(user_id, user_name, STATIC.getLanguage2(e.getGuild()), e.getMember().getUser().getEffectiveAvatarUrl()) == 0) {
+			if(Azrael.SQLInsertUser(user_id, user_name, STATIC.getLanguage2(e.getGuild()), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getTimeCreated().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))) == 0) {
 				STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				logger.error("Information of user {} couldn't saved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
@@ -121,7 +121,7 @@ public class GuildListener extends ListenerAdapter {
 					STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 				else {
 					//TODO: check logic again during daylight saving 
-					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
+					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getUser().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
 					final long hours = TimeUnit.MILLISECONDS.toHours(createdAgo);
 					final long minutes = (TimeUnit.MILLISECONDS.toMinutes(createdAgo)%60);
 					//display accounts which are not older than a day only

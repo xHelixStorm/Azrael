@@ -10,6 +10,7 @@ public class User {
 	private long user_id;
 	private String user_name;
 	private String avatar;
+	private String creationDate;
 	private String originalJoinDate;
 	private String newestJoinDate;
 	
@@ -29,12 +30,14 @@ public class User {
 	 * @param _user_id
 	 * @param _user_name
 	 * @param _avatar
+	 * @param _creationDate
 	 */
 	
-	public User(long _user_id, String _user_name, String _avatar) {
+	public User(long _user_id, String _user_name, String _avatar, String _creationDate) {
 		this.user_id = _user_id;
 		this.user_name = _user_name;
 		this.avatar = _avatar;
+		this.creationDate = _creationDate;
 	}
 	
 	/**
@@ -75,6 +78,15 @@ public class User {
 	
 	public String getAvatar() {
 		return avatar;
+	}
+	
+	/**
+	 * Retrieve creation date
+	 * @return creation date
+	 */
+	
+	public String getCreationDate() {
+		return creationDate;
 	}
 	
 	/**
