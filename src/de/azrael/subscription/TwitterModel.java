@@ -62,6 +62,9 @@ public class TwitterModel {
 						if(tweets.size() > 30)
 							tweets.subList(0, 29);
 					}
+					else {
+						return success;
+					}
 			        final String pattern = "https:\\/\\/t.co\\/[\\w\\d]*";
 			        final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
 			        for (Status tweet : tweets) {
@@ -88,7 +91,7 @@ public class TwitterModel {
 				        			if(!tweetFound)
 				        				tweetProhibited = true;
 				        		}
-				        		if(prohibitedSubscriptions.parallelStream().filter(f -> username.equals(f)).findAny().orElse(null) != null)
+				        		if(prohibitedSubscriptions.parallelStream().filter(f -> username.equals(f) || username.substring(1).equals(f)).findAny().orElse(null) != null)
 				        			tweetProhibited = true;
 				        		
 				        		if(!tweetProhibited) {

@@ -9,16 +9,19 @@ package de.azrael.constructors;
 public class Category {
 	private String type;
 	private String typeName;
+	private int registerType;
 	
 	/**
 	 * Category constructor
-	 * @param _category_id id of the constructor
-	 * @param _name constructor's name
+	 * @param _type
+	 * @param _typeName constructor's name
+	 * @param _registerType 
 	 */
 	
-	public Category(String _type, String _typeName) {
+	public Category(String _type, String _typeName, int _registerType) {
 		this.type = _type;
 		this.typeName = _typeName;
+		this.registerType = _registerType;
 	}
 	
 	/**
@@ -37,5 +40,14 @@ public class Category {
 	
 	public String getTypeName() {
 		return this.typeName;
+	}
+	
+	/**
+	 * Category register type
+	 * @return
+	 */
+	
+	public int getRegisterType() {
+		return this.registerType;
 	}
 }

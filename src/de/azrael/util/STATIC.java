@@ -736,7 +736,6 @@ public class STATIC {
 	public static boolean setPermissions(Guild guild, TextChannel textChannel, Collection<Permission> permissions) {
 		if(guild.getSelfMember().hasPermission(textChannel, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			textChannel.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
-			//TODO: translations/tests
 			writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.BLUE), STATIC.getTranslation2(guild, Translation.CHANNEL_PERMISSION_ASSIGNED).replaceFirst("\\{\\}", permissions.toString()).replace("{}", textChannel.getAsMention()), Channel.LOG.getType());
 			logger.info("Permissions overriden of text channel {} in guild {}", textChannel.getId(), guild.getId());
 			return true;
@@ -747,7 +746,6 @@ public class STATIC {
 	public static boolean setPermissions(Guild guild, Category category, Collection<Permission> permissions) {
 		if(guild.getSelfMember().hasPermission(category, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)) {
 			category.getManager().putPermissionOverride(guild.getSelfMember(), permissions, null).complete();
-			//TODO: translations/test
 			writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.BLUE), STATIC.getTranslation2(guild, Translation.CATEGORY_PERMISSION_ASSIGNED).replaceFirst("\\{\\}", permissions.toString()).replace("{}", category.getAsMention()), Channel.LOG.getType());
 			logger.info("Permissions overriden of category {} in guild {}", category.getId(), guild.getId());
 			return true;

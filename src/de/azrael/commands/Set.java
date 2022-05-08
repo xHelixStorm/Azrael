@@ -497,7 +497,6 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_GIVEAWAY_ITEMS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					//TODO: update translation with two parameters and file
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY)
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXTEND))).build()).queue();
 					return true;

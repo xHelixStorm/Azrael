@@ -251,7 +251,6 @@ public class UserExecution {
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**0**", true);
 							else
 								message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_WATCH_LEVEL), "**"+watchedUser.getLevel()+"**", true);
-							//TODO: translation
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_CREATION_DATE), (user.getCreationDate() != null && !user.getCreationDate().isBlank() ? user.getCreationDate() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)), true);
 							message.addBlankField(false);
 							Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, e.getGuild().getIdLong());
@@ -270,7 +269,6 @@ public class UserExecution {
 							}
 							StringBuilder out = new StringBuilder();
 							message.clear();
-							//TODO: remove limit
 							final var names = Azrael.SQLgetDoubleActionEventDescriptions("MEMBER_NAME_UPDATE", "GUILD_MEMBER_JOIN", user_id, e.getGuild().getIdLong());
 							int count = 1;
 							for(String description : names) {
@@ -287,7 +285,6 @@ public class UserExecution {
 							}
 							message.clear();
 							out.setLength(0);
-							//TODO: remove limit
 							final var nicknames = Azrael.SQLgetSingleActionEventDescriptions("MEMBER_NICKNAME_UPDATE", user_id, e.getGuild().getIdLong());
 							count = 1;
 							for(String description : nicknames) {
@@ -304,22 +301,39 @@ public class UserExecution {
 							}
 							if(System.getProperty("ACTION_LOG").equals("true")) {
 								message.clear();
-								message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_DELETED_MESSAGES));
 								out.setLength(0);
-								for(String description : Azrael.SQLgetSingleActionEventDescriptionsOrdered("MESSAGES_DELETED", user_id, e.getGuild().getIdLong())) {
+								final var eventDescriptions = Azrael.SQLgetSingleActionEventDescriptionsOrdered("MESSAGES_DELETED", user_id, e.getGuild().getIdLong());
+								count = 1;
+								for(String description : eventDescriptions) {
+									if(count == 30) break;
 									out.append(description+"\n");
+									count++;
 								}
-								message.setDescription(out);
-								if(out.length() > 0)e.getChannel().sendMessage(message.build()).queue();
+								if(out.length() > 0) {
+									final int maxPage = (nicknames.size()/30)+(nicknames.size()%30 > 0 ? 1 : 0);
+									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_DELETED_MESSAGES));
+									e.getChannel().sendMessage(message.setDescription(out.toString()).build()).queue(m -> {
+										STATIC.addPaginationReactions(e, m, maxPage, "3", "30", eventDescriptions);
+									});
+								}
 								
 								message.clear();
-								message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EVENTS));
 								out.setLength(0);
-								for(String description : Azrael.SQLgetCriticalActionEvents(user_id, e.getGuild().getIdLong())) {
+								final var criticalEvents = Azrael.SQLgetCriticalActionEvents(user_id, e.getGuild().getIdLong());
+								count = 1;
+								for(String description : criticalEvents) {
+									if(count == 30) break;
 									out.append(description+"\n");
+									count++;
 								}
 								message.setDescription(out);
-								if(out.length() > 0)e.getChannel().sendMessage(message.build()).queue();
+								if(out.length() > 0) {
+									final int maxPage = (nicknames.size()/30)+(nicknames.size()%30 > 0 ? 1 : 0);
+									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EVENTS));
+									e.getChannel().sendMessage(message.build()).queue(m -> {
+										STATIC.addPaginationReactions(e, m, maxPage, "3", "30", criticalEvents);
+									});
+								}
 							}
 							logger.info("User {} has displayed server information of user {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo(), e.getGuild().getId());
 						}
@@ -1953,7 +1967,6 @@ public class UserExecution {
 						
 						if(collected_messages.length() > 0) {
 							final var userMessage = messages.get(0).get(0);
-							//TODO: remember to translate required translations
 							final String content = STATIC.getTranslation2(e.getGuild(), Translation.USER_DELETE_REMOVED_2).replaceFirst("\\{\\}", ""+hash_counter).replaceFirst("\\{\\}", userMessage.getUserName()).replace("{}", ""+userMessage.getUserID())+collected_messages.toString();
 							long nextNumber = Azrael.SQLgetNextNumberDeletedMessages();
 							if(nextNumber > 0) {

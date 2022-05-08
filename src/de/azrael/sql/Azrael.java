@@ -330,7 +330,6 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			//TODO: adapt query with new column
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertUser);
 			stmt.setLong(1, user_id);
 			stmt.setString(2, name);
@@ -354,7 +353,6 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false); 
-			//TODO: Add creation_date
 			stmt = myConn.prepareStatement(AzraelStatements.SQLBulkInsertUsers);
 			for(Member member : members) {
 				stmt.setLong(1, member.getUser().getIdLong());
@@ -494,7 +492,6 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			//TODO: Add column creation_date
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
 			stmt.setString(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -1459,11 +1456,12 @@ public class Azrael {
 					channelProperties.setChannel_Name(rs.getString(2));
 					channelProperties.setChannel_Type(rs.getString(3));
 					channelProperties.setChannel_Type_Name(rs.getString(4));
-					channelProperties.setGuild_ID(rs.getLong(5));
-					channelProperties.setGuild_Name(rs.getString(6));
-					channelProperties.setLang_Filter(rs.getString(7));
-					channelProperties.setURLCensoring(rs.getBoolean(8));
-					channelProperties.setTextRemoval(rs.getBoolean(9));
+					channelProperties.setRegisterType(rs.getInt(5));
+					channelProperties.setGuild_ID(rs.getLong(6));
+					channelProperties.setGuild_Name(rs.getString(7));
+					channelProperties.setLang_Filter(rs.getString(8));
+					channelProperties.setURLCensoring(rs.getBoolean(9));
+					channelProperties.setTextRemoval(rs.getBoolean(10));
 					channels.add(channelProperties);
 				}
 				Hashes.addChannels(guild_id, channels);
@@ -1494,6 +1492,7 @@ public class Azrael {
 				Channels channelProperties = new Channels();
 				channelProperties.setChannel_Type(rs.getString(1));
 				channelProperties.setChannel_Type_Name(rs.getString(2));
+				channelProperties.setRegisterType(rs.getInt(3));
 				channels.add(channelProperties);
 			}
 			return channels;
@@ -1813,16 +1812,33 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertChannel_Filter(long channel_id, String filter_lang) {
-		logger.trace("SQLInsertChannel_Filter launched. Passed params {}, {}", channel_id, filter_lang);
+	@SuppressWarnings("resource")
+	public static int SQLInsertChannel_Filter(long channel_id, ArrayList<String> filterLanguages) {
+		logger.trace("SQLInsertChannel_Filter launched. Passed params {}, {}", channel_id, filterLanguages);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
+			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Filter);
 			stmt.setLong(1, channel_id);
-			stmt.setString(2, filter_lang);
-			return stmt.executeUpdate();
+			
+			if(stmt.executeUpdate() >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLInsertChannel_Filter2);
+				for(String lang : filterLanguages) {
+					stmt.setLong(1, channel_id);
+					stmt.setString(2, lang);
+					stmt.addBatch();
+				}
+				if(stmt.executeBatch()[0] >= 0) {
+					myConn.commit();
+					return 1;
+				}
+				else {
+					myConn.rollback();
+				}
+			}
+			return 0;
 		} catch (SQLException e) {
 			logger.error("SQLInsertChannel_Filter Exception", e);
 			return 0;
@@ -2013,7 +2029,7 @@ public class Azrael {
 	}
 	
 	public static ArrayList<String> SQLgetFilterLanguages(String lang) {
-		logger.trace("SQLgetFilterLanguages launched. No params passed");
+		logger.trace("SQLgetFilterLanguages launched. Params passed {}", lang);
 		ArrayList<String> filter_lang = new ArrayList<String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
@@ -2022,6 +2038,30 @@ public class Azrael {
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
 			stmt.setString(1, lang);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				filter_lang.add(rs.getString(1));
+			}
+			return filter_lang;
+		} catch (SQLException e) {
+			logger.error("SQLgetFilterLanguages Exception", e);
+			return filter_lang;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static ArrayList<String> SQLgetFilterLanguages() {
+		logger.trace("SQLgetFilterLanguages launched. No params passed");
+		ArrayList<String> filter_lang = new ArrayList<String>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages2);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				filter_lang.add(rs.getString(1));
@@ -3654,7 +3694,8 @@ public class Azrael {
 			while(rs.next()) {
 				categories.add(new de.azrael.constructors.Category(
 					rs.getString(1),
-					rs.getString(2)
+					rs.getString(2),
+					rs.getInt(3)
 				));
 			}
 			return categories;

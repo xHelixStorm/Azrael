@@ -630,6 +630,8 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 		//Derived from H!user information
 		else if(item instanceof String && method.equals("2"))
 			return "[`"+(String)item+"`] ";
+		else if(item instanceof String && method.equals("3"))
+			return (String)item+"\n";
 		//Derived from H!inventory
 		else if(item instanceof InventoryContent)
 			return (((InventoryContent)item).getDescription() != null ? ((InventoryContent)item).getDescription() : ((InventoryContent)item).getWeaponDescription()+" "+((InventoryContent)item).getStat())+"\n";

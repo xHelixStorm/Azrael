@@ -116,7 +116,8 @@ public class Invites implements CommandPublic {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_ALREADY_RUNNING).replaceFirst("\\{\\}", inviteStatus.get(e.getGuild().getIdLong()).getInviteCount()+"").replace("{}", inviteStatus.get(e.getGuild().getIdLong()).getTotalInvites()+"")).build()).queue();
+				final var invite = inviteStatus.get(e.getGuild().getIdLong());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_ALREADY_RUNNING).replaceFirst("\\{\\}", invite.getInviteCount()+"").replace("{}", invite.getTotalInvites()+"")).build()).queue();
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
@@ -188,7 +189,8 @@ public class Invites implements CommandPublic {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_ALREADY_RUNNING).replaceFirst("\\{\\}", inviteStatus.get(e.getGuild().getIdLong()).getInviteCount()+"").replace("{}", inviteStatus.get(e.getGuild().getIdLong()).getTotalInvites()+"")).build()).queue();
+				final var invite = inviteStatus.get(e.getGuild().getIdLong());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_ALREADY_RUNNING).replaceFirst("\\{\\}", invite.getInviteCount()+"").replace("{}", invite.getTotalInvites()+"")).build()).queue();
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_STATUS))) {

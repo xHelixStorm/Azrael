@@ -13,6 +13,7 @@ import de.azrael.enums.Translation;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
@@ -29,26 +30,22 @@ public class RegisterRankingRole {
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_HELP)).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		long guild_id = e.getGuild().getIdLong();
-		long role_id = 0;
-		String role_name = "";
 		String level = "";
 		int level_requirement = 0;
+		Role role = null;
 		
 		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_RANKING_ROLE);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			if(_args.length == 3) {
-				if(e.getGuild().getRoleById(_args[1]) != null) {
-					role_id = Long.parseLong(_args[1]);
-					role_name = e.getGuild().getRoleById(role_id).getName();
-				}
-				else {
+			if(args.length == 3 && args[1].matches("[0-9]*")) {
+				role = e.getGuild().getRoleById(args[1]);
+				if(role == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
 					return true;
 				}
-				if(_args[2].replaceAll("[0-9]*", "").length() == 0) {
-					level = _args[2];
+				if(args[2].replaceAll("[0-9]*", "").length() == 0) {
+					level = args[2];
 					level_requirement = Integer.parseInt(level);
 				}
 				else {
@@ -64,9 +61,9 @@ public class RegisterRankingRole {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
 			}
 			else {
-				if(RankingSystem.SQLInsertRole(role_id, role_name, level_requirement, guild_id) != -1) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_ADDED).replaceFirst("\\{\\}", role_name).replace("{}", ""+level_requirement)).build()).queue();
-					logger.info("User {} has registered the ranking role {} with the level requirement {} in guild {}", e.getMember().getUser().getId(), role_name, level_requirement, e.getGuild().getId());
+				if(RankingSystem.SQLInsertRole(role.getIdLong(), role.getName(), level_requirement, guild_id) != -1) {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_ADDED).replaceFirst("\\{\\}", role.getName()).replace("{}", ""+level_requirement)).build()).queue();
+					logger.info("User {} has registered the ranking role {} with the level requirement {} in guild {}", e.getMember().getUser().getId(), role.getName(), level_requirement, e.getGuild().getId());
 					Hashes.removeRankingRoles(guild_id);
 					if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
 						if(RankingSystem.SQLgetLevels(guild_id) != null) {
@@ -81,8 +78,8 @@ public class RegisterRankingRole {
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-					logger.error("Ranking role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
-					RankingSystem.SQLInsertActionLog("High", role_id, guild_id, "Role couldn't be registered as ranking role", "The role "+role_name+" couldn't be inserted into the RankingSystem.roles table");
+					logger.error("Ranking role {} couldn't be registered in guild {}", role.getId(), e.getGuild().getId());
+					RankingSystem.SQLInsertActionLog("High", role.getIdLong(), guild_id, "Role couldn't be registered as ranking role", "The role "+role.getName()+" couldn't be inserted into the RankingSystem.roles table");
 				}
 			}
 			return true;

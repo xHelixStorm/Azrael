@@ -1,6 +1,7 @@
 package de.azrael.commandsContainer;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +51,7 @@ public class RegisterChannel {
 				e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_NO_TYPES)).build()).queue();
 		}
 		else {
-			e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Channel types couldn't be retrieved in guild {}", e.getGuild().getId());
 		}
 	}
@@ -69,63 +70,82 @@ public class RegisterChannel {
 				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, long guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails, BotConfigs botConfig) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails, BotConfigs botConfig) {
 		String channel;
-		long channel_id;
 		String channel_type;
 		
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(all|bot|eng|fre|ger|log|mus|tra|tur|rus|spa|por|ita|ara|rea|qui|sub|wat|del|edi|vot|vo2|co1|co2|co3|co4|co5|co6|upd)");
-			Matcher matcher = pattern.matcher(args[1]);
-			if(args.length > 2 && matcher.find()) {
-				channel_type = matcher.group();
-				channel = args[2].replaceAll("[^0-9]*", "");
-				if(channel.length() == 18) {
-					channel_id = Long.parseLong(channel);
-					var result = 0;
-					switch(channel_type) {
-						case "eng", "ger", "fre", "tur", "rus", "spa", "por", "ita", "ara", "all" -> {
-							result = Azrael.SQLRegisterLanguageChannel(guild_id, channel_id, channel_type);
-						}
-						case "bot", "co1", "co2", "co3", "co4", "co5", "co6", "vot", "vo2" -> {
-							result = Azrael.SQLRegisterSpecialChannel(guild_id, channel_id, channel_type);
-						}
-						case "log", "tra", "rea", "qui", "sub", "wat", "del", "edi", "upd" -> {
-							result = Azrael.SQLRegisterUniqueChannel(guild_id, channel_id, channel_type);
-						}
-					}
-					Hashes.removeChannels(guild_id);
-					if(result > 0) {
-						logger.info("User {} has registered channel {} as {} channel in guild {}", e.getMember().getUser().getId(), channel_id, channel_type, guild_id);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
-						if(channel_type.equals("rea")) {
-							//use the temp cache to append reactions after the bot sends a message
-							if(Azrael.SQLUpdateReaction(guild_id, true) > 0) {
-								ReactionMessage.print(e, channel_id, botConfig);
+			final var channelTypes = Azrael.SQLgetChannelTypes();
+			if(channelTypes != null && channelTypes.size() > 0) {
+				final HashMap<String, Integer> registerTypes = new HashMap<String, Integer>();
+				StringBuilder out = new StringBuilder();
+				for(final var channelType : channelTypes) {
+					if(out.length() > 0)
+						out.append("|");
+					out.append(channelType.getChannel_Type());
+					registerTypes.put(channelType.getChannel_Type(), channelType.getRegisterType());
+				}
+				Pattern pattern = Pattern.compile("("+out.toString()+")");
+				Matcher matcher = pattern.matcher(args[1]);
+				if(args.length > 2 && matcher.find()) {
+					channel_type = matcher.group();
+					channel = args[2].replaceAll("[^0-9]*", "");
+					if(channel.length() > 0) {
+						TextChannel textChannel = e.getGuild().getTextChannelById(channel);
+						if(textChannel != null) {
+							var result = 0;
+							switch(registerTypes.get(channel_type)) {
+								case 1 -> {
+									result = Azrael.SQLRegisterLanguageChannel(e.getGuild().getIdLong(), textChannel.getIdLong(), channel_type);
+								}
+								case 2 -> {
+									result = Azrael.SQLRegisterSpecialChannel(e.getGuild().getIdLong(), textChannel.getIdLong(), channel_type);
+								}
+								case 3 -> {
+									result = Azrael.SQLRegisterUniqueChannel(e.getGuild().getIdLong(), textChannel.getIdLong(), channel_type);
+								}
+							}
+							Hashes.removeChannels(e.getGuild().getIdLong());
+							if(result > 0) {
+								logger.info("User {} has registered channel {} as {} channel in guild {}", e.getMember().getUser().getId(), textChannel.getId(), channel_type, e.getGuild().getId());
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
+								if(channel_type.equals("rea")) {
+									//use the temp cache to append reactions after the bot sends a message
+									if(Azrael.SQLUpdateReaction(e.getGuild().getIdLong(), true) > 0) {
+										ReactionMessage.print(e, textChannel.getIdLong(), botConfig);
+									}
+									else {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("Role reactions couldn't be automatically enabled in guild {}", e.getGuild().getId());
+									}
+								}
+								else if(channel_type.equals("sub")) {
+									SubscriptionUtils.startTimer(e.getJDA());
+								}
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("Role reactions couldn't be automatically enabled in guild {}", guild_id);
+								logger.error("Channel {} couldn't be saved as channel type {} in guild {}", textChannel.getId(), channel_type, e.getGuild().getId());
 							}
 						}
-						else if(channel_type.equals("sub")) {
-							SubscriptionUtils.startTimer(e.getJDA());
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Channel {} couldn't be saved as channel type {} in guild {}", channel_id, channel_type, guild_id);
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 					}
 				}
-				else {
+				else{
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
+				return true;
 			}
-			else{
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Channel types couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
-			return true;
 		}
 		else {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
@@ -134,7 +154,7 @@ public class RegisterChannel {
 		return false;
 	}
 	
-	public static boolean runCommandURL(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommandURL(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			var channel = args[1].replaceAll("[<>#]", "");
@@ -142,8 +162,8 @@ public class RegisterChannel {
 				var channel_id = Long.parseLong(channel);
 				if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 					var url_censoring = (args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) ? true : false);
-					if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, _guild_id, url_censoring) > 0) {
-						Hashes.removeChannels(_guild_id);
+					if(Azrael.SQLInsertChannel_ConfURLCensoring(channel_id, e.getGuild().getIdLong(), url_censoring) > 0) {
+						Hashes.removeChannels(e.getGuild().getIdLong());
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						logger.info("User {} has changed the url censoring status of channel {} to {} in guild {}", e.getMember().getUser().getId(), channel_id, url_censoring, e.getGuild().getId());
 					}
@@ -168,7 +188,7 @@ public class RegisterChannel {
 		return false;
 	}
 	
-	public static boolean runCommandTxt(GuildMessageReceivedEvent e, long _guild_id, String [] args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommandTxt(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			var channel = args[1].replaceAll("[<>#]", "");
@@ -176,8 +196,8 @@ public class RegisterChannel {
 				var channel_id = Long.parseLong(channel);
 				if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 					var txt_removal = (args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE)) ? true : false);
-					if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, _guild_id, txt_removal) > 0) {
-						Hashes.removeChannels(_guild_id);
+					if(Azrael.SQLInsertChannel_ConfTXTCensoring(channel_id, e.getGuild().getIdLong(), txt_removal) > 0) {
+						Hashes.removeChannels(e.getGuild().getIdLong());
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_CHANNEL_REGISTERED)).build()).queue();
 						logger.info("User {} has changed the text removal status of channel {} to {} in guild {}", e.getMember().getUser().getId(), channel_id, txt_removal, e.getGuild().getId());
 					}
@@ -202,7 +222,7 @@ public class RegisterChannel {
 		return true;
 	}
 	
-	public static boolean runChannelsRegistration(GuildMessageReceivedEvent e, long _guild_id, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runChannelsRegistration(GuildMessageReceivedEvent e, boolean adminPermission, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNELS);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
 			for(TextChannel tc : e.getGuild().getTextChannels()) {

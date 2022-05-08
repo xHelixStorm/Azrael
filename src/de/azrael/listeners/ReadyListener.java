@@ -280,9 +280,8 @@ public class ReadyListener extends ListenerAdapter {
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			//print bot is now operational message in all servers
 			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(g.getIdLong());
-			//TODO: translate message
 			if(botConfig.getNotifications())
-				STATIC.writeToRemoteChannel(g, null, "Bot is now operational!", Channel.LOG.getType());
+				STATIC.writeToRemoteChannel(g, null, STATIC.getTranslation2(g, Translation.BOT_NOW_OPERATIONAL), Channel.LOG.getType());
 			executor.execute(new RoleExtend(g));
 			Azrael.SQLBulkInsertCategories(g.getCategories());
 			Azrael.SQLBulkInsertChannels(g.getTextChannels());

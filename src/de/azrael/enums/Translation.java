@@ -174,6 +174,7 @@ public enum Translation {
 	LANG_ITA					("lang_ita"),
 	LANG_ARA					("lang_ara"),
 	
+	BOT_NOW_OPERATIONAL			("bot_now_operational"),
 	NOT_BOT_CHANNEL				("not_bot_channel"),
 	WRONG_CHANNEL				("wrong_channel"),
 	NOT_QUIZ_CHANNEL			("not_quiz_channel"),
@@ -1451,6 +1452,7 @@ public enum Translation {
 	UPDATE_DISABLED				("update_disabled"),
 	
 	PRUNE_HELP					("prune_help"),
+	PRUNE_ALREADY_RUNNING		("prune_already_running"),
 	PRUNE_CONFIRMATION			("prune_confirmation"),
 	PRUNE_SEL_MEMBERS			("prune_sel_members"),
 	PRUNE_SEL_ROLES				("prune_sel_roles"),
@@ -1458,6 +1460,9 @@ public enum Translation {
 	PRUNE_EXC_ROLES				("prune_exc_roles"),
 	PRUNE_COMPLETE				("prune_complete"),
 	PRUNE_ABORT					("prune_abort"),
+	PRUNE_STATUS				("prune_status"),
+	PRUNE_STATUS_ERR			("prune_status_err"),
+	
 	WARN_HELP					("warn_help"),
 	WARN_SENT					("warn_sent"),
 	WARN_SENT_2					("warn_sent_2"),

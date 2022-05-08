@@ -61,7 +61,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
-				return RegisterRole.runCommandWithAdminFirst(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterRole.runCommandWithAdminFirst(e, args, adminPermission, thumbnails);
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
@@ -144,7 +144,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_ROLE)) {
-				return RegisterRole.runCommand(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterRole.runCommand(e, args, adminPermission, thumbnails);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CATEGORY)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_CATEGORY)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_CATEGORY);
@@ -170,7 +170,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL)) {
-				return RegisterChannel.runCommand(e, guild_id, args, adminPermission, thumbnails, botConfig);
+				return RegisterChannel.runCommand(e, args, adminPermission, thumbnails, botConfig);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL);
@@ -183,7 +183,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_URL)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_URL)) {
-				return RegisterChannel.runCommandURL(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterChannel.runCommandURL(e, args, adminPermission, thumbnails);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT);
@@ -196,10 +196,10 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNEL_TXT)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNEL_TXT)) {
-				return RegisterChannel.runCommandTxt(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterChannel.runCommandTxt(e, args, adminPermission, thumbnails);
 			}
 			else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TEXT_CHANNELS)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_TEXT_CHANNELS)) {
-				return RegisterChannel.runChannelsRegistration(e, guild_id, adminPermission, thumbnails);
+				return RegisterChannel.runChannelsRegistration(e, adminPermission, thumbnails);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_RANKING_ROLE)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_RANKING_ROLE);
@@ -212,7 +212,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_RANKING_ROLE)) {
-				return RegisterRankingRole.runCommand(e, guild_id, args, adminPermission, thumbnails);
+				return RegisterRankingRole.runCommand(e, args, adminPermission, thumbnails);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_USERS)) {
 				final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_USERS);

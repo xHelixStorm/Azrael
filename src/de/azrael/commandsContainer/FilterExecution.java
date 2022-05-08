@@ -94,7 +94,7 @@ public class FilterExecution {
 		if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_WORD_FILTER)) {
 			final var wordFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_WORD_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("WORD-FILTER");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
 			}
@@ -105,7 +105,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_FILTER)) {
 			final var nameFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_FILTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("NAME-FILTER");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
 			}
@@ -116,7 +116,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_KICK)) {
 			final var nameKickLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_KICK);
 			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("NAME-KICK");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
 			}
@@ -127,7 +127,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_FUNNY_NAMES)) {
 			final var funnyNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_FUNNY_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("FUNNY-NAMES");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "funny-names"));
 			}
@@ -138,7 +138,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_STAFF_NAMES)) {
 			final var staffNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_STAFF_NAMES);
 			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("STAFF-NAMES");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
 			}
@@ -149,7 +149,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_URLS)) {
 			final var urlBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_URLS);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("PROHIBITED-URLS");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-urls"));
 			}
@@ -160,7 +160,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_ALLOWED_URLS)) {
 			final var urlWhitelistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_ALLOWED_URLS);
 			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("ALLOWED-URLS");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "allowed-urls"));
 			}
@@ -171,7 +171,7 @@ public class FilterExecution {
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_SUBS)) {
 			final var tweetBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_SUBS);
 			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
-				message.setTitle("PROHIBITED-SUBS");
+				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-subs"));
 			}
@@ -302,7 +302,6 @@ public class FilterExecution {
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
 						message.setTitle("NAME-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
 						cache.updateDescription("add-load-name-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
@@ -552,7 +551,6 @@ public class FilterExecution {
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
 						message.setTitle("PROHIBITED-URLS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_FQDN)).build()).queue();
 						cache.updateDescription("add-load-prohibited-urls").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
@@ -677,7 +675,6 @@ public class FilterExecution {
 					}
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
 						message.setTitle("PROHIBITED-SUBS "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_USERNAME)).build()).queue();
 						cache.updateDescription("add-load-prohibited-subs").setExpiration(180000);
 						Hashes.addTempCache(key, cache.setExpiration(180000));
@@ -1164,7 +1161,6 @@ public class FilterExecution {
 							}
 							else {
 								message.setColor(Color.RED);
-								//TODO: fix translation
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 							}
 						}
@@ -1282,7 +1278,6 @@ public class FilterExecution {
 				}
 				case "insert-prohibited-subs" -> {
 					if(Azrael.SQLInsertSubscriptionBlacklist(_message, e.getGuild().getIdLong()) >= 0) {
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_INSERT_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.info("User {} has saved the username {} as a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -1298,14 +1293,12 @@ public class FilterExecution {
 				case "remove-prohibited-subs" -> {
 					final var result = Azrael.SQLDeleteSubscriptionBlacklist(_message, e.getGuild().getIdLong());
 					if(result > 0) {
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_REMOVE_NICK)).build()).queue();
 						Hashes.removeTweetBlacklist(e.getGuild().getIdLong());
 						logger.info("User {} has removed the username {} and is no longer a prohibited subscription in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
 					}
 					else if(result == 0) {
 						message.setColor(Color.RED);
-						//TODO: fix translation
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_SUB_REMOVE_ERR)).build()).queue();
 					}
 					else {
@@ -1337,7 +1330,6 @@ public class FilterExecution {
 							if(checkedUsernames.size() > 0) {
 								var QueryResult = Azrael.SQLReplaceTweetBlacklist(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(QueryResult == 0) {
-									//TODO: fix translation
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_NICK)).build()).queue();
 									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
 									logger.info("User {} has inserted usernames with the pastebin url {} to prohibit subscriptions from in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
@@ -1359,7 +1351,7 @@ public class FilterExecution {
 									}
 								}
 								else {
-									//thow error for failing the rollback
+									//throw error for failing the rollback
 									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
 									logger.error("Changes on the prohibited subscriptions couldn't be rolled back on error in guild {}", e.getGuild().getId());
@@ -1367,7 +1359,6 @@ public class FilterExecution {
 							}
 							else {
 								message.setColor(Color.RED);
-								//TODO: fix translation
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
 							}
 						}

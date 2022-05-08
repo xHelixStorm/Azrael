@@ -60,28 +60,23 @@ public class RegisterRole {
 		}
 	}
 	
-	public static boolean runCommandWithAdminFirst(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommandWithAdminFirst(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		String category_abv = null;
-		String role;
-		String role_name;
-		long role_id;
 		
 		if(adminPermission) {
-			if(_args.length == 3 && _args[1].equalsIgnoreCase("adm")) {
+			if(args.length == 3 && args[1].equalsIgnoreCase("adm") && args[2].matches("[0-9]*")) {
 				category_abv = "adm";
-				role = _args[2].replaceAll("[^0-9]*", "");
-				if(e.getGuild().getRoleById(role) != null) {
-					role_id = Long.parseLong(role);
-					role_name = e.getGuild().getRoleById(role_id).getName();
-					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, STATIC.getLevel(category_abv), role_name, category_abv, false) > 0) {
+				Role role = e.getGuild().getRoleById(args[2]);
+				if(role != null) {
+					if(DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), role.getIdLong(), STATIC.getLevel(category_abv), role.getName(), category_abv, false) > 0) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADM_ADDED)).build()).queue();
-						logger.info("User {} has registered the administrator role {} for guild {}", e.getMember().getUser().getId(), role_id, e.getGuild().getId());
+						logger.info("User {} has registered the administrator role {} for guild {}", e.getMember().getUser().getId(), role.getId(), e.getGuild().getId());
 						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
 						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Administrator role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
+						logger.error("Administrator role {} couldn't be registered in guild {}", role.getId(), e.getGuild().getId());
 					}
 				}
 			}
@@ -97,57 +92,67 @@ public class RegisterRole {
 		return false;
 	}
 
-	public static boolean runCommand(GuildMessageReceivedEvent e, long _guild_id, String [] _args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
 		String category_abv = null;
-		String role;
-		String role_name;
-		long role_id;
 		
 		final int commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_ROLE);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			Pattern pattern = Pattern.compile("(adm|mod|com|mut|rea|boo|ver|key|inv)");
-			Matcher matcher = pattern.matcher(_args[1].toLowerCase());
-			if(_args.length > 2 && matcher.find()) {
-				category_abv = matcher.group();
-				role = _args[2].replaceAll("[^0-9]*", "");
-				if(e.getGuild().getRoleById(role) != null) {
-					role_id = Long.parseLong(role);
-					role_name = e.getGuild().getRoleById(role_id).getName();
-					var level = STATIC.getLevel(category_abv);
-					boolean persistant = true;
-					if(category_abv.equals("rea"))
-						persistant = false;
-					if(DiscordRoles.SQLInsertRole(_guild_id, role_id, level, role_name, category_abv, persistant) > 0) {
-						logger.info("User {} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role_name, category_abv, e.getGuild().getId());
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADDED)).build()).queue();
-						Hashes.removeDiscordRoles(e.getGuild().getIdLong());
-						if(category_abv.equals("rea")) {
-							Hashes.removeReactionRoles(e.getGuild().getIdLong());
-						}
-						else if(category_abv.equals("ver")) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NOTICE)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
-							Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ver"));
-						}
-						else if(category_abv.equals("key")) {
-							if(!Azrael.SQLisGiveawayAvailable(_guild_id)) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_KEY)).build()).queue();
-							}
-						}
-						DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+			final var roleTypes = DiscordRoles.SQLgetCategories();
+			if(roleTypes != null && roleTypes.size() > 0) {
+				StringBuilder out = new StringBuilder();
+				for(final var roleType : roleTypes) {
+					if(!roleType.getCategory_ABV().equals("def")) {
+						if(out.length() > 0)
+							out.append("|");
+						out.append(roleType);
 					}
-					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Role {} couldn't be registered in guild {}", role_id, e.getGuild().getId());
+				}
+				Pattern pattern = Pattern.compile("("+out.toString()+")");
+				Matcher matcher = pattern.matcher(args[1].toLowerCase());
+				if(args.length > 2 && args[2].matches("[0-9]*") && matcher.find()) {
+					category_abv = matcher.group();
+					Role role = e.getGuild().getRoleById(args[2]);
+					if(role != null) {
+						var level = STATIC.getLevel(category_abv);
+						boolean persistant = true;
+						if(category_abv.equals("rea"))
+							persistant = false;
+						if(DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), role.getIdLong(), level, role.getName(), category_abv, persistant) > 0) {
+							logger.info("User {} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role.getName(), category_abv, e.getGuild().getId());
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADDED)).build()).queue();
+							Hashes.removeDiscordRoles(e.getGuild().getIdLong());
+							if(category_abv.equals("rea")) {
+								Hashes.removeReactionRoles(e.getGuild().getIdLong());
+							}
+							else if(category_abv.equals("ver")) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NOTICE)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
+								Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ver"));
+							}
+							else if(category_abv.equals("key")) {
+								if(!Azrael.SQLisGiveawayAvailable(e.getGuild().getIdLong())) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_KEY)).build()).queue();
+								}
+							}
+							DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Role {} couldn't be registered in guild {}", role.getId(), e.getGuild().getId());
+						}
+					}
+					else{
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
 					}
 				}
 				else{
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
+				return true;
 			}
-			else{
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Role types couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
-			return true;
 		}
 		else {
 			EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
@@ -157,7 +162,7 @@ public class RegisterRole {
 	}
 	
 	public static void assignVerifiedRoleToMembers(GuildMessageReceivedEvent e, Cache cache) {
-		if(e.getMessage().getContentRaw().equalsIgnoreCase("yes")) {
+		if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 			if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 				final var ver_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("ver")).findAny().orElse(null);
 				if(ver_role != null) {
@@ -190,7 +195,7 @@ public class RegisterRole {
 			}
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REGISTER_ROLE.getColumn(), e.getMessage().getContentRaw());
 		}
-		else if(e.getMessage().getContentRaw().equalsIgnoreCase("no")) {
+		else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_DONE)).build()).queue();
 			Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REGISTER_ROLE.getColumn(), e.getMessage().getContentRaw());
