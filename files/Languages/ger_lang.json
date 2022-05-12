@@ -815,7 +815,7 @@
 	"youtube_register":				"Schreiben Sie nun die youtube url des Kanals! Zum Beispiel https://www.youtube.com/channel/UC0ox9NuTHYeRys63yZpBFuB.",
 	"youtube_added":				"YouTube-Kanal **{}** wurde hinzugefügt! Kanalname **{}** entdeckt!",
 	"youtube_invalid":				"Der angegebene YouTube-Kanal wurde nicht gefunden oder ist nicht gültig!",
-	"youtube_format_current":		"Schlüsselwerte für YouTube-Abonnements sind `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
+	"youtube_format_current":		"Schlüsselwerte für YouTube-Abonnements sind `{channel}`, `{channel_id}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
 	"youtube_not_found":			"Es wurde kein YouTube-Video für diesen Kanal gefunden!",
 	
 	"twitch_help":					"Ermöglicht es Ihnen, einen Benutzer zu abonnieren und Live-Streams von Twitch mit diesen verfügbaren Parametern abzurufen:\n\n- **{}**:\nRegistrieren Sie einen Twitch-Benutzer, um ihm zu folgen!\n- **{}**:\nDefinieren Sie die Anzeigeoptionen für die abgerufenen Twitch-Inhalte!\n- **{}**:\nVerwenden Sie einen anderen Kanal als den Standardkanal!\n- **{}**:\nEntfernen Sie ein registriertes Twitch-Abonnement!\n- **{}**:\nTesten Sie ein registriertes Twitch-Abonnement!\n- **{}**:\nAlle registrierten Twitch-Abonnements anzeigen!",

@@ -474,7 +474,7 @@ public class STATIC {
 		}
 	}
 	
-	//method to trust all certificates and to retrieve the html code from a webpage
+	//method to retrieve the html code from a webpage
 	public static BufferedReader retrieveWebPageCode(String link) throws SocketTimeoutException, IOException {
 		URL url = new URL(link);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();

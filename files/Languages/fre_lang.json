@@ -815,7 +815,7 @@
 	"youtube_register":				"Maintenant, écrivez l'url youtube de la chaîne ! Par exemple https://www.youtube.com/channel/UC0ox9NuTHYeRys63yZpBFuB.",
 	"youtube_added":				"La chaîne YouTube **{}** a été ajoutée ! Nom de la chaîne **{}** détecté !",
 	"youtube_invalid":				"La chaîne YouTube fournie n'a pas été trouvée ou n'est pas valide !",
-	"youtube_format_current":		"Les valeurs clés des abonnements YouTube sont `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
+	"youtube_format_current":		"Les valeurs clés des abonnements YouTube sont `{channel}`, `{channel_id}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
 	"youtube_not_found":			"Aucune vidéo YouTube n'a été trouvée pour cette chaîne !",
 	
 	"twitch_help":					"Permet d'abonner un utilisateur et de récupérer les flux en direct de Twitch avec les paramètres disponibles :\n\n- **{}**:\nEnregistrez un utilisateur Twitch à suivre !\n- **{}**:\nDéfinissez les options d'affichage du contenu Twitch récupéré !\n- **{}**:\nUtilisez un canal spécifique en plus du canal par défaut !\n- **{}**:\nSupprimer un abonnement Twitch enregistré !\n- **{}**:\nTestez un abonnement Twitch enregistré !\n- **{}**:\nAfficher tous les abonnements Twitch enregistrés !",

@@ -815,7 +815,7 @@
 	"youtube_register":				"Now write the youtube url of the channel! For example https://www.youtube.com/channel/UC0ox9NuTHYeRys63yZpBFuB.",
 	"youtube_added":				"YouTube channel **{}** has been added! Channel name **{}** detected!",
 	"youtube_invalid":				"The provided YouTube channel has not been found or is not valid!",
-	"youtube_format_current":		"Key values for YouTube subscriptions are `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
+	"youtube_format_current":		"Key values for YouTube subscriptions are `{channel}`, `{channel_id}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
 	"youtube_not_found":			"No YouTube video has been found for this channel!",
 	
 	"twitch_help":					"Allows you to subscribe a user and fetch live streams from Twitch with these available parameters:\n\n- **{}**:\nRegister a Twitch user to follow!\n- **{}**:\nDefine the display options of the fetched Twitch content!\n- **{}**:\nUse a specific channel besides the default one!\n- **{}**:\nRemove a registered Twitch subscription!\n- **{}**:\nTest a registered Twitch subscription!\n- **{}**:\nShow all registered Twitch subscriptions!",

@@ -11,8 +11,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.api.services.youtube.model.SearchListResponse;
-import com.google.api.services.youtube.model.SearchResult;
+import com.google.api.services.youtube.model.Channel;
+import com.google.api.services.youtube.model.ChannelListResponse;
 import com.vdurmont.emoji.EmojiParser;
 
 import de.azrael.constructors.Cache;
@@ -294,10 +294,10 @@ public class SubscriptionUtils {
 				if(!message.contains(" ") && message.startsWith(url) && message.length() > url.length()) {
 					message = message.substring(url.length()+1);
 					try {
-						SearchListResponse result = GoogleYoutube.searchYouTubeChannelVideos(GoogleYoutube.getService(), message, 1);
+						ChannelListResponse result = GoogleYoutube.searchYouTubeChannel(GoogleYoutube.getService(), message);
 						if(result != null && result.getItems().size() > 0) {
-							final SearchResult item = result.getItems().get(0);
-							name = item.getSnippet().getChannelTitle();
+							final Channel item = result.getItems().get(0);
+							name = item.getSnippet().getTitle();
 							output = STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_ADDED).replaceFirst("\\{\\}", message).replace("{}", name);
 							valid = true;
 						}

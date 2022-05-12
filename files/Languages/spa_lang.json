@@ -815,7 +815,7 @@
 	"youtube_register":				"¡Ahora escribe la url de youtube del canal! Por ejemplo https://www.youtube.com/channel/UC0ox9NuTHYeRys63yZpBFuB.",
 	"youtube_added":				"¡El canal de YouTube **{}** ha sido añadido! ¡Se ha detectado el nombre del canal **{}**!",
 	"youtube_invalid":				"¡El canal de YouTube proporcionado no se ha encontrado o no es válido!",
-	"youtube_format_current":		"Los valores clave de las suscripciones a YouTube son `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
+	"youtube_format_current":		"Los valores clave de las suscripciones a YouTube son `{channel}`, `{channel_id}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
 	"youtube_not_found":			"¡No se ha encontrado ningún vídeo de YouTube para este canal!",
 	
 	"twitch_help":					"Te permite suscribirte a un usuario y obtener transmisiones en directo de Twitch con estos parámetros disponibles:\n\n- **{}**:\n¡Registra un usuario de Twitch para seguirlo!\n- **{}**:\n¡Define las opciones de visualización del contenido obtenido en Twitch!\n- **{}**:\n¡Utilice un canal específico además del predeterminado!\n- **{}**:\n¡Elimina una suscripción registrada de Twitch!\n- **{}**:\n¡Prueba una suscripción registrada a Twitch!\n- **{}**:\n¡Mostrar todas las suscripciones registradas en Twitch!",

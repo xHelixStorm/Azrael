@@ -815,7 +815,7 @@
 	"youtube_register":				"Agora escreva a url do youtube do canal! Por exemplo https://www.youtube.com/channel/UC0ox9NuTHYeRys63yZpBFuB.",
 	"youtube_added":				"O canal YouTube **{}*** foi adicionado! Nome do canal **{}*** detectado!",
 	"youtube_invalid":				"O canal YouTube, desde que não tenha sido encontrado ou não seja válido!",
-	"youtube_format_current":		"Os valores chave para as subscrições no YouTube são `{channel}`, `{channel_id}`, `{pubDate}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
+	"youtube_format_current":		"Os valores chave para as subscrições no YouTube são `{channel}`, `{channel_id}`, `{title}`, `{description}`, `{url}`, `{video_id}`.",
 	"youtube_not_found":			"Nenhum vídeo do YouTube foi encontrado para este canal!",
 	
 	"twitch_help":					"Permite-lhe subscrever um utilizador e ir buscar fluxos ao vivo ao Twitch com estes parâmetros disponíveis:\n\n- **{}**:\nRegiste um utilizador do Twitch a seguir!\n- **{}**:\nDefina as opções de visualização do conteúdo do Twitch obtido!\n- **{}**:\nUtilize um canal específico para além do canal padrão!\n- **{}**:\nRetirar uma subscrição Twitch registada!\n- **{}**:\nTeste uma subscrição Twitch registada!\n- **{}**:\nMostrar todas as subscrições do Twitch registadas!",
