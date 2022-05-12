@@ -6,10 +6,10 @@ import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.api.services.youtube.model.SearchListResponse;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.core.UserPrivs;
@@ -89,6 +89,7 @@ public class CustomCmd implements CommandPublic {
 				
 				//default output message formatting
 				String out = command.getOutput();
+				boolean success = false;
 				if(out == null) {
 					out = "";
 				}
@@ -113,31 +114,38 @@ public class CustomCmd implements CommandPublic {
 				
 				//Fetch single youtube video request
 				if(command.getAction() == CommandAction.YOUTUBE) {
-					String input = "";
+					StringBuilder input = new StringBuilder();
 					for(String arg : args) {
-						input += arg+" ";
+						input.append(arg+" ");
 					}
 					
-					SearchListResponse response = null;
+					JSONArray response = null;
 					try {
-						response = GoogleYoutube.searchYouTubeVideo(GoogleYoutube.getService(), input.trim(), 1L);
+						response = GoogleYoutube.collectYouTubeVideos(input.toString());
 					} catch (Exception e1) {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("YouTube query couldn't be executed for command {} in guild {}", command.getCommand(), e.getGuild().getId(), e1);
 						return true;
-					}
+					} 
 					
-					if(response != null && response.getItems().size() > 0) {
-						final var snippet = response.getItems().get(0).getSnippet();
-						out = out.replaceAll("\\{youtube_url\\}", YOUTUBEENDPOINT+response.getItems().get(0).getId().getVideoId())
-							.replaceAll("\\{youtube_title\\}", snippet.getTitle())
-							.replaceAll("\\{youtube_description\\}", snippet.getDescription())
-							.replaceAll("\\{youtube_channel\\}", snippet.getChannelTitle())
-							.replaceAll("\\{youtube_published\\}", snippet.getPublishedAt().toString());
-					}
-					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_VIDEO_NOT_FOUND)).build()).queue();
-						return true;
+					if(response != null && response.length() > 0) {
+						int index = 0;
+						while(!success && index < response.length()) {
+							JSONObject json = response.getJSONObject(index);
+							if(json.has("videoRenderer")) {
+								success = true;
+								json = json.getJSONObject("videoRenderer");
+								out = out.replaceAll("\\{youtube_url\\}", YOUTUBEENDPOINT+json.getString("videoId"))
+										.replaceAll("\\{youtube_title\\}", json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text"))
+										.replaceAll("\\{youtube_description\\}", json.getJSONObject("detailedMetadataSnippets").getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text"))
+										.replaceAll("\\{youtube_channel\\}", json.getJSONObject("longBylineText").getJSONArray("runs").getJSONObject(0).getString("text"));
+							}
+							index++;
+						}
+						if(!success) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_VIDEO_NOT_FOUND)).build()).queue();
+							return true;
+						}
 					}
 				}
 				//Assign or remove role(s) to user
@@ -155,6 +163,7 @@ public class CustomCmd implements CommandPublic {
 						}
 						if(verifiedRoles.size() > 0) {
 							if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
+								success = true;
 								String roleName = "";
 								String roleId = "";
 								String roleMention = "";
@@ -206,9 +215,9 @@ public class CustomCmd implements CommandPublic {
 						textChannel = e.getChannel();
 				}
 				
-				if(out.trim().length() > 0) {
+				if(success && out.trim().length() > 0) {
 					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_WRITE)))
-						e.getGuild().getTextChannelById(textChannel.getIdLong()).sendMessage(out).queue();
+						textChannel.sendMessage(out).queue();
 					else 
 						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+textChannel.getAsMention(), Channel.LOG.getType());
 				}

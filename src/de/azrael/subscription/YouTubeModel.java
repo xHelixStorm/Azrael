@@ -29,10 +29,8 @@ public class YouTubeModel {
 		final TextChannel textChannel = guild.getTextChannelById(subscriptionChannel);
 		if(textChannel != null) {
 			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
-				JSONObject json = GoogleYoutube.collectYouTubeVideos(subscription.getName());
-				if(json != null && json.has("itemSectionRenderer")) {
-					json = json.getJSONObject("itemSectionRenderer");
-					JSONArray contents = json.getJSONArray("contents");
+				JSONArray contents = GoogleYoutube.collectYouTubeVideos(subscription.getName());
+				if(contents != null && contents.length() > 0) {
 					String channelId = "";
 					String channelName = "";
 					for(int i = 0; i < 2; i++) {
@@ -44,7 +42,7 @@ public class YouTubeModel {
 							success = true;
 						}
 						if(success && curJson.has("shelfRenderer")) {
-							json = json.getJSONObject("shelfRenderer");
+							JSONObject json = curJson.getJSONObject("shelfRenderer");
 							json = json.getJSONObject("content");
 							json = json.getJSONObject("verticalListRenderer");
 							JSONArray items = json.getJSONArray("items");
@@ -93,10 +91,8 @@ public class YouTubeModel {
 	
 	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
 		try {
-			JSONObject json = GoogleYoutube.collectYouTubeVideos(subscription.getName());
-			if(json != null && json.has("itemSectionRenderer")) {
-				json = json.getJSONObject("itemSectionRenderer");
-				JSONArray contents = json.getJSONArray("contents");
+			JSONArray contents = GoogleYoutube.collectYouTubeVideos(subscription.getName());
+			if(contents != null && contents.length() > 0) {
 				String channelId = "";
 				String channelName = "";
 				boolean success = false;
@@ -109,7 +105,7 @@ public class YouTubeModel {
 						success = true;
 					}
 					if(success && curJson.has("shelfRenderer")) {
-						json = json.getJSONObject("shelfRenderer");
+						JSONObject json = curJson.getJSONObject("shelfRenderer");
 						json = json.getJSONObject("content");
 						json = json.getJSONObject("verticalListRenderer");
 						JSONArray items = json.getJSONArray("items");

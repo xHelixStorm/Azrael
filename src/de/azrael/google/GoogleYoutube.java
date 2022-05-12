@@ -6,6 +6,7 @@ import java.net.SocketTimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,7 +15,6 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ChannelListResponse;
-import com.google.api.services.youtube.model.SearchListResponse;
 
 import de.azrael.util.STATIC;
 
@@ -34,24 +34,6 @@ public class GoogleYoutube {
 	}
 	
 	/**
-	 * Search for YouTube Video(s)
-	 * @param service YouTube client service
-	 * @param query search request
-	 * @param maxResults limit of videos to retrieve
-	 * @return query results
-	 * @throws IOException
-	 */
-	
-	public static SearchListResponse searchYouTubeVideo(final YouTube service, final String query, final long maxResults) throws IOException {
-		//Search YouTube Video
-		YouTube.Search.List request = service.search().list("snippet");
-		return request.setMaxResults(maxResults)
-			.setQ(query)
-			.setType("video")
-			.execute();
-	}
-	
-	/**
 	 * Search for YouTube channels
 	 * @param service YouTube client service
 	 * @param channel_id YouTube channel id
@@ -68,12 +50,12 @@ public class GoogleYoutube {
 	/**
 	 * 
 	 * @param name YouTube search criteria
-	 * @return search result json object
+	 * @return search result json array
 	 * @throws SocketTimeoutException
 	 * @throws IOException
 	 */
 	
-	public static JSONObject collectYouTubeVideos(final String name) throws SocketTimeoutException, IOException {
+	public static JSONArray collectYouTubeVideos(final String name) throws SocketTimeoutException, IOException {
 		final BufferedReader bf = STATIC.retrieveWebPageCode("https://www.youtube.com/results?search_query="+name+"&h1=en&persist_h1=1");
 		StringBuilder out = new StringBuilder(); 
 		String line = "";
@@ -91,7 +73,8 @@ public class GoogleYoutube {
 			json = json.getJSONObject("primaryContents");
 			json = json.getJSONObject("sectionListRenderer");
 			json = json.getJSONArray("contents").getJSONObject(0);
-			return json;
+			json = json.getJSONObject("itemSectionRenderer");
+			return json.getJSONArray("contents");
 		}
 		return null;
 	}
