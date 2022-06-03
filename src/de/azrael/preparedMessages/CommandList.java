@@ -2,7 +2,6 @@ package de.azrael.preparedMessages;
 
 import java.util.ArrayList;
 
-import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
@@ -11,7 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 
 public class CommandList {
 	
-	public static String getHelp(Member member, boolean permissionGranted, int type) {
+	public static String getHelp(Member member, boolean permissionGranted, int type, ArrayList<?> commands) {
 		long guild_id = member.getGuild().getIdLong();
 		StringBuilder textCollector = new StringBuilder();
 		boolean administration = false;
@@ -64,12 +63,6 @@ public class CommandList {
 		boolean display = false;
 		boolean patchnotes = false;
 		boolean language = false;
-		
-		final var commands = (ArrayList<?>)BotConfiguration.SQLgetCommand(guild_id, 3, Command.REGISTER, Command.SET, Command.REMOVE, Command.USER, Command.FILTER, Command.ROLE_REACTION, Command.SUBSCRIBE
-				, Command.DOUBLE_EXPERIENCE, Command.HEAVY_CENSORING, Command.MUTE, Command.GOOGLE, Command.WRITE, Command.EDIT, Command.ACCEPT, Command.DENY, Command.SCHEDULE, Command.PRUNE
-				, Command.WARN, Command.INVITES, Command.PUG, Command.MEOW, Command.RANK, Command.PROFILE, Command.TOP, Command.USE, Command.SHOP, Command.INVENTORY, Command.DAILY , Command.QUIZ
-				, Command.RANDOMSHOP, Command.EQUIP, Command.MATCHMAKING, Command.JOIN, Command.LEAVE, Command.CLAN, Command.QUEUE, Command.CW, Command.ROOM, Command.STATS, Command.LEADERBOARD
-				, Command.ABOUT, Command.DISPLAY, Command.PATCHNOTES, Command.LANGUAGE);
 		
 		for(int i = 0; i < commands.size(); i++) {
 			final boolean command = (Boolean)commands.get(i);

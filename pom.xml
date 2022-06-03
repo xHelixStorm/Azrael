@@ -11,11 +11,6 @@
 		    <version>4.3.0_277</version>
 		</dependency>
 		<dependency>
-		    <groupId>org</groupId>
-		    <artifactId>jpastebin</artifactId>
-		    <version>1.0.1</version>
-		</dependency>
-		<dependency>
 		    <groupId>org.twitter4j</groupId>
 		    <artifactId>twitter4j-core</artifactId>
 		    <version>4.0.7</version>

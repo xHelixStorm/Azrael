@@ -93,7 +93,7 @@ public class FilterExecution {
 		
 		if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_WORD_FILTER)) {
 			final var wordFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_WORD_FILTER);
-			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), wordFilterLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "word-filter"));
@@ -104,7 +104,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_FILTER)) {
 			final var nameFilterLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_FILTER);
-			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), nameFilterLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_FILTER).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-filter"));
@@ -115,7 +115,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_NAME_KICK)) {
 			final var nameKickLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_NAME_KICK);
-			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), nameKickLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_NAME_KICK).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "name-kick"));
@@ -126,7 +126,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_FUNNY_NAMES)) {
 			final var funnyNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_FUNNY_NAMES);
-			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), funnyNamesLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_FUNNY_NAMES).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "funny-names"));
@@ -137,7 +137,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_STAFF_NAMES)) {
 			final var staffNamesLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_STAFF_NAMES);
-			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), staffNamesLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_STAFF_NAMES).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "staff-names"));
@@ -148,7 +148,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_URLS)) {
 			final var urlBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_URLS);
-			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), urlBlacklistLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_URLS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-urls"));
@@ -159,7 +159,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_ALLOWED_URLS)) {
 			final var urlWhitelistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_ALLOWED_URLS);
-			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), urlWhitelistLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_ALLOWED_URLS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "allowed-urls"));
@@ -170,7 +170,7 @@ public class FilterExecution {
 		}
 		else if(_message.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS)) && STATIC.getCommandEnabled(e.getGuild(), Command.FILTER_PROHIBITED_SUBS)) {
 			final var tweetBlacklistLevel = STATIC.getCommandLevel(e.getGuild(), Command.FILTER_PROHIBITED_SUBS);
-			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+			if(UserPrivs.comparePrivilege(e.getMember(), tweetBlacklistLevel)) {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PARAM_PROHIBITED_SUBS).toUpperCase());
 				printFilterActions(e, message);
 				Hashes.addTempCache(key, new Cache(180000, "prohibited-subs"));

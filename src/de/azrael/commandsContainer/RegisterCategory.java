@@ -47,9 +47,9 @@ public class RegisterCategory {
 		}
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, Thumbnails thumbnails) {
 		final var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_CATEGORY);
-		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 			StringBuilder out = new StringBuilder();
 			final var categoryTypes = Azrael.SQLgetCategoryTypes();
 			if(categoryTypes != null && categoryTypes.size() > 0) {

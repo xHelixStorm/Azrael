@@ -231,7 +231,7 @@ public class UserExecution {
 				if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_INFORMATION)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_INFORMATION)) {
 					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_INFORMATION, Command.USER_USE_WATCH_CHANNEL);
 					final var informationLevel = (Integer)command.get(0);
-					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), informationLevel)) {
 						User user = Azrael.SQLgetUserThroughID(cache.getAdditionalInfo(), e.getGuild().getIdLong());
 						if(user != null) {
 							user = Azrael.SQLgetJoinDatesFromUser(user_id, e.getGuild().getIdLong(), user);
@@ -352,7 +352,7 @@ public class UserExecution {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_MANAGE)) {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MESSAGE_HISTORY)) {
 							final var deleteMessagesLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_DELETE_MESSAGES);
-							if(UserPrivs.comparePrivilege(e.getMember(), deleteMessagesLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+							if(UserPrivs.comparePrivilege(e.getMember(), deleteMessagesLevel)) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_DELETE_HELP)).build()).queue();
 								cache.updateDescription("delete-messages"+user_id).setExpiration(180000);
 								Hashes.addTempCache(key, cache);
@@ -379,7 +379,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNING)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_WARNING)) {
 					final var warningLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING);
-					if(UserPrivs.comparePrivilege(e.getMember(), warningLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), warningLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WARNING_HELP)).build()).queue();
 						cache.updateDescription("warning"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -403,7 +403,7 @@ public class UserExecution {
 					if(!UserPrivs.isUserMuted(member)) {
 						if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 							final var muteLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_MUTE);
-							if(UserPrivs.comparePrivilege(e.getMember(), muteLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+							if(UserPrivs.comparePrivilege(e.getMember(), muteLevel)) {
 								message.setColor(Color.BLUE);
 								if(botConfig.getForceReason()) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
@@ -441,7 +441,7 @@ public class UserExecution {
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNMUTE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNMUTE)) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 						final var unmuteLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNMUTE);
-						if(UserPrivs.comparePrivilege(e.getMember(), unmuteLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+						if(UserPrivs.comparePrivilege(e.getMember(), unmuteLevel)) {
 							if(!Azrael.SQLisBanned(user_id, e.getGuild().getIdLong())) {
 								if(Azrael.SQLgetCustomMuted(user_id, e.getGuild().getIdLong())) {
 									//write into cache for RoleTimer and RoleRemovedListener to use for any google API operation
@@ -571,7 +571,7 @@ public class UserExecution {
 					}
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 						final var banLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_BAN);
-						if(UserPrivs.comparePrivilege(e.getMember(), banLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+						if(UserPrivs.comparePrivilege(e.getMember(), banLevel)) {
 							message.setColor(Color.BLUE);
 							if(botConfig.getForceReason()) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
@@ -602,7 +602,7 @@ public class UserExecution {
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNBAN)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNBAN)) {
 					if(e.getGuild().getSelfMember().hasPermission(Permission.BAN_MEMBERS)) {
 						final var unbanLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_UNBAN);
-						if(UserPrivs.comparePrivilege(e.getMember(), unbanLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+						if(UserPrivs.comparePrivilege(e.getMember(), unbanLevel)) {
 							e.getGuild().retrieveBanById(user_id).queue(success -> {
 								if(botConfig.getForceReason()) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
@@ -650,7 +650,7 @@ public class UserExecution {
 					}
 					if(e.getGuild().getSelfMember().hasPermission(Permission.KICK_MEMBERS)) {
 						final var kickLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_KICK);
-						if(UserPrivs.comparePrivilege(e.getMember(), kickLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+						if(UserPrivs.comparePrivilege(e.getMember(), kickLevel)) {
 							message.setColor(Color.BLUE);
 							if(botConfig.getForceReason()) {
 								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_REASON)).build()).queue();
@@ -680,7 +680,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_ASSIGN_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_ASSIGN_ROLE)) {
 					final var assignRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_ASSIGN_ROLE);
-					if(UserPrivs.comparePrivilege(e.getMember(), assignRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), assignRoleLevel)) {
 						int count = 0;
 						ArrayList<Long> roles = new ArrayList<Long>();
 						StringBuilder out = new StringBuilder();
@@ -709,7 +709,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_REMOVE_ROLE)) {
 					final var removeRoleLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_REMOVE_ROLE);
-					if(UserPrivs.comparePrivilege(e.getMember(), removeRoleLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), removeRoleLevel)) {
 						int count = 0;
 						ArrayList<Long> roles = new ArrayList<Long>();
 						StringBuilder out = new StringBuilder();
@@ -738,7 +738,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_HISTORY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_HISTORY)) {
 					final var historyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_HISTORY);
-					if(UserPrivs.comparePrivilege(e.getMember(), historyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), historyLevel)) {
 						StringBuilder out = new StringBuilder();
 						for(var history : Azrael.SQLgetHistory(user_id, e.getGuild().getIdLong())) {
 							if(history.getType().equals("roleAdd"))
@@ -763,7 +763,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_WATCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_WATCH)) {
 					final var watchLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_WATCH);
-					if(UserPrivs.comparePrivilege(e.getMember(), watchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), watchLevel)) {
 						if(!botConfig.getCacheLog()) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_WATCH_CACHE)).build()).queue();
 						}
@@ -782,7 +782,7 @@ public class UserExecution {
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_UNWATCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_UNWATCH)) {
 					final var command = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 2, Command.USER_UNWATCH, Command.USER_USE_WATCH_CHANNEL);
 					final var unwatchLevel = (Integer)command.get(0);
-					if(UserPrivs.comparePrivilege(e.getMember(), unwatchLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), unwatchLevel)) {
 						var watchedMember = Azrael.SQLgetWatchlist(user_id, e.getGuild().getIdLong());
 						if(watchedMember != null) {
 							if(!watchedMember.hasHigherPrivileges()) {
@@ -835,7 +835,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_GIFT_EXPERIENCE) && guild_settings != null && guild_settings.getRankingState()) {
 					final var giftExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_EXPERIENCE);
-					if(UserPrivs.comparePrivilege(e.getMember(), giftExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), giftExperienceLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_EXP)).build()).queue();
 						cache.updateDescription("gift-experience"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -848,7 +848,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_EXPERIENCE) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setExperienceLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_EXPERIENCE);
-					if(UserPrivs.comparePrivilege(e.getMember(), setExperienceLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), setExperienceLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_EXP)).build()).queue();
 						cache.updateDescription("set-experience"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -861,7 +861,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_LEVEL)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_LEVEL) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setLevelLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_LEVEL);
-					if(UserPrivs.comparePrivilege(e.getMember(), setLevelLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), setLevelLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_LEVEL)).build()).queue();
 						cache.updateDescription("set-level"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -874,7 +874,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIFT_CURRENCY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_GIFT_CURRENCY) && guild_settings != null && guild_settings.getRankingState()) {
 					final var giftCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_GIFT_CURRENCY);
-					if(UserPrivs.comparePrivilege(e.getMember(), giftCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), giftCurrencyLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_GIFT_CUR)).build()).queue();
 						cache.updateDescription("gift-currency"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -887,7 +887,7 @@ public class UserExecution {
 				}
 				else if(comment.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_SET_CURRENCY)) && STATIC.getCommandEnabled(e.getGuild(), Command.USER_SET_CURRENCY) && guild_settings != null && guild_settings.getRankingState()) {
 					final var setCurrencyLevel = STATIC.getCommandLevel(e.getGuild(), Command.USER_SET_CURRENCY);
-					if(UserPrivs.comparePrivilege(e.getMember(), setCurrencyLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+					if(UserPrivs.comparePrivilege(e.getMember(), setCurrencyLevel)) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.USER_SET_CUR)).build()).queue();
 						cache.updateDescription("set-currency"+user_id).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -960,7 +960,7 @@ public class UserExecution {
 							}
 						}
 						else {
-							if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING_FORCE)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+							if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_WARNING_FORCE))) {
 								int warning_id = Integer.parseInt(_message.replaceAll("[^0-9]*", ""));
 								int max_warning_id = Azrael.SQLgetMaxWarning(e.getGuild().getIdLong());
 								if(warning_id <= max_warning_id) {
@@ -1518,7 +1518,7 @@ public class UserExecution {
 				}
 			}
 			else if(cache.getAdditionalInfo().replaceAll("[0-9]*", "").equals("watch")) {
-				if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_USE_WATCH_CHANNEL)) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
+				if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.USER_USE_WATCH_CHANNEL))) {
 					var trash_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 					var watch_channel = _allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.WAT.getType())).findAny().orElse(null);
 					if(trash_channel != null || watch_channel != null) {

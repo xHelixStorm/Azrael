@@ -1,6 +1,7 @@
 package de.azrael.commands;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -44,22 +45,28 @@ public class Help implements CommandPublic {
 		
 		//if any bot channels are registered, be sure that the commands gets written from within a bot channel
 		//or was written by a staff member. If written by a staff member, ignore channel restrictions.
-		final boolean admin = (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()));
-		if(this_channel == null && bot_channels.size() > 0 && !admin) {
+		final boolean viewAll = (UserPrivs.isUserAdmin(e.getMember()) || UserPrivs.isUserMod(e.getMember()) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()));
+		if(this_channel == null && bot_channels.size() > 0 && !viewAll) {
 			e.getChannel().sendMessage(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.NOT_BOT_CHANNEL)+STATIC.getChannels(bot_channels)).queue();
 		}
 		//print commands list
 		else {
-			String out = CommandList.getHelp(e.getMember(), admin, 1);
+			final var commands = (ArrayList<?>)BotConfiguration.SQLgetCommand(guild_id, 3, Command.REGISTER, Command.SET, Command.REMOVE, Command.USER, Command.FILTER, Command.ROLE_REACTION, Command.SUBSCRIBE
+					, Command.DOUBLE_EXPERIENCE, Command.HEAVY_CENSORING, Command.MUTE, Command.GOOGLE, Command.WRITE, Command.EDIT, Command.ACCEPT, Command.DENY, Command.SCHEDULE, Command.PRUNE
+					, Command.WARN, Command.INVITES, Command.PUG, Command.MEOW, Command.RANK, Command.PROFILE, Command.TOP, Command.USE, Command.SHOP, Command.INVENTORY, Command.DAILY , Command.QUIZ
+					, Command.RANDOMSHOP, Command.EQUIP, Command.MATCHMAKING, Command.JOIN, Command.LEAVE, Command.CLAN, Command.QUEUE, Command.CW, Command.ROOM, Command.STATS, Command.LEADERBOARD
+					, Command.ABOUT, Command.DISPLAY, Command.PATCHNOTES, Command.LANGUAGE);
+			
+			String out = CommandList.getHelp(e.getMember(), viewAll, 1, commands);
 			if(out.length() > 0)
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_1)).setDescription(out).build()).queue();
-			out = CommandList.getHelp(e.getMember(), admin, 2);
+			out = CommandList.getHelp(e.getMember(), viewAll, 2, commands);
 			if(out.length() > 0)
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_2)).setDescription(out).build()).queue();
-			out = CommandList.getHelp(e.getMember(), admin, 3);
+			out = CommandList.getHelp(e.getMember(), viewAll, 3, commands);
 			if(out.length() > 0)
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_3)).setDescription(out).build()).queue();
-			out = CommandList.getHelp(e.getMember(), admin, 4);
+			out = CommandList.getHelp(e.getMember(), viewAll, 4, commands);
 			if(out.length() > 0)
 				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.COMMAND_HEADER_4)).setDescription(out).build()).queue();
 		}

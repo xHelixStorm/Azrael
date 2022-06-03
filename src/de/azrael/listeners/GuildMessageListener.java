@@ -477,8 +477,8 @@ public class GuildMessageListener extends ListenerAdapter {
 							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
 							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot()) {
 								//check if an administrator or moderator wishes to skip a question or interrupt all questions
-								if(UserPrivs.comparePrivilege(e.getMember(), Quiz.getCommandLevel(guild_id)) || BotConfiguration.SQLisAdministrator(user_id, guild_id)) {
-									if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+								if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+									if(UserPrivs.comparePrivilege(e.getMember(), Quiz.getCommandLevel(guild_id))) {
 										RunQuiz.quizState.put(e.getGuild().getIdLong(), message);
 										STATIC.killThread("quiz_gu"+e.getGuild().getId());
 										Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.QUIZ.getColumn(), message);

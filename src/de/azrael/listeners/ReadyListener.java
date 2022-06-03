@@ -64,7 +64,7 @@ public class ReadyListener extends ListenerAdapter {
 		STATIC.initializeBootTime();
 		
 		//create the temp directory and verify if multiple sessions are running. If yes, terminate this session
-		FileHandler.createTemp(e);
+		FileHandler.createTemp();
 		final String fileName = System.getProperty("SESSION_NAME")+"running.azr";
 		if(new File(Directory.TEMP.getPath()+fileName).exists()) {
 			final String fileContent = FileHandler.readFile(Directory.TEMP, fileName).trim();
@@ -82,9 +82,6 @@ public class ReadyListener extends ListenerAdapter {
 		System.out.println();
 		System.out.println("Azrael Version: "+STATIC.getVersion()+"\nAll credits to xHelixStorm");
 		System.out.println();
-		
-		//initialize Twitter login, if keys are available
-		STATIC.loginTwitter();
 
 		//Iterate through all joined guilds
 		for(Guild guild : e.getJDA().getGuilds()) {
@@ -169,8 +166,6 @@ public class ReadyListener extends ListenerAdapter {
 			else if(customCommands == null) {
 				logger.error("Custom commands couldn't be retrieved in guild {}", guild.getId());
 			}
-			//retrieve all registered subscriptions and start the timer to make these display on the server
-			ParseSubscription.runTask(e.getJDA());
 			
 			//print public and private patch notes, if available for the current version of the bot
 			Patchnote priv_notes = null;
@@ -209,7 +204,7 @@ public class ReadyListener extends ListenerAdapter {
 			//check if double exp should be enabled or disabled for the current guild
 			var doubleExp = botConfig.getDoubleExperience();
 			if(!doubleExp.equals("auto"))
-				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(0, doubleExp));
+				Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(doubleExp));
 			
 			//run scheduled messages timers
 			ScheduleExecution.startTimers(guild);
@@ -276,7 +271,7 @@ public class ReadyListener extends ListenerAdapter {
 		//execute background threads to collect current users, users under watch, text channels and muted users 
 		ExecutorService executor = Executors.newSingleThreadExecutor();
 		executor.execute(() -> { Azrael.SQLgetWholeWatchlist(); });
-		executor.execute(new CollectUsersGuilds(e, null));
+		executor.execute(new CollectUsersGuilds(e.getJDA()));
 		e.getJDA().getGuilds().parallelStream().forEach(g -> {
 			//print bot is now operational message in all servers
 			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(g.getIdLong());
@@ -294,6 +289,9 @@ public class ReadyListener extends ListenerAdapter {
 					Hashes.addTempCache("doubleExp_gu"+g.getId(), new Cache("on"));
 			}
 		});
+		
+		//retrieve all registered subscriptions and start the timer to make these display on the server
+		ParseSubscription.runTask(e.getJDA());
 		
 		//if double experience is enabled, run 2 tasks for the start time and end time
 		DoubleExperienceStart.runTask(e, null, null, null);

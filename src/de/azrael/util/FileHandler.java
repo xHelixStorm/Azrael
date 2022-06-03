@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.enums.Directory;
-import net.dv8tion.jda.api.events.ReadyEvent;
 
 public class FileHandler {
 	private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
@@ -78,7 +77,7 @@ public class FileHandler {
 			file.delete();
 	}
 	
-	public static void createTemp(ReadyEvent e) {
+	public static void createTemp() {
 		(new File(System.getProperty("TEMP_DIRECTORY"))).mkdirs();
 	}
 }

@@ -267,7 +267,7 @@ public class STATIC {
 				commandLevel = (Integer)val;
 		}
 		if(enabled) {
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong()))
+			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel))
 				return true;
 			else if(!botConfig.getIgnoreMissingPermissions())
 				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);

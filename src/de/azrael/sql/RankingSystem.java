@@ -564,11 +564,12 @@ public class RankingSystem {
 				while(rs.next()) {
 					roles.add(new Roles(rs.getLong(1), rs.getString(2), rs.getInt(3)));
 				}
-				Hashes.addRankingRoles(guild_id, roles);
+				if(roles.size() > 0)
+					Hashes.addRankingRoles(guild_id, roles);
 				return roles;
 			} catch (SQLException e) {
 				logger.error("SQLgetRoles Exception", e);
-				return null;
+				return roles;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -1130,6 +1131,26 @@ public class RankingSystem {
 		}
 	}
 	
+	public static int SQLDeleteDailyItems(String description, String type, long guild_id) {
+		logger.trace("SQLDeleteDailyItems launched. Passed params {}, {}, {}", description, type, guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(2);
+			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteDailyItems);
+			stmt.setString(1, description);
+			stmt.setString(2, type);
+			stmt.setLong(3, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteDailyItems Exception", e);
+			return -1;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	//inventory
 	public static int SQLInsertInventory(long user_id, long guild_id, int item_id, Timestamp position, int number, String status) {
 		logger.trace("SQLInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, item_id, position, number, status);
@@ -1423,7 +1444,7 @@ public class RankingSystem {
 	
 	//giveaway
 	public static boolean SQLBulkInsertGiveawayRewards(String [] rewards, Timestamp timestamp, long guild_id) {
-		logger.trace("SQLbulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, guild_id);
+		logger.trace("SQLBulkInsertGiveawayRewards launched. Passed params {}, {}, {}", rewards, timestamp, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -1444,6 +1465,24 @@ public class RankingSystem {
 		} catch (SQLException e) {
 			logger.error("SQLBulkInsertGiveawayRewards Exception", e);
 			return true;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLDeleteGiveawayRewards(long guild_id) {
+		logger.trace("SQLDeleteGiveawayRewards launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(2);
+			stmt = myConn.prepareStatement(RankingSystemStatements.SQLDeleteGiveawayRewards);
+			stmt.setLong(1, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteGiveawayRewards Exception", e);
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -1663,8 +1702,8 @@ public class RankingSystem {
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
+			ArrayList<Level> levels = new ArrayList<Level>();
 			try {
-				ArrayList<Level> levels = new ArrayList<Level>();
 				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemStatements.SQLgetLevels);
 				stmt.setLong(1, guild_id);
@@ -1672,11 +1711,12 @@ public class RankingSystem {
 				while(rs.next()) {
 					levels.add(new Level(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7)));
 				}
-				Hashes.addRankingLevels(guild_id, levels);
+				if(levels.size() > 0)
+					Hashes.addRankingLevels(guild_id, levels);
 				return levels;
 			} catch (SQLException e) {
 				logger.error("SQLgetLevels Exception", e);
-				return null;
+				return levels;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
@@ -2138,11 +2178,12 @@ public class RankingSystem {
 					setDaily.setAction(rs.getString(6));
 					dailies.add(setDaily);
 				}
-				Hashes.addDailyItems(guild_id, dailies);
+				if(dailies.size() > 0)
+					Hashes.addDailyItems(guild_id, dailies);
 				return dailies;
 			} catch (SQLException e) {
 				logger.error("SQLgetDailiesAndType Exception", e);
-				return dailies;
+				return null;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			  try { stmt.close(); } catch (Exception e) { /* ignored */ }

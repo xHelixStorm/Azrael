@@ -18,11 +18,11 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class SetProfileDefaultSkin {
 	private final static Logger logger = LoggerFactory.getLogger(SetProfileDefaultSkin.class);
 	
-	public static void runTask(GuildMessageReceivedEvent e, int _default_skin, int _last_theme, ArrayList<UserProfile> skins) {
-		if((_default_skin > 0 && _default_skin <= _last_theme) || _default_skin == 0) {
-			final var skin = skins.parallelStream().filter(f -> f.getLine() == _default_skin).findAny().orElse(null);
-			if(skin != null || _default_skin == 0) {
-				final var skinId = (skin != null ? skin.getSkin() : _default_skin);
+	public static void runTask(GuildMessageReceivedEvent e, int defaultSkin, int lastTheme, ArrayList<UserProfile> skins) {
+		if(defaultSkin >= 0 && defaultSkin <= lastTheme) {
+			final var skin = skins.parallelStream().filter(f -> f.getLine() == defaultSkin).findAny().orElse(null);
+			if(skin != null || defaultSkin == 0) {
+				final var skinId = (skin != null ? skin.getSkin() : defaultSkin);
 				final var skinDescription = (skin != null ? skin.getDescriptionMode() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
 				if(RankingSystem.SQLUpdateProfileDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skinId) > 0) {
 					logger.info("User {} has set the default profile skin to {} in guild {}", e.getMember().getUser().getId(), skinId, e.getGuild().getId());

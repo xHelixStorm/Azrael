@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class SetDailyItem {
 	private final static Logger logger = LoggerFactory.getLogger(SetDailyItem.class);
 
-	public static void runTask(GuildMessageReceivedEvent e, String[] args, ArrayList<Dailies> _dailies, int _weight) {
+	public static void runTask(GuildMessageReceivedEvent e, String[] args) {
 		String type = null;
 		int probability = 0;
 		//be sure that enough parameters are provided
@@ -40,7 +40,7 @@ public class SetDailyItem {
 			return;
 		}
 		//verify that a numerical probability has been forwarded
-		if(args[2].replaceAll("[0-9]*", "").length() == 0) {
+		if(args[2].matches("[0-9]{1,}")) {
 			probability = Integer.parseInt(args[2]);
 		}
 		else {
@@ -57,29 +57,67 @@ public class SetDailyItem {
 		}
 		
 		final String itemName = item.toString();
-		//check if this item has been already registered
-		if(_dailies.parallelStream().filter(f -> f.getDescription().equalsIgnoreCase(itemName)).findAny().orElse(null) != null) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ALREADY_REGISTERED)).build()).queue();
-			return;
-		}
 		
-		//verify that the probability doesn't exceed the limit
-		if((_weight+probability) <= 10000) {
-			if(RankingSystem.SQLInsertDailyItems(itemName, probability, type, e.getGuild().getIdLong()) > 0) {
+		//logic to insert a daily item
+		if(probability > 0) {
+			ArrayList<Dailies> dailies = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
+			if(dailies == null) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				return;
+			}
+			
+			//check if this item has been already registered, if yes enter update mode
+			boolean updateMode = false;
+			Dailies daily = dailies.parallelStream().filter(f -> f.getDescription().equalsIgnoreCase(itemName)).findAny().orElse(null);
+			if(daily != null) 
+				updateMode = true;
+			
+			//verify that the probability doesn't exceed the limit
+			var weight = dailies.parallelStream().mapToInt(i -> i.getWeight()).sum();
+			if(updateMode)
+				weight = weight - daily.getWeight();
+			final long total = weight+probability;
+			if(total <= 100000) {
+				if(RankingSystem.SQLInsertDailyItems(itemName, probability, type, e.getGuild().getIdLong()) > 0) {
+					Hashes.removeDailyItems(e.getGuild().getIdLong());
+					if(!updateMode) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ADDED).replace("{}", ""+total)).build()).queue();
+						logger.info("User {} has inserted the item {} into the daily item pool with the probability {} in guild {}", e.getMember().getUser().getId(), itemName, probability, e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item registered", "Daily item "+itemName+" of type "+type+" with the probability "+probability+" has been added");
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_UPDATED).replace("{}", ""+total)).build()).queue();
+						logger.info("User {} has updated the probability to obtain item {} with the probability {} in guild {}", e.getMember().getUser().getId(), itemName, probability, e.getGuild().getId());
+						RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item updated", "Daily item "+itemName+" of type "+type+" has been updated with the probability "+probability);
+					}
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					logger.error("The daily item {} couldn't be inserted with the probability {} in guild {}", itemName, probability, e.getGuild().getId());
+					RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with probability "+probability+" and item "+itemName);
+				}
+			}
+			else {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_OVER_THE_LIMIT).replace("{}", ""+weight)).build()).queue();
+			}
+		}
+		//logic to remove a daily item
+		else {
+			final int result = RankingSystem.SQLDeleteDailyItems(itemName, type, e.getGuild().getIdLong());
+			if(result > 0) {
 				Hashes.removeDailyItems(e.getGuild().getIdLong());
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ADDED).replace("{}", ""+(_weight+probability))).build()).queue();
-				logger.info("User {} has inserted the item {} into the daily item pool with the probability {} in guild {}", e.getMember().getUser().getId(), itemName, probability, e.getGuild().getId());
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_REMOVED)).build()).queue();
+				logger.info("The daily item {} of type {} has been removed in guild {}", itemName, type, e.getGuild().getId());
+				RankingSystem.SQLInsertActionLog("low", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item removed", "Daily item "+itemName+" of type "+type+" with the probability "+probability+" has been removed");
+			}
+			else if(result == 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_NOT_REMOVED)).build()).queue();
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("The daily item {} couldn't be inserted with the probability {} in guild {}", itemName, probability, e.getGuild().getId());
-				RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item registration error", "daily item couldn't be inserted with probability "+probability+" and item "+itemName);
+				logger.error("The daily item {} of type {} couldn't be removed in guild {}", itemName, type, e.getGuild().getId());
+				RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item deletion error", "daily item couldn't be removed with type "+type+" and item "+itemName);
 			}
 		}
-		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_OVER_THE_LIMIT).replace("{}", ""+_weight)).build()).queue();
-		}
-		
-		
 	}
 }

@@ -1,7 +1,7 @@
 package de.azrael.enums;
 
 public enum Directory {
-	TEMP (null, false),
+	TEMP 			(null, false),
 	LOG 			("./log/"),
 	MESSAGE_LOG 	("./message_log/"),
 	USER_LOG 		("./user_log/", true),

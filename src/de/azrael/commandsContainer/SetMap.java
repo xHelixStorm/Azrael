@@ -19,26 +19,31 @@ public class SetMap {
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
-		if(args.length == 2 || args.length == 3) {
-			String url = null;
-			if(args.length == 3 && !args[2].startsWith("http") && !args[2].endsWith("jpg") && !args[2].endsWith("png") && !args[2].endsWith("gif")) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAP_ERR)).build()).queue();
-				return;
-			}
-			else if(args.length == 3)
-				url = args[2];
-			
-			if(Competitive.SQLInsertMap(e.getGuild().getIdLong(), args[1], url) > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAPS_SUCCESS)).build()).queue();
-				logger.info("User {} has saved the new competitive map {} in guild {}", e.getMember().getUser().getId(), args[0], e.getGuild().getId());
-			}
-			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-				logger.error("Competitive map {} couldn't be saved in guild {}", args[0], e.getGuild().getId());
-			}
+		final int lastIndex = args.length-1;
+		boolean endsInUrl = false;
+		if(args[lastIndex].startsWith("http") && (args[lastIndex].endsWith("jpg") || args[lastIndex].endsWith("png") || args[lastIndex].endsWith("gif"))) {
+			endsInUrl = true;
+		}
+		
+		StringBuilder map = new StringBuilder();
+		for(int i = 1; i < args.length; i++) {
+			if(i == args.length-1 && endsInUrl)
+				break;
+			map.append(args[i]+" ");
+		}
+		final String insertMap = map.toString().trim();
+		
+		String url = null;
+		if(endsInUrl)
+			url = args[lastIndex];
+		
+		if(Competitive.SQLInsertMap(e.getGuild().getIdLong(), insertMap, url) > 0) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAP_SUCCESS)).build()).queue();
+			logger.info("User {} has saved the new competitive map {} in guild {}", e.getMember().getUser().getId(), insertMap, e.getGuild().getId());
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Competitive map {} couldn't be saved in guild {}", insertMap, e.getGuild().getId());
 		}
 	}
 }

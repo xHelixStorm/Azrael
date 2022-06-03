@@ -22,20 +22,28 @@ public class SetPrivilegeLevel {
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if(args.length == 3) {
-			var role = args[1];
-			if(e.getGuild().getRoleById(role) != null) {
-				var role_id = Long.parseLong(role);
-				if(args[2].replaceAll("[0-9]*", "").length() == 0) {
-					var level = Integer.parseInt(args[2]);
-					if(level <= 100 && level >= 0) {
-						if(DiscordRoles.SQLUpdateLevel(e.getGuild().getIdLong(), role_id, level) > 0) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_ADDED)).build()).queue();
-							logger.info("User {} has updated the permission level of role {} to level {} in guild {}", role_id, level, e.getGuild().getId());
-							DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+			if(args[2].matches("[0-9]*")) {
+				final var role = e.getGuild().getRoleById(args[2]);
+				if(role != null) {
+					if(args[1].matches("[0-9]*")) {
+						var level = Integer.parseInt(args[1]);
+						if(level <= 100 && level >= 0) {
+							final int result = DiscordRoles.SQLUpdateLevel(e.getGuild().getIdLong(), role.getIdLong(), level);
+							if(result > 0) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_ADDED)).build()).queue();
+								logger.info("User {} has updated the permission level of role {} to level {} in guild {}", role.getId(), level, e.getGuild().getId());
+								DiscordRoles.SQLgetRoles(e.getGuild().getIdLong());
+							}
+							else if(result == 0) {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_NOT_FOUND)).build()).queue();
+							}
+							else {
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+								logger.error("Permission level of role {} couldn't be updated to level {} in guild {}", role.getId(), level, e.getGuild().getId());
+							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("Permission level of role {} couldn't be updated to level {} in guild {}", role_id, level, e.getGuild().getId());
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_NO_LEVEL)).build()).queue();
 						}
 					}
 					else {
@@ -43,7 +51,7 @@ public class SetPrivilegeLevel {
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION_NO_LEVEL)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.ROLE_NOT_EXISTS)).build()).queue();
 				}
 			}
 			else {

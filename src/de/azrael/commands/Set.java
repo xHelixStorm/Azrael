@@ -23,7 +23,6 @@ import de.azrael.commandsContainer.SetRankDefaultSkin;
 import de.azrael.commandsContainer.SetRankingSystem;
 import de.azrael.commandsContainer.SetWarning;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Dailies;
 import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
@@ -52,9 +51,8 @@ public class Set implements CommandPublic {
 
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
-		var adminPermission = BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET);
-		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getSettings());
 			if(args.length == 0) {
 				//parameters are disabled by default
@@ -71,22 +69,24 @@ public class Set implements CommandPublic {
 				boolean setGiveawayItems = false;
 				boolean setCompServer = false;
 				boolean setMaxClanMembers = false;
-				boolean setMatchmakingMembers = false;
+				boolean setRoomLimit = false;
 				boolean setMap = false;
 				boolean setLanguage = false;
 				
 				final var subCommands = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, Command.SET_PERMISSIONS, Command.SET_CHANNEL_CENSOR, Command.SET_WARNINGS
 						, Command.SET_RANKING, Command.SET_MAX_EXPERIENCE, Command.SET_DEFAULT_LEVEL_SKIN, Command.SET_DEFAULT_RANK_SKIN, Command.SET_DEFAULT_PROFILE_SKIN
 						, Command.SET_DEFAULT_ICON_SKIN, Command.SET_DAILY_ITEM, Command.SET_GIVEAWAY_ITEMS, Command.SET_COMP_SERVER, Command.SET_MAX_CLAN_MEMBERS
-						, Command.SET_MATCHMAKING_MEMBERS, Command.SET_MAP, Command.SET_LANGUAGE);
+						, Command.SET_ROOM_LIMIT, Command.SET_MAP, Command.SET_LANGUAGE);
 				
-				for(final var values : subCommands) {
+				for(final var command : subCommands) {
 					boolean enabled = false;
 					String name = "";
-					if(values instanceof Boolean)
-						enabled = (Boolean)values;
-					else if(values instanceof String)
-						name = ((String)values).split(":")[0];
+					for(final var values : (ArrayList<?>)command) {
+						if(values instanceof Boolean)
+							enabled = (Boolean)values;
+						else if(values instanceof String)
+							name = ((String)values).split(":")[0];
+					}
 					
 					if(name.equals(Command.SET_PERMISSIONS.getColumn()))
 						setPermissions = enabled;
@@ -114,8 +114,8 @@ public class Set implements CommandPublic {
 						setCompServer = enabled;
 					else if(name.equals(Command.SET_MAX_CLAN_MEMBERS.getColumn()))
 						setMaxClanMembers = enabled;
-					else if(name.equals(Command.SET_MATCHMAKING_MEMBERS.getColumn()))
-						setMatchmakingMembers = enabled;
+					else if(name.equals(Command.SET_ROOM_LIMIT.getColumn()))
+						setRoomLimit = enabled;
 					else if(name.equals(Command.SET_MAP.getColumn()))
 						setMap = enabled;
 					else if(name.equals(Command.SET_LANGUAGE.getColumn()))
@@ -123,22 +123,22 @@ public class Set implements CommandPublic {
 				}
 				
 				StringBuilder sf = new StringBuilder();
-				if(setPermissions)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS)));
-				if(setChannelCensor)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR)));
-				if(setWarnings)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS)));
-				if(setRanking)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)));
-				if(setMaxExperience)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)));
-				if(setDefaultLevelSkin)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN)));
-				if(setDefaultRankSkin)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN)));
-				if(setDefaultProfileSkin)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN)));
-				if(setDefaultIconSkin)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_9).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN)));
-				if(setDailyItem)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_10).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM)));
-				if(setGiveawayItems)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_11).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)));
-				if(setCompServer)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_12).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER)));
-				if(setMaxClanMembers)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_13).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS)));
-				if(setMatchmakingMembers)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_14).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS)));
-				if(setMap)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_15).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP)));
-				if(setLanguage)sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_16).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)));
+				if(setPermissions)			sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS)));
+				if(setChannelCensor)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR)));
+				if(setWarnings)				sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS)));
+				if(setRanking)				sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_4).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)));
+				if(setMaxExperience)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_5).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)));
+				if(setDefaultLevelSkin)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_6).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN)));
+				if(setDefaultRankSkin)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_7).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN)));
+				if(setDefaultProfileSkin)	sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN)));
+				if(setDefaultIconSkin)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_9).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN)));
+				if(setDailyItem)			sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_10).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM)));
+				if(setGiveawayItems)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_11).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)));
+				if(setCompServer)			sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_12).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER)));
+				if(setMaxClanMembers)		sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_13).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS)));
+				if(setRoomLimit)			sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_14).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROOM_LIMIT)));
+				if(setMap)					sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_15).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP)));
+				if(setLanguage)				sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_16).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)));
 				
 				if(sf.length() > 0)
 					e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_HELP)+sf.toString()).build()).queue();
@@ -148,7 +148,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_PERMISSIONS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_PERMISSIONS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION)).build()).queue();
 					return true;
 				}
@@ -158,7 +158,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_PERMISSIONS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_PERMISSIONS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetPrivilegeLevel.runTask(e, args);
 					return true;
 				}
@@ -168,7 +168,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_CHANNEL_CENSOR)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_CHANNEL_CENSOR);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
 					if(langs != null && langs.size() > 0) {
 						StringBuilder out = new StringBuilder();
@@ -192,7 +192,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL_CENSOR)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_CHANNEL_CENSOR)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_CHANNEL_CENSOR);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetChannelFilter.runTask(e, args);
 					return true;
 				}
@@ -202,7 +202,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_WARNINGS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_WARNINGS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetWarning.runHelp(e);
 					return true;
 				}
@@ -210,9 +210,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_WARNINGS)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WARNINGS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_WARNINGS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_WARNINGS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetWarning.runTask(e, args[1]);
 					return true;
 				}
@@ -222,7 +222,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_RANKING)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_RANKING);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANKING)
 							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
@@ -232,9 +232,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_RANKING)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_RANKING)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_RANKING);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetRankingSystem.runTask(e, args[1]);
 					return true;
 				}
@@ -244,17 +244,17 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_EXPERIENCE)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_EXPERIENCE);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_EXPERIENCE)
 							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 					return true;
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_EXPERIENCE)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_EXPERIENCE)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_EXPERIENCE);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					SetMaxExperience.runTask(e, args[1], RankingSystem.SQLgetGuild(e.getGuild().getIdLong()));
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
+					SetMaxExperience.runTask(e, args[1]);
 					return true;
 				}
 				else {
@@ -263,7 +263,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
@@ -289,13 +289,13 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_LEVEL_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_LEVEL_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					final var skins = RankingSystem.SQLgetRankingLevelList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
-							if(args[1].replaceAll("[0-9]*", "").length() == 0)
+							if(args[1].matches("[0-9]*"))
 								SetLevelDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
@@ -316,7 +316,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
@@ -342,13 +342,13 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_RANK_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_RANK_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					final var skins = RankingSystem.SQLgetRankingRankList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
-							if(args[1].replaceAll("[0-9]", "").length() == 0)
+							if(args[1].matches("[0-9]"))
 								SetRankDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
@@ -369,7 +369,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
@@ -395,13 +395,13 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_PROFILE_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_PROFILE_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					final var skins = RankingSystem.SQLgetRankingProfileList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
-							if(args[1].replaceAll("[0-9]", "").length() == 0)
+							if(args[1].matches("[0-9]"))
 								SetProfileDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
@@ -422,7 +422,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					StringBuilder out = new StringBuilder();
 					StringBuilder out2 = new StringBuilder();
 					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
@@ -448,13 +448,13 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DEFAULT_ICON_SKIN)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DEFAULT_ICON_SKIN);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					final var skins = RankingSystem.SQLgetRankingIconsList(e.getGuild().getIdLong());
 					if(skins != null) {
 						if(skins.size() > 0) {
-							if(args[1].replaceAll("[0-9]", "").length() == 0)
+							if(args[1].matches("[0-9]"))
 								SetIconDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
@@ -474,7 +474,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DAILY_ITEM)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DAILY_ITEM);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ITEM_HELP)).build()).queue();
 					return true;
 				}
@@ -484,10 +484,8 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DAILY_ITEM)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DAILY_ITEM);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-					ArrayList<Dailies> daily_items = RankingSystem.SQLgetDailiesAndType(e.getGuild().getIdLong());
-					var tot_weight = daily_items.parallelStream().mapToInt(i -> i.getWeight()).sum();
-					SetDailyItem.runTask(e, args, daily_items, tot_weight);
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
+					SetDailyItem.runTask(e, args);
 					return true;
 				}
 				else {
@@ -496,9 +494,10 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_GIVEAWAY_ITEMS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY)
-							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXTEND))).build()).queue();
+							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXTEND))
+							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR))).build()).queue();
 					return true;
 				}
 				else {
@@ -507,7 +506,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_GIVEAWAY_ITEMS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetGiveawayItems.runTask(e, args);
 					return true;
 				}
@@ -517,14 +516,14 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_COMP_SERVER)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_COMP_SERVER);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetCompServer.runHelp(e);
 					return true;
 				}
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_COMP_SERVER)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_COMP_SERVER)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_COMP_SERVER);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetCompServer.runTask(e, args);
 					return true;
 				}
@@ -534,7 +533,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMaxClanMembers.runHelp(e);
 					return true;
 				}
@@ -542,9 +541,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_CLAN_MEMBERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_CLAN_MEMBERS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMaxClanMembers.runTask(e, args);
 					return true;
 				}
@@ -552,9 +551,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS)) {
-				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROOM_LIMIT)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_ROOM_LIMIT)) {
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_ROOM_LIMIT);
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMatchmakingMembers.runHelp(e);
 					return true;
 				}
@@ -562,9 +561,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MATCHMAKING_MEMBERS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS)) {
-				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MATCHMAKING_MEMBERS);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROOM_LIMIT)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_ROOM_LIMIT)) {
+				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_ROOM_LIMIT);
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMatchmakingMembers.runTask(e, args);
 					return true;
 				}
@@ -574,7 +573,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAP)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAP);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMap.runHelp(e);
 					return true;
 				}
@@ -584,7 +583,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAPS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAP)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAP);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetMap.runTask(e, args);
 					return true;
 				}
@@ -594,7 +593,7 @@ public class Set implements CommandPublic {
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_LANGUAGE)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_LANGUAGE);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetLanguage.runHelp(e);
 					return true;
 				}
@@ -602,9 +601,9 @@ public class Set implements CommandPublic {
 					UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
 				}
 			}
-			else if(args.length > 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_LANGUAGE)) {
+			else if(args.length == 2 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_LANGUAGE)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_LANGUAGE);
-				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
+				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 					SetLanguage.runTask(e, args);
 					return true;
 				}

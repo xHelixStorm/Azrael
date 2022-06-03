@@ -15,8 +15,8 @@ class RankingSystemStatements {
 	final static String SQLUpdateUsersDefaultProfileSkin = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPpzSEBBNfvhb4tGNBDgBtWO1tRa8f80DYkxGqRetHARQ2QQ2GPV0LOsjwXPMCdyLGeL4EYFNd3x8fnXdlsjUxnYImQC2viMmpfY3ILmU5IuBuAbDMrfN4CZu+jKZTbpXQoQ==");
 	final static String SQLUpdateUserIconSkin = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp9R2ypwbjiVqO7v7UdOjl4eR38X8VsbnMAuyGzJlI+PzBcw+D6dNtLWgQeP6MlAD3iJ8r+WW5ZrOlvTa3D4fhMs=");
 	final static String SQLUpdateUsersDefaultIconSkin = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp0r7eND7Nja3sjsw/z24enMJmcssh8nRDjifNuBiDv8lHEATwA/lhnGgvsxgn9CAxJl7fGOO/5yiceKw5nd/Zm7rlukM9ROEGWS1x+ijgWEZ");
-	final static String SQLInsertGuild = STATIC.decrypt("xT8feoGbkwVNwScURTdaHzA3pMP4Ro34++j5iMWdbra5/Pd8aSTyjlUpfpRRClo1uq1RZ3ETSMimQfXN89KXjJ6Lc9fEEchFiMXrnn1qaf2EO5olMTUCjt54M7Qxdn8KKOMv4+mwhXDYEXHdLOvE+G+GNEL5nJwmx+hnIRrnL9o7Toeq2FSt0ynIOuaFLKfdAJ/X+0Kaql6vkumDcDV8sOIPQCN3Prq5QwBMEBjgyDpv/f4Dtysd2MDXWH4J3vDc");
-	final static String SQLUpdateMaxExperience = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLv6XLEzdjD+TpxlZuth3Lz3DDN24VqTadPBVYVQwa2uJCvXqNONmUCZlMBkJEGoj18wmj/rcKyw9MJWv8aHAvoM=");
+	final static String SQLInsertGuild = STATIC.decrypt("xT8feoGbkwVNwScURTdaHzA3pMP4Ro34++j5iMWdbra5/Pd8aSTyjlUpfpRRClo1pD10E3ZcLu/1RdDf5zowbKiH7d+UJizXap3Vx8/cuh9Y7wVEgf4TUGf+XmnekSKn/SxYB9F30eA07sUn/YvKXqRD0QTSTRrEfBYEvqtjNVJ5lHwnY4z9dpN2i8n+d7IK6HSf3Me+/eDcQtLWjHodvQ==");
+	final static String SQLUpdateMaxExperience = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLv6XLEzdjD+TpxlZuth3Lz2nbUTc4T+u0wcpn0PVrfjqljKOD8ArKuveDsdWYcVdoOuW6Qz1E4QZZLXH6KOBYRk=");
 	final static String SQLUpdateRankingSystem = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLqm0hEQSvd7f/EOExJBzsWk7c/UPywwa6pS0VABR+xz34cDOkM8c9C6Wf5SsHYjVZfYYX5VoKQgPDWZIdCKoCbo=");
 	final static String SQLUpdateLevelDefaultSkin = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLmJUaPQN5HotCt3GoEq3yXQO+/CS3L+gYVBWxt7KqNKNoNah2ZW+4G+Ot8PbFzBXTg==");
 	final static String SQLUpdateRankDefaultSkin = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLrm2q7rjK/ebVC58rQgHgAOXV2DOjiHm8YvAXTVtkIhiz6m4SN44ISTnZclsQPrKkg==");
@@ -41,7 +41,8 @@ class RankingSystemStatements {
 	final static String SQLgetRankingRankList = STATIC.decrypt("IEBr/5cCQc0wU73gpE6aXZAapoOXV7Kl4wQEMg5Jaw3GHLhao4hrxRKRpebaado59hhflWgpCA8NZkh0IqgJug==");
 	final static String SQLgetRankingProfileList = STATIC.decrypt("IEBr/5cCQc0wU73gpE6aXaMqAQDaBbOtWMBFormI3DPkVzeb0biZkhE8+eiPXJsrrvsXFe68TU8vU9wNUw2OKA==");
 	final static String SQLgetRankingIconsList = STATIC.decrypt("IEBr/5cCQc0wU73gpE6aXeWyq07k4fuZGp0Q0KOv6qKyQB5uNTVhuf0OgnSHRg0roIds2aNxoSXImxbCOHIl1Q==");
-	final static String SQLInsertDailyItems = STATIC.decrypt("5mRzs94Q08/NUfvx1S+XmGxMeQOIXrG0Up15+ZiWPdLGbk3hOyqcrXp2CEGil9fj4ENlGzBJvTfdwuZEZJzFqAESmsn7AtAdR3kpkybVbgmAVAB9vQCPo12jbBOqt76esRuzo+ZFvHw9tWkLKxTtpw==");
+	final static String SQLInsertDailyItems = STATIC.decrypt("5mRzs94Q08/NUfvx1S+XmGxMeQOIXrG0Up15+ZiWPdLGbk3hOyqcrXp2CEGil9fj4ENlGzBJvTfdwuZEZJzFqAESmsn7AtAdR3kpkybVbgmAVAB9vQCPo12jbBOqt76efjxBgieIdeflPHHhp+Lw9uxXTld6wv1TqBodfTxamxQ5zmKsRco1Gr+61eRAoCeUR2gZMkesE9U5+z87zp77jA==");
+	final static String SQLDeleteDailyItems = STATIC.decrypt("S160tS6uO5lo9CunbD4yy6Wxh4mb4++JoiJ0YZPPqkBaNO7oJrUa8EawEBFNqoore4SnqXz9HMBxPm4JdnDRRmABe6yrXjPz2F/8fyu6QHM=");
 	final static String SQLInsertInventory = STATIC.decrypt("nFjQglFjCUvf4kZaVVdfo/c4jI97+zaBeJUAdr4vhUBHcL74lNAGSYvlMeGef29tBW7fPJkKb8Ayx1tHXtznwhWctYrDdlwPO6o5OPOTkPGft5GfeA204cD9CEH9qXz/nRlv/SfdtmuFHPhKvWvBP7/41OtZYdjJY0WrmjZRFtdMLJaDYLKxO6OV4aR58hOsWp76sKSWde2Pv6gCkz8cGA==");
 	final static String SQLInsertInventoryWithLimit = STATIC.decrypt("nFjQglFjCUvf4kZaVVdfo/c4jI97+zaBeJUAdr4vhUBHcL74lNAGSYvlMeGef29tBW7fPJkKb8Ayx1tHXtznwmRtzQR0Yyw0or/zisRusttbTWLP58TEhGh+qCbOrCPYZYZ0+Ty5bVtJ/H4UuioqqrkqHHlCkO3kk3r8F3Gn/zadx29dKVuP9Wp3pPoitiUE4TzsHXXRefg6NDFM+yqCI84A5piyWG8DJOcPnlMHrc6ubjk3hwq66mJWQV6RMiEJ9YQZlnvvqTmr8udJ7MmOLw==");
 	final static String SQLgetNumberLimitFromInventory = STATIC.decrypt("LS0SllNsc6iWp/VqeK94qPa1ttp1Pxuwno+XodcadT8oPQaUkxyaAXG98iE9Z7Yk+9T4G541xYGIPHhPaJnWoB05iT7zh3njIMUxX9jePWBgbAN2s39Qb6hbhFk9l9MEMKIj9PoRHCctqPz3aiSwmPYYX5VoKQgPDWZIdCKoCbo=");
@@ -55,6 +56,7 @@ class RankingSystemStatements {
 	final static String SQLgetDailiesUsage = STATIC.decrypt("MTaLIzLox2kYAwQxfAyFpPIvaKnanM9t0Ce/Ldj1ZKiXrGJ30JELPs8LwUcZzacFtCB65A9IC6c5j7isDSABPSJ8r+WW5ZrOlvTa3D4fhMs=");
 	final static String SQLInsertDailiesUsage = STATIC.decrypt("5mRzs94Q08/NUfvx1S+XmNYJB8ZQ3tLI9aTLdL3mQIAfIs5fNed7KdNPwK6P1InpYp2zuGOe1nFCLSR+cL8OcOuyp9ABwQ7Z4rdP4en/O7D4cj/X++TnO4aqAQSOXyFt5siCACJ99nK9tZrkKyATXVGj3QGuGLrZtujnVQpBmtlP09x4l4zYXKCx+SJcgWsZYqLx8LT5A7oXCqFB0GgdQ7vVA2aIyZXJJCEgAwyg2bA=");
 	final static String SQLBulkInsertGiveawayRewards = STATIC.decrypt("IN8VjKonXA7/JLOIMbzI+vCFa9D9zzWQ6LlVjx7AJJtY9fijmBKaQHXyeV7ck0PAAs0nklhAVjGPFIZUEYpdzfbvk9ymrIyr3uT4WO2NwxDSUFvfY/62zKWeYTwH4jGV");
+	final static String SQLDeleteGiveawayRewards = STATIC.decrypt("NMa4aoMQXK4hjvJnzwk5TyT7O/ezxffPmatD1s9lKvcCuZtSBpv8l10BXSsavj4P");
 	final static String SQLRetrieveGiveawayReward = STATIC.decrypt("n7nFuc+uX4k/x2EFWv15L9JAxqebXEN2+SbigLliu3MPMSI9FxudNPzy2ny6HfZaGfdKLV5zUzqUVI1j9Mp9UFIlFbk/tLdEHLag/6Kvx0ozGya5cXaOFd0JrFi/hHx6FjtZQedqx8ZuKUZr5ZGv7Q==");
 	final static String SQLUpdateUsedOnReward = STATIC.decrypt("m94m//J9OS6m16Ega8jqJgBMvnuGgOovCm8NNynEMrQH8VHOyAqjGE6AjPX/H8Pq/32X/IcoYPAaokDEuNFLbA==");
 	final static String SQLUpdateRewardExpiration = STATIC.decrypt("m94m//J9OS6m16Ega8jqJjumdNriOqPY83aQRdWGroRQ5OTClsj1KBfMuT6p3+AMetrxNn7Gt0updz30CSI6vqCHbNmjcaElyJsWwjhyJdU=");

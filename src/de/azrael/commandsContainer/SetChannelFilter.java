@@ -25,18 +25,25 @@ public class SetChannelFilter {
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if(args.length == 3) {
-			String channel = args[1].replaceAll("[^0-9]*", "");
-			if(channel.length() > 0) {
-				TextChannel textChannel = e.getGuild().getTextChannelById(channel);
+			args[2] = args[2].replaceAll("[^0-9]*", "");
+			if(args[2].matches("[0-9]{1,}")) {
+				TextChannel textChannel = e.getGuild().getTextChannelById(args[2]);
 				if(textChannel != null) {
 					final var languages = Azrael.SQLgetFilterLanguages();
 					if(languages.size() > 0) {
 						ArrayList<String> filterLanguages = new ArrayList<String>();
 						ArrayList<String> errorLanguages = new ArrayList<String>();
-						final String [] enteredLangs = args[2].split(",");
+						final String [] enteredLangs = args[1].split(",");
+						boolean addLanguages = true;
 						for(String lang : enteredLangs) {
-							if(languages.contains(lang))
-								filterLanguages.add(lang);
+							if(lang.equals("all")) {
+								filterLanguages = languages;
+								addLanguages = false;
+							}
+							if(languages.contains(lang)) {
+								if(addLanguages)
+									filterLanguages.add(lang);
+							}
 							else
 								errorLanguages.add(lang);
 						}
@@ -51,10 +58,10 @@ public class SetChannelFilter {
 							return;
 						}
 						if(filterLanguages.size() > 0) {
-							final var channelConf = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == textChannel.getIdLong()).findAny().orElse(null);
 							if(Azrael.SQLInsertChannel_Filter(textChannel.getIdLong(), filterLanguages) > 0) {
+								final var channelConf = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == textChannel.getIdLong()).findAny().orElse(null);
 								if(channelConf == null) {
-									Azrael.SQLInsertChannel_Conf(textChannel.getIdLong(), e.getGuild().getIdLong(), filterLanguages.get(0));
+									Azrael.SQLInsertChannel_Conf(textChannel.getIdLong(), e.getGuild().getIdLong(), (filterLanguages.contains("all") ? "all" : filterLanguages.get(0)));
 								}
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR_ADDED)).build()).queue();
 								logger.info("Filter languages {} have been registered for text channel {} in guild {}", filterLanguages, textChannel.getId(), e.getGuild().getId());
@@ -75,7 +82,7 @@ public class SetChannelFilter {
 					}
 				}
 				else{
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_TEXT_CHANNEL)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TEXT_CHANNEL_NOT_EXISTS)).build()).queue();
 				}
 			}
 			else {

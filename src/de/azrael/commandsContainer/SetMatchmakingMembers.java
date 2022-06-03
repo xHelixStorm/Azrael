@@ -15,16 +15,16 @@ public class SetMatchmakingMembers {
 	private final static Logger logger = LoggerFactory.getLogger(SetMatchmakingMembers.class);
 	
 	public static void runHelp(GuildMessageReceivedEvent e) {
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MATCHMAKING_MEMBERS_HELP)).build()).queue();
+		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ROOM_LIMIT_HELP)).build()).queue();
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if(args.length == 2) {
-			if(args[1].replaceAll("[0-9]*", "").length() == 0) {
-				final int members = Integer.parseInt(args[1]);
+			if(args[1].matches("[0-9]*")) {
+				final long members = Long.parseLong(args[1]);
 				if(members >= 0 && members <= 100) {
-					if(Competitive.SQLUpdateMatchmakingMembers(e.getGuild().getIdLong(), members) > 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MATCHMAKING_MEMBERS_SUC).replace("{}", ""+members)).build()).queue();
+					if(Competitive.SQLUpdateMatchmakingMembers(e.getGuild().getIdLong(), (int)members) > 0) {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ROOM_LIMIT_SUC).replace("{}", ""+members)).build()).queue();
 						logger.info("User {} has updated the max matchamking members limit to {} in guild {}", e.getMember().getUser().getId(), members, e.getGuild().getId());
 					}
 					else {
@@ -33,11 +33,11 @@ public class SetMatchmakingMembers {
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MATCHMAKING_MEMBERS_ERR)).build()).queue();
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ROOM_LIMIT_ERR)).build()).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MATCHMAKING_MEMBERS_ERR)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ROOM_LIMIT_ERR)).build()).queue();
 			}
 		}
 		else {

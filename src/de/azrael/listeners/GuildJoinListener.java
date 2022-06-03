@@ -58,7 +58,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		Hashes.initializeGuildMessagePool(guild_id, 1000);
 		
 		//collect all users in the server
-		new Thread(new CollectUsersGuilds(null, e)).start();
+		new Thread(new CollectUsersGuilds(e.getJDA())).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
 }

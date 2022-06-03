@@ -1111,44 +1111,20 @@ public class Azrael {
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			switch(warning_id) {
-				case 1 -> {
-					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning);
-					stmt.setLong(1, guild_id);
-					stmt.setLong(2, guild_id);
-				}
-				case 2 -> {
-					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning2);
-					stmt.setLong(1, guild_id);
-					stmt.setLong(2, guild_id);
-					stmt.setLong(3, guild_id);
-				}
-				case 3 -> {
-					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning3);
-					stmt.setLong(1, guild_id);
-					stmt.setLong(2, guild_id);
-					stmt.setLong(3, guild_id);
-					stmt.setLong(4, guild_id);
-				}
-				case 4 -> {
-					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning4);
-					stmt.setLong(1, guild_id);
-					stmt.setLong(2, guild_id);
-					stmt.setLong(3, guild_id);
-					stmt.setLong(4, guild_id);
-					stmt.setLong(5, guild_id);
-				}
-				case 5 -> {
-					stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning5);
-					stmt.setLong(1, guild_id);
-					stmt.setLong(2, guild_id);
-					stmt.setLong(3, guild_id);
-					stmt.setLong(4, guild_id);
-					stmt.setLong(5, guild_id);
-					stmt.setLong(6, guild_id);
-				}
+			myConn.setAutoCommit(false);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertWarning);
+			for(int warning = 0; warning <= warning_id; warning++) {
+				stmt.setLong(1, guild_id);
+				stmt.setInt(2, warning);
+				stmt.setInt(3, warning);
+				stmt.addBatch();
 			}
-			return stmt.executeUpdate();
+			final var result = stmt.executeBatch();
+			if(result[0] > 0)
+				myConn.commit();
+			else
+				myConn.rollback();
+			return result[0];
 		} catch (SQLException e) {
 			logger.error("SQLInsertWarning Exception", e);
 			return 0;
@@ -4066,6 +4042,24 @@ public class Azrael {
 		}
 	}
 	
+	public static int SQLDeleteGiveawayRewards(long guild_id) {
+		logger.trace("SQLDeleteGiveawayRewards launched. Params passed {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteGiveawayRewards);
+			stmt.setLong(1, guild_id);
+			return stmt.executeUpdate();
+		} catch(SQLException e) {
+			logger.error("SQLDeleteGiveawayRewards Exception", e);
+			return -1;
+		} finally {
+			try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static boolean SQLisGiveawayRewardAlreadySent(long guild_id, long user_id) {
 		logger.trace("SQLisGiveawayRewardAlreadySent launched. Params passed {}, {}", guild_id, user_id);
 		Connection myConn = null;
@@ -4523,24 +4517,34 @@ public class Azrael {
 			stmt.setLong(1, channel_id);
 			stmt.setString(2, channel_type);
 			stmt.setLong(3, guild_id);
-			int result = stmt.executeUpdate();
+			int [] result = {stmt.executeUpdate()};
 			
-			if(result > 0) {
+			if(result[0] > 0) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel2);
 				stmt.setLong(1, channel_id);
 				stmt.executeUpdate();
 				
 				stmt = myConn.prepareStatement(AzraelStatements.SQLRegisterLanguageChannel3);
-				stmt.setLong(1, channel_id);
-				stmt.setString(2, channel_type);
-				result = stmt.executeUpdate();
+				if(!channel_type.equals("all")) {
+					stmt.setLong(1, channel_id);
+					stmt.setString(2, channel_type);
+					result[0] = stmt.executeUpdate();
+				}
+				else {
+					for(final var lang : SQLgetFilterLanguages()) {
+						stmt.setLong(1, channel_id);
+						stmt.setString(2, lang);
+						stmt.addBatch();
+					}
+					result = stmt.executeBatch();
+				}
 				
-				if(result > 0)
+				if(result[0] > 0)
 					myConn.commit();
 				else
 					myConn.rollback();
 			}
-			return result;
+			return result[0];
 		} catch (SQLException e) {
 			logger.error("SQLRegisterLanguageChannel Exception", e);
 			return 0;

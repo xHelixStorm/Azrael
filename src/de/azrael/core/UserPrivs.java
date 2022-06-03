@@ -79,8 +79,8 @@ public class UserPrivs {
 	}
 	
 	public static boolean comparePrivilege(Member member, int requiredLevel) {
-		var highestLevel = 0;
 		if(member != null) {
+			var highestLevel = 0;
 			for(final var role : member.getRoles()) {
 				var level = DiscordRoles.SQLgetRoles(member.getGuild().getIdLong()).parallelStream().filter(f -> f.getRole_ID() == role.getIdLong()).findAny().orElse(null);
 				if(level != null) {
@@ -94,8 +94,14 @@ public class UserPrivs {
 					}
 				}
 			}
+			if(highestLevel >= requiredLevel) {
+				return true;
+			}
+			else if(BotConfiguration.SQLisAdministrator(member.getUser().getIdLong(), member.getGuild().getIdLong())) {
+				return true;
+			}
 		}
-		return (highestLevel >= requiredLevel);
+		return false;
 	}
 	
 	/**

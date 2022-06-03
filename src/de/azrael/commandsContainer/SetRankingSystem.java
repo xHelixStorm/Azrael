@@ -17,16 +17,22 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class SetRankingSystem {
 	private final static Logger logger = LoggerFactory.getLogger(SetRankingSystem.class);
 	
-	public static void runTask(GuildMessageReceivedEvent e, String _input){
+	public static void runTask(GuildMessageReceivedEvent e, String input) {
 		boolean ranking_state = false;
 		boolean wrongInput = false;
 		String message;
 		
-		if(_input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
+		if(input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))) {
 			ranking_state = true;
 			message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_ENABLE);
+			Hashes.removeRankingLevels(e.getGuild().getIdLong());
+			if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).size() == 0) {
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_WARN)).build()).queue();
+				logger.error("Ranking levels couldn't be called and cached in guild {}", e.getGuild().getId());
+				return;
+			}
 		}
-		else if(_input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
+		else if(input.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))) {
 			ranking_state = false;
 			message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_DISABLE);
 		}
@@ -40,21 +46,13 @@ public class SetRankingSystem {
 				Guilds guild = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 				guild.setRankingState(ranking_state);
 				Hashes.addStatus(e.getGuild().getIdLong(), guild);
-				logger.info("User {} has updated the ranking system status to {} in guild {}", e.getMember().getUser().getId(), _input, e.getGuild().getId());
+				logger.info("User {} has updated the ranking system status to {} in guild {}", e.getMember().getUser().getId(), input, e.getGuild().getId());
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(message).build()).queue();
 				
 				if(ranking_state) {
 					Hashes.initializeGuildRanking(e.getGuild().getIdLong());
 					Hashes.removeRankingRoles(e.getGuild().getIdLong());
-					if(RankingSystem.SQLgetRoles(e.getGuild().getIdLong()) == null) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Registered ranking roles couldn't be called and cached in guild {}", e.getGuild().getId());
-					}
-					Hashes.removeRankingLevels(e.getGuild().getIdLong());
-					if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).size() == 0) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("Ranking levels couldn't be called and cached in guild {}", e.getGuild().getId());
-					}
+					RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
 					new Thread(new CollectUsers(e, true)).start();
 				}
 				else {

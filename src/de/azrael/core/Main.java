@@ -196,16 +196,22 @@ public class Main {
 				if(dbNumber != null && dbNumber.trim().matches("^[0-9]*$")) {
 					for(int i = 1; i <= Integer.parseInt(dbNumber.trim()); i++) {
 						final String dbName = prop.getProperty("DB_"+i+"_DB_NAME");
-						final String ip = prop.getProperty("DB_"+i+"_IP", "127.0.0.1");
-						final String port = prop.getProperty("DB_"+i+"_PORT", "3306");
-						final String host = prop.getProperty("DB_"+i+"_HOST", "http://localhost");
+						final String ip = prop.getProperty("DB_"+i+"_IP");
+						final String port = prop.getProperty("DB_"+i+"_PORT");
+						final String host = prop.getProperty("DB_"+i+"_HOST");
 						final String timezone = prop.getProperty("DB_"+i+"_TIMEZONE", "UTC");
 						final String user = prop.getProperty("DB_"+i+"_USER");
 						final String pass = prop.getProperty("DB_"+i+"_PASS");
 						
-						if(dbName == null || user == null || pass == null) {
+						if(dbName == null || ip == null || port == null || host == null || user == null || pass == null) {
 							if(dbName == null)
 								logger.error("Parameter DB_{}_DB_NAME not found!", i);
+							if(ip == null)
+								logger.error("Parameter DB_{}_IP not found!", i);
+							if(port == null)
+								logger.error("Parameter DB_{}_PORT not found!", i);
+							if(host == null)
+								logger.error("Parameter DB_{}_HOST not found!", i);
 							if(user == null)
 								logger.error("Parameter DB_{}_USER not found!", i);
 							logger.error("Database configuration couldn't be loaded. Application shutdown!");
@@ -267,7 +273,7 @@ public class Main {
 			if(System.getProperty("WEBSERVER_PORT") == null || !System.getProperty("WEBSERVER_PORT").matches("[0-9]{1,}"))
 				System.setProperty("WEBSERVER_PORT", prop.getProperty("WEBSERVER_PORT", "0"));
 			if(System.getProperty("TEMP_DIRECTORY") == null)
-				System.setProperty("TEMP_DIRECTORY", "./temp");
+				System.setProperty("TEMP_DIRECTORY", "./temp/");
 			if(System.getProperty("SPREADSHEET_UPDATE_DELAY") == null || (!System.getProperty("SPREADSHEET_UPDATE_DELAY").matches("[0-9]*") && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) > 60  && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) < 0))
 				System.setProperty("SPREADSHEET_UPDATE_DELAY", "0");
 			

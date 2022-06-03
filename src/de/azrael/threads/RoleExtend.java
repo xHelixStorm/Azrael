@@ -82,13 +82,13 @@ public class RoleExtend implements Runnable {
 		}
 		
 		//Get members that have recently joined the server, but were not yet verified, into the waiting room
-		final var members = guild.loadMembers().get().parallelStream().filter(f -> !f.getUser().isBot() && f.getRoles().size() == 0).collect(Collectors.toList());
-		if(members.size() > 0) {
-			int y = 0;
-			final var categories = Azrael.SQLgetCategories(guild.getIdLong());
-			if(categories != null && categories.size() > 0) {
-				final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
-				if(verification != null) {
+		final var verification = Azrael.SQLgetCategories(guild.getIdLong()).parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+		if(verification != null) {
+			final var verRole = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("ver")).findAny().orElse(null);
+			if(verRole != null) {
+				final var members = guild.loadMembers().get().parallelStream().filter(f -> !f.getUser().isBot() && f.getRoles().size() == 0).collect(Collectors.toList());
+				if(members.size() > 0) {
+					int y = 0;
 					Category category = guild.getCategoryById(verification.getCategoryID());
 					if(category != null) {
 						if(guild.getSelfMember().hasPermission(category, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS) || STATIC.setPermissions(guild, category, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))) {
@@ -123,13 +123,13 @@ public class RoleExtend implements Runnable {
 					else {
 						logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
 					}
+					//display the amount of users that were put into waiting rooms
+					if(y > 0) {
+						logger.info("{} users have been moved into waiting rooms in guild {}", y, guild.getId());
+						EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_TITLE));
+						STATIC.writeToRemoteChannel(guild, message, y+STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_MOVED), Channel.LOG.getType());
+					}
 				}
-			}
-			//display the amount of users that were put into waiting rooms
-			if(y > 0) {
-				logger.info("{} users have been moved into waiting rooms in guild {}", y, guild.getId());
-				EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_TITLE));
-				STATIC.writeToRemoteChannel(guild, message, y+STATIC.getTranslation2(guild, Translation.UNMUTE_WAITING_MOVED), Channel.LOG.getType());
 			}
 		}
 	}

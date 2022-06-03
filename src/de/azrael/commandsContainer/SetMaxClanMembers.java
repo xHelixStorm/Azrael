@@ -19,9 +19,9 @@ public class SetMaxClanMembers {
 	}
 	
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
-		if(args[1].replaceAll("[0-9]*", "").length() == 0) {
+		if(args[1].matches("[0-9]*")) {
 			final var members = Long.parseLong(args[1]);
-			if(members >= 0 && members <= 100) {
+			if(members >= 0 && members <= 1000) {
 				if(Competitive.SQLUpdateMaxClanMembers(e.getGuild().getIdLong(), (int)members) > 0) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_CLAN_MEMBERS_UPDATED)).build()).queue();
 					logger.info("User {} has updated the max clan members limit to {} in guild {}", e.getMember().getUser().getId(), members, e.getGuild().getId());

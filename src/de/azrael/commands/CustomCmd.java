@@ -19,7 +19,6 @@ import de.azrael.enums.Translation;
 import de.azrael.google.GoogleYoutube;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
-import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -42,7 +41,7 @@ public class CustomCmd implements CommandPublic {
 		final String cmd = e.getMessage().getContentRaw().split(" ")[0].substring(botConfig.getCommandPrefix().length());
 		final var command = Azrael.SQLgetCustomCommand(e.getGuild().getIdLong(), cmd);
 		if(command != null && command.isEnabled()) {
-			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel()) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {		
+			if(UserPrivs.comparePrivilege(e.getMember(), command.getLevel())) {		
 				//channel restrictions check
 				HashSet<String> restrictions = Azrael.SQLgetCustomCommandRestrictions(e.getGuild().getIdLong(), command.getCommand());
 				if(restrictions != null && restrictions.size() > 0) {

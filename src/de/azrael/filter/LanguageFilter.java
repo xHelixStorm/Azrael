@@ -57,15 +57,11 @@ public class LanguageFilter implements Runnable {
 			
 			final var parseMessage = thisMessage.toLowerCase();
 			
-			for(String exception : CharacterReplacer.getExceptions()) {
-				if(parseMessage.matches("(.|\\s){0,}\\b"+exception+"\\b(.|\\s){0,}")) {
-					exceptionFound = true;
-				}
-			}
-			
 			if(exceptionFound == false) {
 				var blockHeavyCensor = false;
 				for(String filter : filter_lang) {
+					if(filter.equals("all"))
+						continue;
 					Optional<String> option = Azrael.SQLgetFilter(filter, message.getGuild().getIdLong()).parallelStream()
 						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
 					if(option.isPresent()) {

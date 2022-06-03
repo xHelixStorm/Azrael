@@ -6,7 +6,7 @@ class DiscordRolesStatements {
 	final static String SQLInsertRole = STATIC.decrypt("nweeWsN6AwBwHyuBbNhLXc0fcW/tihVc4Q+Oc3YhwYViJc7vfIWGg0OrbwKsgKNlg6M4iQTzSldwTvHgmGAZmyYgrLvefwuFNglqssIXu2T/H009xpXzoAGCUzzcCbLFYQdc32Ob1bnjXA4Wj3CDDJoRpIT4y0zyKaatw6rZ9LZN0dKxlWieaittMo0f/JOayhJJYQG+/YcMHQzC0uejUsG1ZhZy+ySFQ2HHv1WRTx7COqFHP0SUI8Gt8D9+uwdlX91Xjk0DOZ8U/UY79vJIZI1Y0oObev6MAyPmGCFZpa5EGl89Fa6Srd9+VUWT01Li");
 	final static String SQLInsertRoles = STATIC.decrypt("nweeWsN6AwBwHyuBbNhLXc0fcW/tihVc4Q+Oc3YhwYViJc7vfIWGg0OrbwKsgKNlg6M4iQTzSldwTvHgmGAZmyYgrLvefwuFNglqssIXu2T/H009xpXzoAGCUzzcCbLFYQdc32Ob1bnjXA4Wj3CDDJoRpIT4y0zyKaatw6rZ9LZN0dKxlWieaittMo0f/JOayhJJYQG+/YcMHQzC0uejUsG1ZhZy+ySFQ2HHv1WRTx7COqFHP0SUI8Gt8D9+uwdlX91Xjk0DOZ8U/UY79vJIZI1Y0oObev6MAyPmGCFZpa5EGl89Fa6Srd9+VUWT01Li");
 	final static String SQLUpdateAllRoles = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t7MQwxjL1olpMQWMXDM2rxK+kcRkwe1Cd0g4tSlnsdRL0PgPTg/SZ2fOVVexJvgez9ZWIjjkOUE++e6vP5Ist+SCJg1PT6IgCXfXespXSED/");
-	final static String SQLUpdateLevel = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t4rxNLCQ0cbL4+ZjVDzgsTbgJtM1Ojq73oEMCytn3YOuYAF7rKteM/PYX/x/K7pAcw==");
+	final static String SQLUpdateLevel = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t4rxNLCQ0cbL4+ZjVDzgsTbgJtM1Ojq73oEMCytn3YOukjM5slfTVs9dlQFeBmWqZhjHIymNeA1oJl2Xk2huPia8YGNGBtNlI1dCy7ySTeRd");
 	final static String SQLgetRoles = STATIC.decrypt("qVnLeov84sW1cHMhxUeRhwh8GnBzNnkWmtlGZy0RpfMCuZtSBpv8l10BXSsavj4P");
 	final static String SQLgetReactionRoles = STATIC.decrypt("qVnLeov84sW1cHMhxUeRhwh8GnBzNnkWmtlGZy0RpfMUwGpwagwOn1KjSEAqitE4Nm/EpJij++kBCdUWdS1ihvExfnYAbvSzxtJGBhPT1nc=");
 	final static String SQLUpdateRoleName = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t/kAzTj5ONpEtnV3ahqi8FfdYF4nG8li2A5at9iQodEQ/32X/IcoYPAaokDEuNFLbA==");

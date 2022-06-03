@@ -111,7 +111,7 @@ public class DiscordRoles {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertRole Exception", e);
-			return 0;
+			return -1;
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -143,7 +143,8 @@ public class DiscordRoles {
 					);
 					roles.add(roleDetails);
 				}
-				Hashes.addDiscordRole(guild_id, roles);
+				if(roles.size() > 0)
+					Hashes.addDiscordRole(guild_id, roles);
 				return roles;
 			} catch (SQLException e) {
 				logger.error("SQLgetRoles Exception", e);

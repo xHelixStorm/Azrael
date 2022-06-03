@@ -30,23 +30,21 @@ public class RegisterRankingRole {
 		e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_HELP)).build()).queue();
 	}
 	
-	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, boolean adminPermission, Thumbnails thumbnails) {
+	public static boolean runCommand(GuildMessageReceivedEvent e, String [] args, Thumbnails thumbnails) {
 		long guild_id = e.getGuild().getIdLong();
-		String level = "";
 		int level_requirement = 0;
 		Role role = null;
 		
 		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.REGISTER_RANKING_ROLE);
-		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || adminPermission) {
-			if(args.length == 3 && args[1].matches("[0-9]*")) {
-				role = e.getGuild().getRoleById(args[1]);
+		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
+			if(args.length == 3 && args[2].matches("[0-9]*")) {
+				role = e.getGuild().getRoleById(args[2]);
 				if(role == null) {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_ROLE_ID)).build()).queue();
 					return true;
 				}
-				if(args[2].replaceAll("[0-9]*", "").length() == 0) {
-					level = args[2];
-					level_requirement = Integer.parseInt(level);
+				if(args[1].matches("[0-9]*")) {
+					level_requirement = Integer.parseInt(args[1]);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_NO_LEVEL)).build()).queue();
@@ -66,9 +64,9 @@ public class RegisterRankingRole {
 					logger.info("User {} has registered the ranking role {} with the level requirement {} in guild {}", e.getMember().getUser().getId(), role.getName(), level_requirement, e.getGuild().getId());
 					Hashes.removeRankingRoles(guild_id);
 					if(RankingSystem.SQLgetRoles(guild_id).size() > 0) {
-						if(RankingSystem.SQLgetLevels(guild_id) != null) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-							logger.error("RankingSystem Levels couldn't be retrieved and cached in guild {}", e.getGuild().getId());
+						if(RankingSystem.SQLgetLevels(guild_id).size() == 0) {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.ORANGE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_WARNING)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_WARN)).build()).queue();
+							logger.warn("RankingSystem level table is not available in guild {}", e.getGuild().getId());
 						}
 					}
 					else {
