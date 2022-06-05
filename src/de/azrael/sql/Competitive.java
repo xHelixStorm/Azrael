@@ -1929,6 +1929,43 @@ public class Competitive {
 		}
 	}
 	
+	public static int SQLDeleteMap(long guild_id, String mapName) {
+		logger.trace("SQLDeleteMap launched. Passed params {}, {}", guild_id, mapName);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDeleteMap);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, mapName);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteMap Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLClearMaps(long guild_id) {
+		logger.trace("SQLClearMaps launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLClearMaps);
+			stmt.setLong(1, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLClearMaps Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static CompMap SQLgetRandomMap(long guild_id) {
 		logger.trace("SQLgetRandomMap launched. Passed params {}, {}", guild_id);
 		Connection myConn = null;
