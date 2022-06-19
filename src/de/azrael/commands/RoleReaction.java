@@ -71,7 +71,6 @@ public class RoleReaction implements CommandPublic {
 										e.getGuild().removeRoleFromMember(m, e.getGuild().getRoleById(role_id)).queue();
 									});
 								}
-								if(i == 8) break;
 							}
 						}
 						else {
