@@ -2,19 +2,21 @@ package de.azrael.core;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.EnumSet;
 import java.util.Properties;
 
 import javax.security.auth.login.LoginException;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import de.azrael.commands.About;
 import de.azrael.commands.Accept;
 import de.azrael.commands.Changemap;
@@ -131,12 +133,11 @@ public class Main {
 					+ "sessionname:<String> (if the bot should be started more than once, assign a name)\n"
 					+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
 					+ "countguilds:<BOOLEAN> (true/false parameter to either enable or disable the count of all guilds as status message)\n"
-					+ "filelog:<BOOLEAN> (true/false parameter to print all messages into a text file when enabled)\n"
 					+ "statusmessage:<STRING> (Message to display as status message. Separate blank spaces with '-')\n"
 					+ "temp:<STRING> (Path for the temp directory)\n"
 					+ "homepage:<String> (url for the Bot homepage)\n"
 					+ "port:<NUMERIC> (port number for the webservice)\n"
-					+ "spreadsheetdelay:<NUMERIC> (numeric delay time to execute batch updates on spreadsheets)");
+					+ "spreadsheetdelay:<NUMERIC> (numeric delay time to execute batch updates on spreadsheets)\n");
 			
 		} 
 		else {
@@ -152,8 +153,6 @@ public class Main {
 					System.setProperty("ACTION_LOG", argument.split(":")[1].trim());
 				if(currentArgument.startsWith("countguilds:"))
 					System.setProperty("COUNT_GUILDS", argument.split(":")[1].trim());
-				if(currentArgument.startsWith("filelog:"))
-					System.setProperty("FILE_LOG", argument.split(":")[1].trim());
 				if(currentArgument.startsWith("statusmessage:")) {
 					var splitMessage = argument.split(":")[1].split("-");
 					StringBuilder message = new StringBuilder();
@@ -175,6 +174,37 @@ public class Main {
 					System.setProperty("SPREADSHEET_UPDATE_DELAY", argument.split(":")[1].trim());
 			}
 			
+			//set default values, if not set
+			if(System.getProperty("SESSION_NAME") == null)
+				System.setProperty("SESSION_NAME", "Azrael");
+			if(System.getProperty("COUNT_GUILDS") == null || (!System.getProperty("COUNT_GUILDS").equals("true") && !System.getProperty("COUNT_GUILDS").equals("false")))
+				System.setProperty("COUNT_GUILDS", "false");
+			if(System.getProperty("ACTION_LOG") == null || (!System.getProperty("ACTION_LOG").equals("true") && !System.getProperty("ACTION_LOG").equals("false")))
+				System.setProperty("ACTION_LOG", System.getProperty("ACTION_LOG", "false"));
+			if(System.getProperty("WEBSERVER_PORT") == null || !System.getProperty("WEBSERVER_PORT").matches("[0-9]{1,}"))
+				System.setProperty("WEBSERVER_PORT", System.getProperty("WEBSERVER_PORT", "0"));
+			if(System.getProperty("TEMP_DIRECTORY") == null)
+				System.setProperty("TEMP_DIRECTORY", "./temp/");
+			if(System.getProperty("SPREADSHEET_UPDATE_DELAY") == null || (!System.getProperty("SPREADSHEET_UPDATE_DELAY").matches("[0-9]*") && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) > 60  && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) < 0))
+				System.setProperty("SPREADSHEET_UPDATE_DELAY", "0");
+			
+			try {
+				final String fileName = Directory.LOG.getPath()+System.getProperty("SESSION_NAME");
+				System.setProperty("LOG_FILE", fileName);
+				
+				LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+				loggerContext.reset();
+				JoranConfigurator configurator = new JoranConfigurator();
+				InputStream configStream;
+				configStream = FileUtils.openInputStream(new File("./logback.xml"));
+				configurator.setContext(loggerContext);
+				configurator.doConfigure(configStream);
+				configStream.close();
+				
+			} catch (IOException | JoranException e1) {
+				logger.warn("Log file couldn't be found on start up", e1);
+			}
+			
 			if(System.getProperty("TOKEN") == null) {
 				logger.error("No token has been provided!");
 				return;
@@ -185,9 +215,9 @@ public class Main {
 			}
 			
 			//Load DB configuration from file
-			Properties prop = new Properties();
 			try {
 				FileInputStream secret = new FileInputStream(SECRET);
+				Properties prop = new Properties();
 				prop.load(secret);
 				
 				//Database options
@@ -259,36 +289,6 @@ public class Main {
 				logger.error("Database configurations couldn't be loaded. Application shutdown!", e1);
 				return;
 			}
-			
-			//set default values, if not set
-			if(System.getProperty("SESSION_NAME") == null)
-				System.setProperty("SESSION_NAME", "Azrael");
-			if(System.getProperty("COUNT_GUILDS") == null || (!System.getProperty("COUNT_GUILDS").equals("true") && !System.getProperty("COUNT_GUILDS").equals("false")))
-				System.setProperty("COUNT_GUILDS", "false");
-			if(System.getProperty("ACTION_LOG") == null || (!System.getProperty("ACTION_LOG").equals("true") && !System.getProperty("ACTION_LOG").equals("false")))
-				System.setProperty("ACTION_LOG", prop.getProperty("ACTION_LOG", "false"));
-			if(System.getProperty("FILE_LOG") == null || (!System.getProperty("FILE_LOG").equals("true") && !System.getProperty("FILE_LOG").equals("false")))
-				System.setProperty("FILE_LOG", prop.getProperty("FILE_LOG", "false"));
-			if(System.getProperty("WEBSERVER_PORT") == null || !System.getProperty("WEBSERVER_PORT").matches("[0-9]{1,}"))
-				System.setProperty("WEBSERVER_PORT", prop.getProperty("WEBSERVER_PORT", "0"));
-			if(System.getProperty("TEMP_DIRECTORY") == null)
-				System.setProperty("TEMP_DIRECTORY", "./temp/");
-			if(System.getProperty("SPREADSHEET_UPDATE_DELAY") == null || (!System.getProperty("SPREADSHEET_UPDATE_DELAY").matches("[0-9]*") && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) > 60  && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) < 0))
-				System.setProperty("SPREADSHEET_UPDATE_DELAY", "0");
-			
-			if(System.getProperty("FILE_LOG").equals("true")) {
-				PrintStream out;
-				try {
-					final String fileName = System.getProperty("SESSION_NAME");
-					out = new PrintStream(new FileOutputStream("log/"+fileName+".log", true));
-					System.setOut(out);
-					System.setErr(out);
-				} catch (FileNotFoundException e1) {
-					logger.warn("Log file couldn't be found on start up", e1);
-				}
-			}
-			
-			System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");
 			
 			builder = JDABuilder.createDefault(System.getProperty("TOKEN"))
 					.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))

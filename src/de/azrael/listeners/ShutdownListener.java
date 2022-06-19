@@ -73,7 +73,6 @@ public class ShutdownListener extends ListenerAdapter {
 		params.append(" encryption:"+System.getProperty("AES_SECRET"));
 		params.append(" actionlog:"+System.getProperty("ACTION_LOG"));
 		params.append(" countguilds:"+System.getProperty("COUNT_GUILDS"));
-		params.append(" filelog:"+System.getProperty("FILE_LOG"));
 		params.append(" statusmessage:"+System.getProperty("STATUS_MESSAGE"));
 		params.append(" homepage:"+System.getProperty("HOMEPAGE"));
 		params.append(" port:"+System.getProperty("WEBSERVER_PORT"));

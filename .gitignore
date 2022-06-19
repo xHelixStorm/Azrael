@@ -7,3 +7,5 @@
 /target/
 .secret_data
 *.log
+/user_log/
+/cache/
