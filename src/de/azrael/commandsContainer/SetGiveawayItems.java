@@ -1,11 +1,13 @@
 package de.azrael.commandsContainer;
 
 import java.awt.Color;
+import java.io.File;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +33,17 @@ public class SetGiveawayItems {
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if((args.length == 2 || args.length == 3)) {
 			final var attachments = e.getMessage().getAttachments();
+			File file = null;
 			boolean attachmentFound = false;
 			String fileName = "";
 			//check if an attachment has been added
 			if(attachments.size() == 1 && (attachments.get(0).getFileExtension() == null || attachments.get(0).getFileExtension().contains("txt"))) {
 				fileName = e.getGuild().getId()+attachments.get(0).getFileName();
-				attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
+				try {
+					file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+				} catch (InterruptedException | ExecutionException e1) {
+					logger.error("Giveaway file {} couldn't be downloaded in guild {}", fileName, e.getGuild().getId());
+				}
 				attachmentFound = true;
 			}
 			switch(args[1]) {
@@ -71,6 +78,10 @@ public class SetGiveawayItems {
 								e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 								logger.error("Giveaway rewards couldn't be cleared in guild {}", e.getGuild().getId());
 							}
+						}
+						else if(attachmentFound && (file == null || !file.exists())) {
+							EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
+							e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						}
 						//verify file and save the content into array
 						else if(attachmentFound) {
@@ -122,6 +133,10 @@ public class SetGiveawayItems {
 							e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("Giveaway rewards couldn't be cleared in guild {}", e.getGuild().getId());
 						}
+					}
+					else if(attachmentFound && (file == null || !file.exists())) {
+						EmbedBuilder error = new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED);
+						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					}
 					//verify if an attachment has been submitted
 					else if(attachmentFound) {
