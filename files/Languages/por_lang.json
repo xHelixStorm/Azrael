@@ -423,7 +423,7 @@
     "filter_write_add_file":	    "As palavras ou nomes foram inseridos com sucesso!",
     "filter_write_insert_url":      "O URL foi inserido com sucesso!",
     "filter_write_remove_url":      "O URL foi removido com sucesso!",
-    "filter_write_file_url":    	"Os URLS foram inseridos com sucesso!",
+    "filter_write_file_url":    	"Os URLs foram inseridos com sucesso!",
     "filter_write_insert_nick":     "O nome de utilizador da subscrição foi inserido com sucesso!",
     "filter_write_remove_nick":     "O nome de utilizador da subscrição foi removido com sucesso!",
     "filter_write_file_nick": 		"Os nomes de utilizador da subscrição foram inseridos com sucesso!",

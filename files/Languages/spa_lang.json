@@ -423,7 +423,7 @@
 	"filter_write_add_file":		"¡Las palabras o nombres se han insertado correctamente!",
 	"filter_write_insert_url":		"¡La URL se ha insertado correctamente!",
 	"filter_write_remove_url":		"¡La URL ha sido eliminada correctamente!",
-	"filter_write_file_url":		"¡Las URLS se han insertado correctamente!",
+	"filter_write_file_url":		"¡Las URLs se han insertado correctamente!",
 	"filter_write_insert_nick":		"El nombre de usuario de la suscripción se ha insertado con éxito.",
 	"filter_write_remove_nick":		"El nombre de usuario de la suscripción ha sido eliminado con éxito.",
 	"filter_write_file_nick":		"Los nombres de usuario de la suscripción se han insertado con éxito.",
