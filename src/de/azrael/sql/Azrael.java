@@ -4245,26 +4245,35 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter);
 				stmt.setString(1, lang);
 				stmt.setLong(2, guild_id);
-				stmt.executeUpdate();
+				result = stmt.executeUpdate();
 			}
 			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter2);
-			
-			for(String word : words) {
-				if(!word.isBlank()) {
-					stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
-					stmt.setString(2, lang);
-					stmt.setLong(3, guild_id);
-					stmt.addBatch();
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceWordFilter2);
+				for(String word : words) {
+					if(!word.isBlank()) {
+						stmt.setString(1, CharacterReplacer.simpleReplace(word.toLowerCase()));
+						stmt.setString(2, lang);
+						stmt.setLong(3, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			logger.error("SQLReplaceWordFilter Exception", e);
 			try {
@@ -4288,26 +4297,35 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter);
 				stmt.setLong(1, guild_id);
 				stmt.setBoolean(2, kick);
-				stmt.executeUpdate();
+				result = stmt.executeUpdate();
 			}
-			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter2);
-			
-			for(String word : words) {
-				if(!word.isBlank()) {
-					stmt.setString(1, word);
-					stmt.setBoolean(2, kick);
-					stmt.setLong(3, guild_id);
-					stmt.addBatch();
+
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceNameFilter2);
+				for(String word : words) {
+					if(!word.isBlank()) {
+						stmt.setString(1, word);
+						stmt.setBoolean(2, kick);
+						stmt.setLong(3, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			logger.error("SQLReplaceNameFilter Exception", e);
 			try {
@@ -4331,23 +4349,33 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
 				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames);
 				stmt.setLong(1, guild_id);
+				result = stmt.executeUpdate();
 			}
 			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames2);;
-			
-			for(String word : words) {
-				if(!word.isBlank()) {
-					stmt.setString(1, word);
-					stmt.setLong(2, guild_id);
-					stmt.addBatch();
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceFunnyNames2);;
+				for(String word : words) {
+					if(!word.isBlank()) {
+						stmt.setString(1, word);
+						stmt.setLong(2, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			logger.error("SQLReplaceFunnyNames Exception", e);
 			try {
@@ -4364,37 +4392,47 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceURLBlacklist(String [] urls, long guild_id, boolean delete) {
-		logger.trace("SQLReplaceURLBlacklist launched. Passed params array, {}, {}", guild_id, delete);
+	public static int SQLReplaceProhibitedURLs(String [] urls, long guild_id, boolean delete) {
+		logger.trace("SQLReplaceProhibitedURLs launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
-				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceProhibitedURLs);
 				stmt.setLong(1, guild_id);
-				stmt.executeUpdate();
+				result = stmt.executeUpdate();
 			}
 			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLBlacklist2);
-			for(String url : urls) {
-				if(!url.isBlank()) {
-					stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
-					stmt.setLong(2, guild_id);
-					stmt.addBatch();
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceProhibitedURLs2);
+				for(String url : urls) {
+					if(!url.isBlank()) {
+						stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+						stmt.setLong(2, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			try {
-				logger.error("SQLReplaceURLBlacklist Exception", e);
+				logger.error("SQLReplaceProhibitedURLs Exception", e);
 				myConn.rollback();
 				return 1;
 			} catch (SQLException e1) {
-				logger.error("SQLReplaceURLBlacklist roll back Exception", e1);
+				logger.error("SQLReplaceProhibitedURLs roll back Exception", e1);
 				return 2;
 			}
 		} finally {
@@ -4404,37 +4442,47 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceURLWhitelist(String [] urls, long guild_id, boolean delete) {
-		logger.trace("SQLReplaceURLWhitelist launched. Passed params array, {}, {}", guild_id, delete);
+	public static int SQLReplaceAllowedURLs(String [] urls, long guild_id, boolean delete) {
+		logger.trace("SQLReplaceAllowedURLs launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
-				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceAllowedURLs);
 				stmt.setLong(1, guild_id);
-				stmt.executeUpdate();
+				result = stmt.executeUpdate();
 			}
 			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceURLWhitelist2);
-			for(String url : urls) {
-				if(!url.isBlank()) {
-					stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
-					stmt.setLong(2, guild_id);
-					stmt.addBatch();
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceAllowedURLs2);
+				for(String url : urls) {
+					if(!url.isBlank()) {
+						stmt.setString(1, url.replaceAll("(http:\\/\\/|https:\\/\\/)", "").replaceAll("www.", "").replace("\\b\\/[\\w\\d=?!&#\\[\\]().,+_*';:@$\\/-]*\\b", ""));
+						stmt.setLong(2, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			try {
-				logger.error("SQLReplaceURLWhitelist Exception", e);
+				logger.error("SQLReplaceAllowedURLs Exception", e);
 				myConn.rollback();
 				return 1;
 			} catch (SQLException e1) {
-				logger.error("SQLReplaceURLWhitelist roll back Exception", e1);
+				logger.error("SQLReplaceAllowedURLs roll back Exception", e1);
 				return 2;
 			}
 		} finally {
@@ -4444,37 +4492,47 @@ public class Azrael {
 	}
 	
 	@SuppressWarnings("resource")
-	public static int SQLReplaceTweetBlacklist(String [] usernames, long guild_id, boolean delete) {
-		logger.trace("SQLReplaceTweetBlacklist launched. Passed params array, {}, {}", guild_id, delete);
+	public static int SQLReplaceProhibitedSubscriptions(String [] usernames, long guild_id, boolean delete) {
+		logger.trace("SQLReplaceProhibitedSubscriptions launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
+			int result = 0;
 			if(delete) {
-				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist);
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceProhibitedSubscriptions);
 				stmt.setLong(1, guild_id);
-				stmt.executeUpdate();
+				result = stmt.executeUpdate();
 			}
 			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceTweetBlacklist2);
-			for(String username : usernames) {
-				if(!username.isBlank()) {
-					stmt.setString(1, username);
-					stmt.setLong(2, guild_id);
-					stmt.addBatch();
+			if(result >= 0) {
+				stmt = myConn.prepareStatement(AzraelStatements.SQLReplaceProhibitedSubscriptions2);
+				for(String username : usernames) {
+					if(!username.isBlank()) {
+						stmt.setString(1, username);
+						stmt.setLong(2, guild_id);
+						stmt.addBatch();
+					}
 				}
+				result = stmt.executeBatch()[0];
 			}
-			stmt.executeBatch();
-			myConn.commit();
-			return 0;
+			
+			if(result > 0) {
+				myConn.commit();
+				return 0;
+			}
+			else {
+				myConn.rollback();
+				return 3;
+			}
 		} catch (SQLException e) {
 			try {
-				logger.error("SQLReplaceTweetBlacklist Exception", e);
+				logger.error("SQLReplaceProhibitedSubscriptions Exception", e);
 				myConn.rollback();
 				return 1;
 			} catch (SQLException e1) {
-				logger.error("SQLReplaceTweetBlacklist roll back Exception", e1);
+				logger.error("SQLReplaceProhibitedSubscriptions roll back Exception", e1);
 				return 2;
 			}
 		} finally {

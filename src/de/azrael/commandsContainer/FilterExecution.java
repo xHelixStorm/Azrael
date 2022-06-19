@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +42,15 @@ public class FilterExecution {
 		final var subCommands = BotConfiguration.SQLgetCommand(e.getGuild().getIdLong(), 1, Command.FILTER_WORD_FILTER, Command.FILTER_NAME_FILTER, Command.FILTER_NAME_KICK
 				, Command.FILTER_FUNNY_NAMES, Command.FILTER_STAFF_NAMES, Command.FILTER_PROHIBITED_URLS, Command.FILTER_ALLOWED_URLS, Command.FILTER_PROHIBITED_SUBS);
 		
-		for(final var values : subCommands) {
+		for(final var command : subCommands) {
 			boolean enabled = false;
 			String name = "";
-			if(values instanceof Boolean)
-				enabled = (Boolean)values;
-			else if(values instanceof String)
-				name = ((String)values).split(":")[0];
+			for(final var values : (ArrayList<?>)command) {
+				if(values instanceof Boolean)
+					enabled = (Boolean)values;
+				else if(values instanceof String)
+					name = ((String)values).split(":")[0];
+			}
 			
 			if(name.equals(Command.FILTER_WORD_FILTER.getColumn()))
 				filterWordFilter = enabled;
@@ -791,40 +794,57 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							var QueryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
-								Hashes.removeNameFilter(e.getGuild().getIdLong());
-								logger.info("User {} has inserted words with the pastebin url {} into the name filter in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							else if(QueryResult == 1) {
-								//throw error for failing the db replacement
-								message.setColor(Color.RED);
-								var duplicates = checkDuplicates(words);
-								if(duplicates == null || duplicates.size() == 0) {
-									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The name filter couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								var queryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(queryResult == 0) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
+									Hashes.removeNameFilter(e.getGuild().getIdLong());
+									logger.info("User {} has inserted words into the name filter in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+								}
+								else if(queryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED);
+									var duplicates = checkDuplicates(words);
+									if(duplicates == null || duplicates.size() == 0) {
+										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("The name filter couldn't be updated in guild {}", e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									}
+								}
+								else if(queryResult == 2) {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+									logger.error("Changes on the name filter couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 								else {
-									StringBuilder out = new StringBuilder();
-									for(var word : duplicates) {
-										out.append("**"+word+"**\n");
-									}
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Changes on the name filter couldn't be saved in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
-								//thow error for failing the rollback
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-								logger.error("Changes on the name filter couldn't be rolled back on error in guild {}", e.getGuild().getId());
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), fileName);
@@ -870,41 +890,58 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							var QueryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
-								Hashes.removeNameFilter(e.getGuild().getIdLong());
-								logger.info("User {} has inserted words with the pastebin url {} into the name kick list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							else if(QueryResult == 1) {
-								//throw error for failing the db replacement
-								message.setColor(Color.RED);
-								var duplicates = checkDuplicates(words);
-								if(duplicates == null || duplicates.size() == 0) {
-									message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The name kick list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								var queryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(queryResult == 0) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
+									Hashes.removeNameFilter(e.getGuild().getIdLong());
+									logger.info("User {} has inserted words into the name kick list in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+								}
+								else if(queryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED);
+									var duplicates = checkDuplicates(words);
+									if(duplicates == null || duplicates.size() == 0) {
+										message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("The name kick list couldn't be updated in guild {}", e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									}
+								}
+								else if(queryResult == 2) {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+									logger.error("Changes on the name kick list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 								else {
-									StringBuilder out = new StringBuilder();
-									for(var word : duplicates) {
-										out.append("**"+word+"**\n");
-									}
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Changes on the name kick list couldn't be saved in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
-								//thow error for failing the rollback
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-								logger.error("Changes on the name kick list couldn't be rolled back on error in guild {}", e.getGuild().getId());
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), fileName);
@@ -950,40 +987,57 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							var QueryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
-								Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
-								logger.info("User {} has inserted words with the pastebin url {} into the funky names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							else if(QueryResult == 1) {
-								//throw error for failing the db replacement
-								message.setColor(Color.RED);
-								var duplicates = checkDuplicates(words);
-								if(duplicates == null || duplicates.size() == 0) {
-									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The funky names list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								var queryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(queryResult == 0) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
+									Hashes.removeQueryResult("funny-names_"+e.getGuild().getId());
+									logger.info("User {} has inserted words into the funky names list in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+								}
+								else if(queryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED);
+									var duplicates = checkDuplicates(words);
+									if(duplicates == null || duplicates.size() == 0) {
+										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("The funky names list couldn't be updated in guild {}", e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									}
+								}
+								else if(queryResult == 2) {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+									logger.error("Changes on the funky names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 								else {
-									StringBuilder out = new StringBuilder();
-									for(var word : duplicates) {
-										out.append("**"+word+"**\n");
-									}
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Changes on the funky names list couldn't be saved in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
-								//thow error for failing the rollback
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-								logger.error("Changes on the funky names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), fileName);
@@ -1030,40 +1084,57 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							var QueryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-							if(QueryResult == 0) {
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
-								Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
-								logger.info("User {} has inserted names with the pastebin url {} into the staff names list in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							else if(QueryResult == 1) {
-								//throw error for failing the db replacement
-								message.setColor(Color.RED);
-								var duplicates = checkDuplicates(words);
-								if(duplicates == null || duplicates.size() == 0) {
-									e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("The staff names list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								var queryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+								if(queryResult == 0) {
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
+									Hashes.removeQueryResult("staff-names_"+e.getGuild().getId());
+									logger.info("User {} has inserted names into the staff names list in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+								}
+								else if(queryResult == 1) {
+									//throw error for failing the db replacement
+									message.setColor(Color.RED);
+									var duplicates = checkDuplicates(words);
+									if(duplicates == null || duplicates.size() == 0) {
+										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("The staff names list couldn't be updated in guild {}", e.getGuild().getId());
+									}
+									else {
+										StringBuilder out = new StringBuilder();
+										for(var word : duplicates) {
+											out.append("**"+word+"**\n");
+										}
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									}
+								}
+								else if(queryResult == 2) {
+									//thow error for failing the rollback
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+									logger.error("Changes on the staff names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
 								}
 								else {
-									StringBuilder out = new StringBuilder();
-									for(var word : duplicates) {
-										out.append("**"+word+"**\n");
-									}
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									logger.error("Changes on the staff names list couldn't be saved in guild {}", e.getGuild().getId());
 								}
 							}
 							else {
-								//thow error for failing the rollback
 								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-								logger.error("Changes on the staff names list couldn't be rolled back on error in guild {}", e.getGuild().getId());
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), fileName);
@@ -1117,56 +1188,73 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							List<String> checkedURLs = new ArrayList<String>();
-							for(var link : url) {
-								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
-									checkedURLs.add(link);
-								}
-								else {
-									checkedURLs.clear();
-									break;
-								}
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							if(checkedURLs.size() > 0 ) {
-								var QueryResult = Azrael.SQLReplaceURLBlacklist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
-									Hashes.removeURLBlacklist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted urls with the pastebin url {} into the prohibited urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
-								}
-								else if(QueryResult == 1) {
-									//throw error for failing the db replacement
-									message.setColor(Color.RED);
-									var duplicates = checkDuplicates(url);
-									if(duplicates == null || duplicates.size() == 0) {
-										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("The prohibited urls list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								List<String> checkedURLs = new ArrayList<String>();
+								for(var link : url) {
+									if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
+										checkedURLs.add(link);
 									}
 									else {
-										StringBuilder out = new StringBuilder();
-										for(var word : duplicates) {
-											out.append("**"+word+"**\n");
+										checkedURLs.clear();
+										break;
+									}
+								}
+								if(checkedURLs.size() > 0 ) {
+									var queryResult = Azrael.SQLReplaceProhibitedURLs(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+									if(queryResult == 0) {
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
+										Hashes.removeURLBlacklist(e.getGuild().getIdLong());
+										logger.info("User {} has inserted urls into the prohibited urls in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+									}
+									else if(queryResult == 1) {
+										//throw error for failing the db replacement
+										message.setColor(Color.RED);
+										var duplicates = checkDuplicates(url);
+										if(duplicates == null || duplicates.size() == 0) {
+											e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+											logger.error("The prohibited urls list couldn't be updated in guild {}", e.getGuild().getId());
 										}
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+										else {
+											StringBuilder out = new StringBuilder();
+											for(var word : duplicates) {
+												out.append("**"+word+"**\n");
+											}
+											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+										}
+									}
+									else if(queryResult == 2) {
+										//thow error for failing the rollback
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+										logger.error("Changes on the prohibited urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									}
+									else {
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("Changes on the prohibited urls couldn't be saved in guild {}", e.getGuild().getId());
 									}
 								}
 								else {
-									//thow error for failing the rollback
-									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the prohibited urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									message.setColor(Color.RED);
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 								}
 							}
 							else {
-								message.setColor(Color.RED);
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
@@ -1220,56 +1308,73 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							List<String> checkedURLs = new ArrayList<String>();
-							for(var link : url) {
-								if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
-									checkedURLs.add(link);
-								}
-								else {
-									checkedURLs.clear();
-									break;
-								}
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							if(checkedURLs.size() > 0) {
-								var QueryResult = Azrael.SQLReplaceURLWhitelist(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
-									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted urls with the pastebin url {} into the allowed urls in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
-								}
-								else if(QueryResult == 1) {
-									//throw error for failing the db replacement
-									message.setColor(Color.RED);
-									var duplicates = checkDuplicates(url);
-									if(duplicates == null || duplicates.size() == 0) {
-										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.error("The allowed urls list couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								List<String> checkedURLs = new ArrayList<String>();
+								for(var link : url) {
+									if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
+										checkedURLs.add(link);
 									}
 									else {
-										StringBuilder out = new StringBuilder();
-										for(var word : duplicates) {
-											out.append("**"+word+"**\n");
+										checkedURLs.clear();
+										break;
+									}
+								}
+								if(checkedURLs.size() > 0) {
+									var queryResult = Azrael.SQLReplaceAllowedURLs(url, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+									if(queryResult == 0) {
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_URL)).build()).queue();
+										Hashes.removeURLWhitelist(e.getGuild().getIdLong());
+										logger.info("User {} has inserted urls into the allowed urls in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+									}
+									else if(queryResult == 1) {
+										//throw error for failing the db replacement
+										message.setColor(Color.RED);
+										var duplicates = checkDuplicates(url);
+										if(duplicates == null || duplicates.size() == 0) {
+											e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+											logger.error("The allowed urls list couldn't be updated in guild {}", e.getGuild().getId());
 										}
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+										else {
+											StringBuilder out = new StringBuilder();
+											for(var word : duplicates) {
+												out.append("**"+word+"**\n");
+											}
+											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+										}
+									}
+									else if(queryResult == 2) {
+										//thow error for failing the rollback
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+										logger.error("Changes on the allowed urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									}
+									else {
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("Changes on the allowed urls couldn't be saved in guild {}", e.getGuild().getId());
 									}
 								}
 								else {
-									//thow error for failing the rollback
-									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the allowed urls couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									message.setColor(Color.RED);
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
 								}
 							}
 							else {
-								message.setColor(Color.RED);
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_URL)).build()).queue();
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
@@ -1315,56 +1420,63 @@ public class FilterExecution {
 						final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 						String fileExtension = attachments.get(0).getFileExtension();
 						if(fileExtension == null || fileExtension.contains("txt")) {
-							attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-							String [] usernames = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-							List<String> checkedUsernames = new ArrayList<String>();
-							for(var username : usernames) {
-								if(username.startsWith("@")) {
-									checkedUsernames.add(username);
-								}
-								else {
-									checkedUsernames.clear();
-									break;
-								}
+							File file = null;
+							try {
+								file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 							}
-							if(checkedUsernames.size() > 0) {
-								var QueryResult = Azrael.SQLReplaceTweetBlacklist(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
-								if(QueryResult == 0) {
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_NICK)).build()).queue();
-									Hashes.removeURLWhitelist(e.getGuild().getIdLong());
-									logger.info("User {} has inserted usernames with the pastebin url {} to prohibit subscriptions from in guild {}", e.getMember().getUser().getIdLong(), _message, e.getGuild().getId());
-								}
-								else if(QueryResult == 1) {
-									//throw error for failing the db replacement
-									message.setColor(Color.RED);
-									var duplicates = checkDuplicates(usernames);
-									if(duplicates == null || duplicates.size() == 0) {
-										e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-										logger.warn("The list with prohibited subscriptions couldn't be updated with the pastebin url {} in guild {}", _message, e.getGuild().getId());
+							if(file != null && file.exists()) {
+								String [] usernames = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								if(usernames.length > 0) {
+									var queryResult = Azrael.SQLReplaceProhibitedSubscriptions(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
+									if(queryResult == 0) {
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE_NICK)).build()).queue();
+										Hashes.removeURLWhitelist(e.getGuild().getIdLong());
+										logger.info("User {} has inserted usernames to prohibit subscriptions from in guild {}", e.getMember().getUser().getIdLong(), e.getGuild().getId());
+									}
+									else if(queryResult == 1) {
+										//throw error for failing the db replacement
+										message.setColor(Color.RED);
+										var duplicates = checkDuplicates(usernames);
+										if(duplicates == null || duplicates.size() == 0) {
+											e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+											logger.warn("The list with prohibited subscriptions couldn't be updated in guild {}", e.getGuild().getId());
+										}
+										else {
+											StringBuilder out = new StringBuilder();
+											for(var word : duplicates) {
+												out.append("**"+word+"**\n");
+											}
+											e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)).build()).queue();
+										}
+									}
+									else if(queryResult == 2) {
+										//throw error for failing the rollback
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+										logger.error("Changes on the prohibited subscriptions couldn't be rolled back on error in guild {}", e.getGuild().getId());
 									}
 									else {
-										StringBuilder out = new StringBuilder();
-										for(var word : duplicates) {
-											out.append("**"+word+"**\n");
-										}
-										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)).build()).queue();
+										message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+										e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("Changes on the prohibited subscriptions couldn't be saved in guild {}", e.getGuild().getId());
 									}
 								}
 								else {
-									//throw error for failing the rollback
-									message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-									logger.error("Changes on the prohibited subscriptions couldn't be rolled back on error in guild {}", e.getGuild().getId());
+									message.setColor(Color.RED);
+									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
 								}
 							}
 							else {
-								message.setColor(Color.RED);
-								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_NICK)).build()).queue();
+								message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+								e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							}
 						}
 						else {
 							message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
@@ -1478,41 +1590,58 @@ public class FilterExecution {
 			final String fileName = e.getGuild().getId()+"_"+attachments.get(0).getFileName();
 			String fileExtension = attachments.get(0).getFileExtension();
 			if(fileExtension == null || fileExtension.contains("txt")) {
-				attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName);
-				String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
-				var QueryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
-				if(QueryResult == 0) {
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
-					clearHash(e, lang, false);
-					Hashes.removeQueryResult("all_"+e.getGuild().getId());
-					logger.info("User {} has inserted words with the pastebin url {} into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), _message, lang, e.getGuild().getId());
+				File file = null;
+				try {
+					file = attachments.get(0).downloadToFile(Directory.TEMP.getPath()+fileName).get();
+				} catch (InterruptedException | ExecutionException e1) {
+					logger.error("Provided file {} couldn't be cached in guild {}", attachments.get(0).getFileName(), e.getGuild().getId(), e1);
 				}
-				else if(QueryResult == 1) {
-					//throw error for failing the db replacement
-					message.setColor(Color.RED);
-					var duplicates = checkDuplicates(words);
-					if(duplicates == null || duplicates.size() == 0) {
-						e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The {} word filter couldn't be updated with the pastebin url {} in guild {}", lang, _message, e.getGuild().getId());
+				if(file != null && file.exists()) {
+					String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+					var queryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
+					if(queryResult == 0) {
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
+						clearHash(e, lang, false);
+						Hashes.removeQueryResult("all_"+e.getGuild().getId());
+						logger.info("User {} has inserted words into the {} word filter in guild {}", e.getMember().getUser().getIdLong(), lang, e.getGuild().getId());
+					}
+					else if(queryResult == 1) {
+						//throw error for failing the db replacement
+						message.setColor(Color.RED);
+						var duplicates = checkDuplicates(words);
+						if(duplicates == null || duplicates.size() == 0) {
+							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							logger.error("The {} word filter couldn't be updated in guild {}", lang, e.getGuild().getId());
+						}
+						else {
+							StringBuilder out = new StringBuilder();
+							for(var word : duplicates) {
+								out.append("**"+word+"**\n");
+							}
+							e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+						}
+					}
+					else if(queryResult == 2) {
+						//throw error for failing the rollback
+						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
+						logger.error("Changes on the {} word filter couldn't be rolled back on error in guild {}", lang, e.getGuild().getId());
 					}
 					else {
-						StringBuilder out = new StringBuilder();
-						for(var word : duplicates) {
-							out.append("**"+word+"**\n");
-						}
-						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_DUPLICATES)+out.toString()).build()).queue();
+						message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
+						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						logger.error("Changes on the {} word filter couldn't be saved in guild {}", lang, e.getGuild().getId());
 					}
 				}
 				else {
-					//throw error for failing the rollback
 					message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_ROLLBACK_ERR)).build()).queue();
-					logger.error("Changes on the {} word filter couldn't be rolled back on error in guild {}", lang, e.getGuild().getId());
+					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				}
 			}
 			else {
 				message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				logger.error("Invalid file with extension {} in guild {}", fileExtension, e.getGuild().getId());
 			}
 			Hashes.clearTempCache(key);
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);

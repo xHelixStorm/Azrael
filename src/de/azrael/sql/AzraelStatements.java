@@ -191,12 +191,12 @@ class AzraelStatements {
 	final static String SQLReplaceNameFilter2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jCHAvhYgPYKP2RoFprSSFtz5WBy+198cqDrdoZpcExRBn7eRn3gNtOHA/QhB/al8/78XlA492QR/Vs0L4vobKMc=");
 	final static String SQLReplaceFunnyNames = STATIC.decrypt("UfhBdItcItaYkB85CSc1/JCubaf6aRe1cirzlfLRDgIn5izag4+g9ut5AeNVjTM0");
 	final static String SQLReplaceFunnyNames2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jLok0RevjLHnuRvwKT0Sww1GvRq6xjuJdIoXjEvo/4be4k3ksXglgeHqa5BLMLRr8A==");
-	final static String SQLReplaceURLBlacklist = STATIC.decrypt("fO8bJn2b8zqMT4lPH2OMhUNUiw2Hs5DXJMmt9L308V9gAXusq14z89hf/H8rukBz");
-	final static String SQLReplaceURLBlacklist2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jO5JfS5tG64U10/qy/FLacxjNZhQnKKU6UmJbwVMp1ZA60jWCMhWiWQiaaj1848EsvYYX5VoKQgPDWZIdCKoCbo=");
-	final static String SQLReplaceURLWhitelist = STATIC.decrypt("fO8bJn2b8zqMT4lPH2OMhbqyobXEkrXOSoI/fFBzDtVgAXusq14z89hf/H8rukBz");
-	final static String SQLReplaceURLWhitelist2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jM+VnVPqlIiFmgLcwWACe5djNZhQnKKU6UmJbwVMp1ZA60jWCMhWiWQiaaj1848EsvYYX5VoKQgPDWZIdCKoCbo=");
-	final static String SQLReplaceTweetBlacklist = STATIC.decrypt("RHdjCmd6zhVRpJWlfOHuOzULEXKW8krkJitscIs3MRqyQB5uNTVhuf0OgnSHRg0roIds2aNxoSXImxbCOHIl1Q==");
-	final static String SQLReplaceTweetBlacklist2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jN8dxb0UMpJJnvJ8RC4j+eNwNZH36q6jVZ8lyWV6OvkCS418J9srxtJpB4dG2SWCP0jhfxXmlwDKSDDewvvaYZw=");
+	final static String SQLReplaceProhibitedURLs = STATIC.decrypt("fO8bJn2b8zqMT4lPH2OMhUNUiw2Hs5DXJMmt9L308V9gAXusq14z89hf/H8rukBz");
+	final static String SQLReplaceProhibitedURLs2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jO5JfS5tG64U10/qy/FLacxjNZhQnKKU6UmJbwVMp1ZA60jWCMhWiWQiaaj1848EsvYYX5VoKQgPDWZIdCKoCbo=");
+	final static String SQLReplaceAllowedURLs = STATIC.decrypt("fO8bJn2b8zqMT4lPH2OMhbqyobXEkrXOSoI/fFBzDtVgAXusq14z89hf/H8rukBz");
+	final static String SQLReplaceAllowedURLs2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jM+VnVPqlIiFmgLcwWACe5djNZhQnKKU6UmJbwVMp1ZA60jWCMhWiWQiaaj1848EsvYYX5VoKQgPDWZIdCKoCbo=");
+	final static String SQLReplaceProhibitedSubscriptions = STATIC.decrypt("0xSdKw+yCETQWMnhRCcQe9ad64Lb/pdsb4HlwsBy0/cldk/WaZLItmwKk0TvunZwBnJ+hkt/X4MEX2fa1H+tNg==");
+	final static String SQLReplaceProhibitedSubscriptions2 = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jEs2smP0co/uifo6LE8hCXzmvnaLOunvgUJ6PZFWgWbaxW4tdQxHCxMcmDCtx36e6ppUWZzJ5n86mNJ0hI08Soc=");
 	final static String SQLRegisterLanguageChannel = STATIC.decrypt("1g4ee7k4hGTR0EMiNsG6O7Ya73f9vjiP+NGLN01uLUo3n/6bmQrXjQFpQwigQoNkxJaGHoi4nFXRKRLVIGpHAuGFFhElJI32bgkrNqZix4lrJC8YyfK2ghSI1bWKbh0+dEue/N5VqKlyFbnpdwDfM6KBss0VSQSSzWfdKfDDzHJMGL/73UDQq8Oc7vE9Exr3TlvyyI8znO4E+jtGXy858HnEo9uRqUS82mKiEUr5a8uq+jq86Hd3RA3Pgn16w/jZ");
 	final static String SQLRegisterLanguageChannel2 = STATIC.decrypt("cltpVdF1JlyoIUxaxiYiGIBpxTFXQt0nDyValSfUvhK1GlepIsyTY9XuO44PmfqvwHDFoIiSBrm66KlcGvJuTA==");
 	final static String SQLRegisterLanguageChannel3 = STATIC.decrypt("1g4ee7k4hGTR0EMiNsG6O8LzgKkBj7x4yfb/NvbfKghsp3EY1grQH1rRPI05xUq25FP7W1XCdLqz/NtRjiWhepYr9IMDcoAEEJ4RtiarS0RLK+7Uiv1eqmGB/Tb2916l44AO/xkcuXGJLUYao4rC1XnhwhACfVPcENnT1gQaRLrAkSVfeaell6lsDGNOi8ia");
