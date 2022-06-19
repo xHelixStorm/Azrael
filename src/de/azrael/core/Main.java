@@ -104,7 +104,6 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Main {
-	static {System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");}
 	private final static Logger logger = LoggerFactory.getLogger(Main.class);
 	private final static String SECRET = "./.secret_data";
 	private static JDABuilder builder;
@@ -288,6 +287,8 @@ public class Main {
 					logger.warn("Log file couldn't be found on start up", e1);
 				}
 			}
+			
+			System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");
 			
 			builder = JDABuilder.createDefault(System.getProperty("TOKEN"))
 					.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))
