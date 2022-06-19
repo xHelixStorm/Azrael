@@ -359,18 +359,21 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
 										StringBuilder out = new StringBuilder();
 										Object prevItem = null;
-										int count = 1;
+										int count = 0;
 										for(final Object item : (List<?>)object) {
-											if(count == (curPage-1)*pageCount) break;
-											else if(count >= (curPage*pageCount)-(pageCount-1)) {
+											if(count == ((curPage-1)*pageCount)) break;
+											else if(count >= ((curPage-2)*pageCount)) {
 												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
 												if(itemObjectValidation(item, prevItem))
 													count++;
 											}
+											else
+												count++;
 											prevItem = item;
 										}
 										//Rebuild message embed with new description
 										m.editMessage(rebuildEmbed(m.getEmbeds().get(0), out.toString(), curPage-1, maxPage).build()).queue();
+										e.getReaction().removeReaction(e.getMember().getUser()).queue();
 									});
 									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000).updateDescription(""+(curPage-1)));
 								}
@@ -387,18 +390,21 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
 										StringBuilder out = new StringBuilder();
 										Object prevItem = null;
-										int count = 1;
+										int count = 0;
 										for(final Object item : (List<?>)object) {
 											if(count == (curPage+1)*pageCount) break;
-											else if(count >= (curPage*pageCount)-(pageCount-1)) {
+											else if(count >= (curPage*pageCount)) {
 												out.append(buildPaginationMessage(e.getMember(), item, prevItem, pagination.getAdditionalInfo2()));
 												if(itemObjectValidation(item, prevItem))
 													count++;
 											}
+											else
+												count++;
 											prevItem = item;
 										}
 										//Rebuild message embed with new description
 										m.editMessage(rebuildEmbed(m.getEmbeds().get(0), out.toString(), curPage+1, maxPage).build()).queue();
+										e.getReaction().removeReaction(e.getMember().getUser()).queue();
 									});
 									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000).updateDescription(""+(curPage+1)));
 								}
@@ -641,7 +647,7 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 	private static boolean itemObjectValidation(Object item, Object prevItem) {
 		if(prevItem == null)
 			return true;
-		if(((Channels)prevItem).getChannel_ID() == ((Channels)item).getChannel_ID())
+		if(prevItem instanceof Channels && ((Channels)prevItem).getChannel_ID() == ((Channels)item).getChannel_ID())
 			return false;
 		return true;
 	}
