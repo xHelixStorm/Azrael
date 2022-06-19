@@ -422,7 +422,7 @@ public enum Translation {
 	FILTER_WRITE_FQDN			("filter_write_fqdn"),
 	FILTER_WRITE_FILE_FQDN		("filter_write_file_fqdn"),
 	FILTER_WRITE_USERNAME		("filter_write_username"),
-	FILTER_WRITE_FILE_USERNAME	("filter_write_paste_username"),
+	FILTER_WRITE_FILE_USERNAME	("filter_write_file_username"),
 	FILTER_WRITE_INSERT			("filter_write_insert"),
 	FILTER_WRITE_REMOVE			("filter_write_remove"),
 	FILTER_WRITE_ADD_FILE		("filter_write_add_file"),
