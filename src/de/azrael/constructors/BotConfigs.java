@@ -387,7 +387,7 @@ public class BotConfigs {
 		reactions.add(reactionsEmoji7);
 		reactions.add(reactionsEmoji8);
 		reactions.add(reactionsEmoji9);
-		return (String[])reactions.toArray();
+		return reactions.toArray(new String[reactions.size()]);
 	}
 	public String getVoteReactionThumbsUp() {
 		return this.voteReactionThumbsUp;

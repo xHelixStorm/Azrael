@@ -46,6 +46,7 @@ public class ReactionMessage {
 							}
 							else {
 								if(reactions[i] != null && reactions[i].length() > 0) {
+									reactions[i] = reactions[i].replaceAll(":", "");
 									try {
 										reaction = e.getGuild().getEmotesByName(reactions[i], false).get(0).getAsMention();
 									} catch(Exception exc) {

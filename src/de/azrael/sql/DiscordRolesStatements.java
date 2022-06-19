@@ -8,7 +8,7 @@ class DiscordRolesStatements {
 	final static String SQLUpdateAllRoles = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t7MQwxjL1olpMQWMXDM2rxK+kcRkwe1Cd0g4tSlnsdRL0PgPTg/SZ2fOVVexJvgez9ZWIjjkOUE++e6vP5Ist+SCJg1PT6IgCXfXespXSED/");
 	final static String SQLUpdateLevel = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t4rxNLCQ0cbL4+ZjVDzgsTbgJtM1Ojq73oEMCytn3YOukjM5slfTVs9dlQFeBmWqZhjHIymNeA1oJl2Xk2huPia8YGNGBtNlI1dCy7ySTeRd");
 	final static String SQLgetRoles = STATIC.decrypt("qVnLeov84sW1cHMhxUeRhwh8GnBzNnkWmtlGZy0RpfMCuZtSBpv8l10BXSsavj4P");
-	final static String SQLgetReactionRoles = STATIC.decrypt("qVnLeov84sW1cHMhxUeRhwh8GnBzNnkWmtlGZy0RpfMUwGpwagwOn1KjSEAqitE4Nm/EpJij++kBCdUWdS1ihvExfnYAbvSzxtJGBhPT1nc=");
+	final static String SQLgetReactionRoles = STATIC.decrypt("qVnLeov84sW1cHMhxUeRhwh8GnBzNnkWmtlGZy0RpfMUwGpwagwOn1KjSEAqitE4Nm/EpJij++kBCdUWdS1ihv8digPCDZbcKXsCjBQCsG1OW3SiML5lmXb9eX/qpwoS");
 	final static String SQLUpdateRoleName = STATIC.decrypt("Fx4SAO5otvhxOoRg9Tn8t/kAzTj5ONpEtnV3ahqi8FfdYF4nG8li2A5at9iQodEQ/32X/IcoYPAaokDEuNFLbA==");
 	final static String SQLgetCategories = STATIC.decrypt("3DUFKdo+5fK8jrz0VOsUfG23c2HdRhUjX/lTqqaEpaE=");
 	final static String SQLDeleteRole = STATIC.decrypt("u5nvCcP2ijL2bIwgwzOg2HKX3IaS/MUzXZ+1mail1DpwQPEZBNd1BYCvmMOn9+ul0s306qDaJwzO025LVuUgFw==");
