@@ -634,7 +634,7 @@
 	"remove_censor":				"All registered text channel filters for this text channel have been removed!",
 	"remove_censor_err":			"No censor language has been registered for this text channel!",
 	
-	"role_reaction_help":			"Write *{}* or *{}* together with the the command to operate the Bot's reaction functionality. By disabling, all not perisistent reaction roles will be removed from all users!",
+	"role_reaction_help":			"Write *{}* or *{}* together with the command to operate the Bot's reaction functionality. By disabling, all not perisistent reaction roles will be removed from all users!",
 	"role_reaction_enabled":		"Role reactions are already enabled!",
 	"role_reaction_enable":			"Role reactions have been enabled!",
 	"role_reaction_disabled":		"Role reactions are already disabled!",
