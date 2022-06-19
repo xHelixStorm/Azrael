@@ -22,9 +22,8 @@ class AzraelStatements {
 	final static String SQLBulkInsertJoinDates = STATIC.decrypt("oREnflsMOq5JCGnBY0i9jG1gt6cCrYeAIjTlG7t/4YjKXz6yVjO1ao6TDvpIRZIVBzu9nndwmvVKMf3lpaX3wVX6cei0sjjxeStxwLebd+hcX9Av7QrG8lCiVRrjJY6NO3w2Hbbqpnu1zFHQ0WdLfw==");
 	final static String SQLUpdateJoinDate = STATIC.decrypt("HCKbsQoTl3LTcoshi0Vn90UtgZw9yyvQ7lxraQoP3pzHbAgxw3rANXjk5Vm9lp2JA5EEStGUYPCgC4+L5q4cZe/Qkbb/vw6+uguUb4Kzt0fkC/gOBHmrpLjofD7MG3PZ");
 	final static String SQLgetUser = STATIC.decrypt("rYxhi8Qp/P54z0LDgjoLz4EQAM2IConxCRExb1RkySZE+yon/1lC2WvJr2G57JSpYQLvpDVHa7m3YJ/bLxyaqOD7uplkgVPX3QwBMeO0Nnt2ISEkTzubWJQgsIUJ0E8zOKewolf9yR+f7vBosRDHuobpZNLAA/XuC0GCtRIeWrs18u70DKAp2Sql/jVtdU/+");
-	final static String SQLgetUserThroughID = STATIC.decrypt("lvWEIWeeYi0nPQco1jAxpSTwke3zMJzQFPA7FZzXV1NLnbzLZRIX6Ng2PTG8JvBRF1M32dtqXwKTsM6ZdfsyA2HHwJazjv3ls87uB4qvcCmO/XOtleNmq5RcVN7vGsKsAwb3nvxZpUoa+bhBYrm7b9xHSszMIq9vbC4joqobldU=");
+	final static String SQLgetUserThroughID = STATIC.decrypt("MWtQLVQry6xK7/4jtwc7aqk3LdB9MZcWKxRrWPNAwwUau8qP2J8lAWajNG8yNwGP+5tpBlMneAwf55fAYyb1s/y3Oh0ziRZIKRwDQYZyWmvTrrt3zCu0C2bgQhi6FWiY4yBNn8c+IcQ8itXIHKEDGGd3yxi9VUXN7QMrSbwbR6hyYVa1zVoUgSn0YgYp2SINES4ENNXqy8pCvYmwM7KfayY+GfGlGscQktgMoct9KOI8RbSKyvStKKAigudHfRZZLp9/4ski021bXSDCtf5d4y1E4Tto2NjfibO4dJrN2YrmtpVCMNKxGXZiMQRIIFG/ez06EyInkyhJJTt7ezxmudW37DqZt+xX20e5/Lz4UNcF2sdStH0NSM72RjvT6TDchFYJAqwhDA8NFy6BMLC6XqPHi+TJiIitUwWS1BPYpR/0leqAiAfrk1HTvnTfbx92");
 	final static String SQLgetPossibleUsers = STATIC.decrypt("rYxhi8Qp/P54z0LDgjoLz4EQAM2IConxCRExb1RkySZNZ3+b1du29CD/Jg2+pMgQhR2ZQhb5oNJvVfVMUZ1pYq/W3KhAfXG6si9CoDfE59Lg+7qZZIFT190MATHjtDZ7diEhJE87m1iUILCFCdBPMzinsKJX/ckfn+7waLEQx7qG6WTSwAP17gtBgrUSHlq7NfLu9AygKdkqpf41bXVP/g==");
-	final static String SQLgetJoinDatesFromUser = STATIC.decrypt("Qx4v4pf0OSkkTLBiG0gsBRHYMJU8WxYJELa3sYrsNtLk7PL89f9aMvx/jtvFr9CsEBM5j5jhkdrh6R0eYs+4hovSUEhwRra4xX9NSK4G58jRGEWz/HKXYJF8YrAWLdiPe0I4CHijTVKU6ptUTalFPQ==");
 	final static String SQLUpdateUser = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp/kAzTj5ONpEtnV3ahqi8Ffa+APcLeFrBHagUQ4ihIQT");
 	final static String SQLgetUserLang = STATIC.decrypt("yaDV9i0FwkEy6ufxtq3eNq60jMxwnMP+RedT3ChdCDC6+8+bMT1m6Drj81rz/7w8");
 	final static String SQLUpdateUserLanguage = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp9lCO3RDKiVJWj7Ef1fah9ja+APcLeFrBHagUQ4ihIQT");
@@ -207,6 +206,6 @@ class AzraelStatements {
 	final static String SQLRegisterUniqueChannel2 = STATIC.decrypt("1g4ee7k4hGTR0EMiNsG6O7Ya73f9vjiP+NGLN01uLUo3n/6bmQrXjQFpQwigQoNkxJaGHoi4nFXRKRLVIGpHAuGFFhElJI32bgkrNqZix4lrJC8YyfK2ghSI1bWKbh0+dEue/N5VqKlyFbnpdwDfM6KBss0VSQSSzWfdKfDDzHJMGL/73UDQq8Oc7vE9Exr3TlvyyI8znO4E+jtGXy858HnEo9uRqUS82mKiEUr5a8uq+jq86Hd3RA3Pgn16w/jZ");
 	final static String SQLOverwriteQuizData = STATIC.decrypt("+T+jBrr1AphXWv+/PFhSL+nW3THTANnwibqJxLJKmGHSzfTqoNonDM7TbktW5SAX");
 	final static String SQLOverwriteQuizData2 = STATIC.decrypt("PwmOCb6gFy8nv33JYvBQhQO8FPEEAcYfD1jaAj+LFFT2qw1Cvg+aDrHJ4CjMb6/axPdwOt1wVq7mN42/CvWEoPUaClx76QzIhr0XPm7ZaW4/41pPLCFWRCtaRFqoiD8IR+0Z5gpAamq39KftYZWtt4Pl9T/yJbzhhU5zVs7ImH32GF+VaCkIDw1mSHQiqAm6");
-	final static String SQLgetNextNumberDeletedMessages = STATIC.decrypt("RuOP/C59xgMiQFkRIwMLTg5a3B9fCeQLkDCm+mTxijunI2eKsj02LuopKR3qIy5BTFY4e7IQ3g++AGJ+CtHFIPohm93kMQMJARfiVd8abFtXFDaRIg0owTmEyu5fYRsSv/jU61lh2MljRauaNlEW1+4Hn08oHjH6SHnlKGroC9tO4jnmP+tM6QZgUewNyhQe9ntOQORV9ioOBwDd0jCPfQ==");
-	final static String SQLgetNextNumberDeletedMessages2 = STATIC.decrypt("uDystKkT7QdPLFjfTrcCH37yjcKbajGydgPq2mk1hPX71WAQyee6x/VvKwllpcTk");
+	final static String SQLgetNextNumberDeletedMessages = STATIC.decrypt("uDystKkT7QdPLFjfTrcCH37yjcKbajGydgPq2mk1hPX71WAQyee6x/VvKwllpcTk");
+	final static String SQLgetNextNumberDeletedMessages2 = STATIC.decrypt("15nYkdDyMJccD7RNZusXvn6jjGnAOvUDxy6NUWHGOoh6sTcsUo8+kuO5HPT4EjoM");
 }

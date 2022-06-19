@@ -1,14 +1,18 @@
 package de.azrael.commands;
 
+import java.awt.Color;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.commandsContainer.UserExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Command;
+import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 
 /**
@@ -30,12 +34,11 @@ public class User implements CommandPublic {
 		if(args.length == 0) {
 			UserExecution.getHelp(e);
 		}
-		else if(args.length > 0) {
-			StringBuilder arguments = new StringBuilder();
-			for(int i = 0; i < args.length; i++) {
-				arguments.append(args[i]+" ");
-			}
-			UserExecution.runTask(e, e.getMessage().getContentRaw(), arguments.toString().trim(), botConfig);
+		else if(args.length == 1) {
+			UserExecution.runTask(e, args[0], botConfig);
+		}
+		else {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 		return true;
 	}

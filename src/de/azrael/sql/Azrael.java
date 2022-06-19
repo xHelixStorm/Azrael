@@ -284,7 +284,7 @@ public class Azrael {
 			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				descriptions.add("`["+rs.getTimestamp(2).toString()+"] - "+rs.getString(1)+"`");
+				descriptions.add("`["+rs.getTimestamp(2).toString()+"]` - "+rs.getString(1));
 			}
 			return descriptions;
 		} catch (SQLException e) {
@@ -311,7 +311,7 @@ public class Azrael {
 			stmt.setString(3, event);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				descriptions.add("`["+rs.getString(1)+"] -` "+rs.getString(2));
+				descriptions.add("`["+rs.getString(1)+"]` - "+rs.getString(2));
 			}
 			return descriptions;
 		} catch (SQLException e) {
@@ -475,7 +475,7 @@ public class Azrael {
 			if(rs.next()) {
 				return new User(rs.getLong(1), rs.getString(2));
 			}
-			return null;
+			return new User();
 		} catch (SQLException e) {
 			logger.error("SQLgetUser Exception", e);
 			return null;
@@ -493,13 +493,22 @@ public class Azrael {
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetUserThroughID);
-			stmt.setString(1, user_id);
+			stmt.setLong(1, guild_id);
 			stmt.setLong(2, guild_id);
+			stmt.setString(3, user_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
-				return new User(rs.getLong(1), rs.getString(2), rs.getString(4), rs.getString(5));
+				return new User(
+					rs.getLong(1), 
+					rs.getString(2),
+					rs.getString(3),
+					rs.getString(4), 
+					rs.getString(5),
+					rs.getString(6),
+					rs.getString(7)
+				);
 			}
-			return null;
+			return new User();
 		} catch (SQLException e) {
 			logger.error("SQLgetUserThroughID Exception", e);
 			return null;
@@ -528,37 +537,6 @@ public class Azrael {
 		} catch (SQLException e) {
 			logger.error("SQLgetPossibleUsers Exception", e);
 			return null;
-		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static User SQLgetJoinDatesFromUser(long user_id, long guild_id, User user) {
-		logger.trace("SQLgetJoinDatesFromUser launched. Passed params {}, {}, User object", user_id, guild_id);
-		String originalJoinDate = "N/A";
-		String newestJoinDate = "N/A";
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetJoinDatesFromUser);
-			stmt.setLong(1, user_id);
-			stmt.setLong(2, guild_id);
-			rs = stmt.executeQuery();
-			int count = 0;
-			while(rs.next()) {
-				if(count == 0)
-					originalJoinDate = rs.getString(1);
-				else
-					newestJoinDate = rs.getString(1);
-				count++;
-			}
-			return user.setJoinDates(originalJoinDate, newestJoinDate);
-		} catch (SQLException e) {
-			logger.error("SQLgetJoinDatesFromUser Exception", e);
-			return user.setJoinDates(originalJoinDate, newestJoinDate);
 		} finally {
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
@@ -4697,14 +4675,15 @@ public class Azrael {
 			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNextNumberDeletedMessages);
-			stmt.executeUpdate();
-			
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNextNumberDeletedMessages2);
 			rs = stmt.executeQuery();
 			long value = 0;
 			if(rs.next()) {
-				value = rs.getInt(1);
+				value = rs.getLong(1)+1;
 			}
+			
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetNextNumberDeletedMessages2);
+			stmt.setLong(1, value);
+			stmt.executeUpdate();
 			
 			if(value > 0)
 				myConn.commit();
