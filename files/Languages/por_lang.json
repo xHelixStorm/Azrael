@@ -604,7 +604,8 @@
     "register_role_err":            "A permissão {} é necessária para atribuir esta função a todos os membros do servidor! Atribua a permissão necessária e reenvie sua resposta. ",
     "register_role_assign_start":   "A função está sendo atribuída a todos os membros!",
     "register_role_done":           "Registro concluído!",
-    "register_role_key":            "Esta função requer recompensas de brindes registradas! Por favor, não se esqueça de carregá-los! ",
+    "register_role_key":            "Esta função requer recompensas de brindes registradas! Por favor, não se esqueça de carregá-los!",
+    "register_role_rea_err":		"Não podem ser registados mais de 10 papéis do tipo *rea*! Para adicionar mais papéis deste tipo, por favor remova os papéis desnecessários do tipo *rea*.",
     "register_disabled":			"Todos os parâmetros para o comando *Register* estão desactivados. Por favor, active pelo menos um deles e depois tente novamente!",
     
     "remove_help":                  "Remova uma opção registrada! Escreva um dos seguintes parâmetros junto com o comando para mais detalhes:\n\n- **{}**:\nRemova uma função registrada.\n- **{}**:\nRemover uma função de classificação registrada.\n- **{}**:\nRemova uma categoria registrada.\n- **{}**:\nRemova um canal de texto registrado.\n- **{}**:\nRemova a censura de idiomas de um canal de texto. ",

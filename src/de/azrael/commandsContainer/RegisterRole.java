@@ -111,8 +111,15 @@ public class RegisterRole {
 						if(role != null) {
 							var level = STATIC.getLevel(category_abv);
 							boolean persistant = true;
-							if(category_abv.equals("rea"))
+							if(category_abv.equals("rea")) {
 								persistant = false;
+								//Make sure that not more than 10 reaction roles can be registered
+								final int reactionRolesSize = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("rea")).collect(Collectors.toList()).size();
+								if(reactionRolesSize == 10) {
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_REA_ERR)).build()).queue();
+									return true;
+								}
+							}
 							if(DiscordRoles.SQLInsertRole(e.getGuild().getIdLong(), role.getIdLong(), level, role.getName(), category_abv, persistant) > 0) {
 								logger.info("User {} has registered the role {} with the category {} in guild {}", e.getMember().getUser().getId(), role.getName(), category_abv, e.getGuild().getId());
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ADDED)).build()).queue();

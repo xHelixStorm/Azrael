@@ -605,6 +605,7 @@
     "register_role_assign_start":   "Le rôle est attribué à tous les membres!",
     "register_role_done":           "Inscription terminée !",
     "register_role_key":            "Ce rôle nécessite des récompenses pour les cadeaux enregistrés ! N'oubliez pas de les télécharger !",
+    "register_role_rea_err":		"On ne peut pas enregistrer plus de 10 rôles de type *rea* ! Pour ajouter plus de rôles de ce type, veuillez supprimer les rôles inutiles de type *rea*.",
     "register_disabled":			"Tous les paramètres de la commande *Register* sont désactivés. Veuillez en activer au moins un et réessayer!",
     
     "remove_help":                  "Supprimez une option enregistrée ! Pour plus de détails, accompagnez la commande de l'un des paramètres suivants : \n\n- **{}**:\nSupprime un rôle enregistré.\n- **{}**:\nSupprime un rôle de classement enregistré.\n- **{}**:\nSupprime une catégorie enregistrée.\n- **{}**:\nSupprime un canal de texte enregistré.\n- **{}**:\nSupprime les langues de censure d'un canal de texte.",

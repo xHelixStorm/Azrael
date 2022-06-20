@@ -605,6 +605,7 @@
 	"register_role_assign_start":	"Role is being assigned to all members!",
 	"register_role_done":			"Registration completed!",
 	"register_role_key":			"This role requires registered giveaway rewards! Please don't forget to upload them!",
+	"register_role_rea_err":		"No more than 10 roles of type *rea* can be registered! To add more roles of this type, please remove unneeded roles of type *rea*.",
 	"register_disabled":			"All parameters for the command *Register* are disabled. Please enable at least one of them and then try again!",
 	
 	"remove_help":					"Remove a registered option! Write one of the following parameters together with the command for more details:\n\n- **{}**:\nRemove a registered role.\n- **{}**:\nRemove a registered ranking role.\n- **{}**:\nRemove a registered category.\n- **{}**:\nRemove a registered text channel.\n- **{}**:\nRemove censoring languages from a text channel.",

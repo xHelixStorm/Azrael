@@ -610,6 +610,7 @@ public enum Translation {
 	REGISTER_ROLE_ASSIGN_START	("register_role_assign_start"),
 	REGISTER_ROLE_DONE			("register_role_done"),
 	REGISTER_ROLE_KEY			("register_role_key"),
+	REGISTER_ROLE_REA_ERR		("register_role_rea_err"),
 	REGISTER_DISABLED			("register_disabled"),
 	
 	REMOVE_HELP					("remove_help"),

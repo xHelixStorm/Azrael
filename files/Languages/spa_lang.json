@@ -605,6 +605,7 @@
 	"register_role_assign_start":	"¡El rol se está asignando a todos los miembros!",
 	"register_role_done":			"¡Registro completado!",
 	"register_role_key":			"¡Este rol requiere de recompensas registradas para los regalos! ¡Por favor, no olvides subirlas!",
+	"register_role_rea_err":		"No se pueden registrar más de 10 roles de tipo *rea*. Para añadir más roles de este tipo, elimine los roles innecesarios del tipo *rea*.",
 	"register_disabled":			"Todos los parámetros del comando *Register* están desactivados. ¡Por favor, active al menos uno de ellos y vuelva a intentarlo!",
 	
 	"remove_help":					"¡Elimina una opción registrada! Escriba uno de los siguientes parámetros junto con el comando para obtener más detalles:\n\n- **{}**:\nEliminar un rol registrado.\n- **{}**:\nRemover un ranking de roles registrado.\n- **{}**:\nRemover una categoría registrada.\n- **{}**:\nRemover un canal de texto.\n- **{}**:\nRemover censora de idiomas de un canal de texto.",

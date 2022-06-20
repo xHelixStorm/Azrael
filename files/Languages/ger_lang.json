@@ -605,6 +605,7 @@
 	"register_role_assign_start":	"Rolle wird an alle Mitglieder zugewiesen!",
 	"register_role_done":			"Registrierung abgeschlossen!",
 	"register_role_key":			"Diese Rolle erfordert registrierte Giveaway-Belohnungen! Bitte vergessen Sie nicht, diese hochzuladen!",
+	"register_role_rea_err":		"Es können nicht mehr als 10 Rollen des Typs *rea* registriert werden! Um mehr Rollen dieses Typs hinzuzufügen, entfernen Sie bitte nicht benötigte Rollen des Typs *rea*.",
 	"register_disabled":			"Alle Parameter für den Befehl *Register* sind deaktiviert. Bitte aktivieren Sie mindestens einen von ihnen und versuchen Sie es dann erneut!",
 	
 	"remove_help":					"Entfernen Sie eine registrierte Option! Schreiben Sie einen der folgenden Parameter zusammen mit dem Befehl für weitere Details:\n\n- **{}**:\nEine registrierte Rolle entfernen.\n- **{}**:\nEine registrierte Rang-Rolle entfernen.\n- **{}**:\nEine registrierte Kategorie entfernen.\n- **{}**:\nEinen registrierten Textkanal entfernen.\n- **{}**:\nEntfernen Sie Sprachzensuren aus einem Textkanal.",
