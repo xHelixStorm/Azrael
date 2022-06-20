@@ -505,15 +505,12 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//check if the google command has been used
 					final var google = Hashes.getTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(google != null && google.getExpiration() - System.currentTimeMillis() > 0) {
+					if(google != null && !e.getMember().getUser().isBot() && google.getExpiration() - System.currentTimeMillis() > 0) {
 						final String key = "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId();
 						final String lcMessage = message.toLowerCase();
 						if(!lcMessage.equals(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							//actions for google spreadsheets
-							if(google.getAdditionalInfo().equals("spreadsheets")) {
-								GoogleSpreadsheetsExecution.runTask(e, key);
-							}
-							else if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
+							if(google.getAdditionalInfo().equals("spreadsheets-selection")) {
 								if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE)))
 									GoogleSpreadsheetsExecution.create(e, (lcMessage.length() > 7 ? message.substring(STATIC.getTranslation(e.getMember(), Translation.PARAM_CREATE).length()+1) : null), key, botConfig);
 								else if(lcMessage.startsWith(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD)))

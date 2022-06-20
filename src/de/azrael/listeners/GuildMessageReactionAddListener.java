@@ -21,6 +21,7 @@ import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Clan;
 import de.azrael.constructors.Dailies;
+import de.azrael.constructors.GoogleAPISetup;
 import de.azrael.constructors.InventoryContent;
 import de.azrael.constructors.Roles;
 import de.azrael.core.Hashes;
@@ -641,6 +642,9 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 		//Derived from H!inventory
 		else if(item instanceof InventoryContent)
 			return (((InventoryContent)item).getDescription() != null ? ((InventoryContent)item).getDescription() : ((InventoryContent)item).getWeaponDescription()+" "+((InventoryContent)item).getStat())+"\n";
+		//Derived from H!google spreadsheets
+		else if(item instanceof GoogleAPISetup)
+			return "**"+GoogleUtils.buildFileURL(((GoogleAPISetup)item).getFileID(), 2)+"**";
 		return "";
 	}
 	

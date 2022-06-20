@@ -42,13 +42,21 @@ public class GoogleSpreadsheetsExecution {
 		StringBuilder out = new StringBuilder();
 		final var spreadsheets = Azrael.SQLgetGoogleAPISetupOnGuildAndAPI(e.getGuild().getIdLong(), 2);
 		final String NA = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
-		if(spreadsheets == null)
+		final int breaker = 5;
+		if(spreadsheets == null) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Google API information couldn't be retrieved in guild {}", e.getGuild().getId());
+			Hashes.clearTempCache(key);
+			return;
+		}
 		else if(spreadsheets.size() == 0)
 			out.append("**"+NA+"**");
 		else {
+			int count = 0;
 			for(final var spreadsheet : spreadsheets) {
+				if(count == breaker) break;
 				out.append("**"+GoogleUtils.buildFileURL(spreadsheet.getFileID(), 2)+"**\n");
+				count++;
 			}
 		}
 		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_HELP)
@@ -59,7 +67,13 @@ public class GoogleSpreadsheetsExecution {
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EVENTS))
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SHEET))
 				.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_MAP))
-				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RESTRICT))+out.toString()).build()).queue();
+				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RESTRICT))).build()).queue();
+		
+		final int maxPage = (spreadsheets.size()/breaker)+(spreadsheets.size()%breaker > 0 ? 1 : 0);
+		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_REGISTERED)+out.toString()).build()).queue(m -> {
+			if(spreadsheets.size() > 0)
+				STATIC.addPaginationReactions(e, m, maxPage, "1", ""+breaker, spreadsheets);
+		});
 		Hashes.addTempCache(key, new Cache(180000, "spreadsheets-selection"));
 	}
 	

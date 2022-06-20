@@ -451,6 +451,7 @@ public enum Translation {
 	GOOGLE_NOT_LINKED_EVENT		("google_not_linked_event"),
 	GOOGLE_INVALID_DDS			("google_invalid_dds"),
 	GOOGLE_SHEET_HELP			("google_sheet_help"),
+	GOOGLE_SHEET_REGISTERED		("google_sheet_registered"),
 	GOOGLE_SHEET_CREATE			("google_sheet_create"),
 	GOOGLE_SHEET_CREATED		("google_sheet_created"),
 	GOOGLE_SHEET_CREATED_2		("google_sheet_created_2"),

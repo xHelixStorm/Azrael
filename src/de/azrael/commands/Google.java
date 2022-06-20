@@ -6,9 +6,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
@@ -50,7 +49,7 @@ public class Google implements CommandPublic {
 		else if(args.length == 1) {
 			//Write in cache to display options related to google spreadsheets
 			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))) {
-				Hashes.addTempCache("google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "spreadsheets"));
+				GoogleSpreadsheetsExecution.runTask(e, "google_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
