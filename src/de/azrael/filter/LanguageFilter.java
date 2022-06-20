@@ -97,7 +97,7 @@ public class LanguageFilter implements Runnable {
 						if(heavyCensoring != null && heavyCensoring) {
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(message.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage)) || parseMessage.matches("^[^a-zA-Z0-9]*$")) {
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage.toLowerCase())) || parseMessage.matches("^[^a-zA-Z0-9]*$")) {
 								deleteHeavyCensoringMessage(message, allChannels, name, channel, getMessage);
 								messageDeleted = true;
 							}
@@ -143,6 +143,17 @@ public class LanguageFilter implements Runnable {
 									Hashes.addFilterThreshold(message.getGuild().getIdLong(), ""+1);
 								}
 								break;
+							}
+							if(censorMessage == null) {
+								ArrayList<String> messages = new ArrayList<String>();
+								messages.add(getMessage.toLowerCase());
+								Hashes.addCensorMessage(message.getGuild().getIdLong(), messages);
+							}
+							else {
+								censorMessage.add(0, getMessage.toLowerCase());
+								if(censorMessage.size() > 30)
+									censorMessage.remove(30);
+								Hashes.addCensorMessage(message.getGuild().getIdLong(), censorMessage);
 							}
 						}
 					}
