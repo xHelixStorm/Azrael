@@ -70,7 +70,7 @@ public class GoogleSpreadsheetsExecution {
 				.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RESTRICT))).build()).queue();
 		
 		final int maxPage = (spreadsheets.size()/breaker)+(spreadsheets.size()%breaker > 0 ? 1 : 0);
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_REGISTERED)+out.toString()).build()).queue(m -> {
+		e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_SHEET_REGISTERED)).setDescription(out.toString()).build()).queue(m -> {
 			if(spreadsheets.size() > 0)
 				STATIC.addPaginationReactions(e, m, maxPage, "1", ""+breaker, spreadsheets);
 		});
