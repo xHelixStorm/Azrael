@@ -11,6 +11,7 @@ public class Cache {
 	private String additionalInfo;
 	private String additionalInfo2;
 	private String additionalInfo3;
+	private String additionalInfo4;
 	private boolean expire;
 	private Object object;
 	
@@ -24,6 +25,7 @@ public class Cache {
 		this.additionalInfo = "";
 		this.additionalInfo2 = "";
 		this.additionalInfo3 = "";
+		this.additionalInfo4 = "";
 		this.expire = true;
 	}
 	
@@ -38,6 +40,7 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = "";
 		this.additionalInfo3 = "";
+		this.additionalInfo4 = "";
 		this.expire = true;
 	}
 	
@@ -53,6 +56,7 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = _additionalInfo2;
 		this.additionalInfo3 = "";
+		this.additionalInfo4 = "";
 		this.expire = true;
 	}
 	
@@ -69,6 +73,25 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = _additionalInfo2;
 		this.additionalInfo3 = _additionalInfo3;
+		this.additionalInfo4 = "";
+		this.expire = true;
+	}
+	
+	/**
+	 * Constructor for the expiration time and four values
+	 * @param _expiration
+	 * @param _additionalInfo
+	 * @param _additionalInfo2
+	 * @param _additionalInfo3
+	 * @param _additionalInfo4
+	 */
+	
+	public Cache(long _expiration, String _additionalInfo, String _additionalInfo2, String _additionalInfo3, String _additionalInfo4) {
+		this.expiration = System.currentTimeMillis() + _expiration;
+		this.additionalInfo = _additionalInfo;
+		this.additionalInfo2 = _additionalInfo2;
+		this.additionalInfo3 = _additionalInfo3;
+		this.additionalInfo4 = _additionalInfo4;
 		this.expire = true;
 	}
 	
@@ -82,11 +105,12 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = "";
 		this.additionalInfo3 = "";
+		this.additionalInfo4 = "";
 		this.expire = false;
 	}
 	
 	/**
-	 * Constructor to write two values which doesn't expire
+	 * Constructor to write two values which don't expire
 	 * @param _additionalInfo
 	 * @param _additionalInfo2
 	 */
@@ -96,11 +120,12 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = _additionalInfo2;
 		this.additionalInfo3 = "";
+		this.additionalInfo4 = "";
 		this.expire = false;
 	}
 	
 	/**
-	 * Constructor to write three values which doesn't expire
+	 * Constructor to write three values which don't expire
 	 * @param _additionalInfo
 	 * @param _additionalInfo2
 	 * @param _additionalInfo3
@@ -111,6 +136,24 @@ public class Cache {
 		this.additionalInfo = _additionalInfo;
 		this.additionalInfo2 = _additionalInfo2;
 		this.additionalInfo3 = _additionalInfo3;
+		this.additionalInfo4 = "";
+		this.expire = false;
+	}
+	
+	/**
+	 * Constructor to write four values which don't expire
+	 * @param _additionalInfo
+	 * @param _additionalInfo2
+	 * @param _additionalInfo3
+	 * @param _additionalInfo4
+	 */
+	
+	public Cache(String _additionalInfo, String _additionalInfo2, String _additionalInfo3, String _additionalInfo4) {
+		this.expiration = System.currentTimeMillis();
+		this.additionalInfo = _additionalInfo;
+		this.additionalInfo2 = _additionalInfo2;
+		this.additionalInfo3 = _additionalInfo3;
+		this.additionalInfo4 = _additionalInfo4;
 		this.expire = false;
 	}
 	
@@ -159,6 +202,15 @@ public class Cache {
 	
 	public String getAdditionalInfo3() {
 		return this.additionalInfo3;
+	}
+	
+	/**
+	 * Retrieve the fourth temporary value
+	 * @return
+	 */
+	
+	public String getAdditionalInfo4() {
+		return this.additionalInfo4;
 	}
 	
 	/**
@@ -211,6 +263,17 @@ public class Cache {
 	
 	public Cache updateDescription3(String description) {
 		this.additionalInfo3 = description;
+		return this;
+	}
+	
+	/**
+	 * Update the fourth value
+	 * @param description
+	 * @return
+	 */
+	
+	public Cache updateDescription4(String description) {
+		this.additionalInfo4 = description;
 		return this;
 	}
 	

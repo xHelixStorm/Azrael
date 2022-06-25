@@ -357,8 +357,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									final Object object = pagination.getObject();
 									final int pageCount = Integer.parseInt(pagination.getAdditionalInfo3());
 									final int maxPage = (((List<?>)object).size()/pageCount)+(((List<?>)object).size()%pageCount > 0 ? 1 : 0);
+									final String appendMessage = pagination.getAdditionalInfo4();
 									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
 										StringBuilder out = new StringBuilder();
+										if(appendMessage != null)
+											out.append(appendMessage);
 										Object prevItem = null;
 										int count = 0;
 										for(final Object item : (List<?>)object) {
@@ -388,8 +391,11 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 									Hashes.addTempCache("pagination_gu"+e.getGuild().getId()+"me"+e.getMessageId()+"us"+e.getMember().getUser().getId(), pagination.setExpiration(180000));
 								}
 								else {
+									final String appendMessage = pagination.getAdditionalInfo4();
 									e.getChannel().retrieveMessageById(e.getMessageId()).queue(m -> {
 										StringBuilder out = new StringBuilder();
+										if(appendMessage != null)
+											out.append(appendMessage);
 										Object prevItem = null;
 										int count = 0;
 										for(final Object item : (List<?>)object) {

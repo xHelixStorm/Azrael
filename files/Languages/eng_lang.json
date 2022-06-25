@@ -776,7 +776,7 @@
 	"shutdown_prep":				"Shutdown sequence initiated!",
 	"shutdown_soon":				"The Bot will shut down shortly!",
 	
-	"subscribe_help":				"Use this command to subscribe to the following. Write it together with the whole command! The command can be interrupted at any moment with `{}`!\n",
+	"subscribe_help":				"Use this command to subscribe to the following. Write it together with the whole command! The command can be interrupted at any moment with `{}`!\n\n",
 	"subscribe_register_help":		"Do you wish to add a RSS Feed or a Twitter Hashtag/User?\nWrite either 1 to register a RSS Feed or 2 to register a Twitter Hashtag/User as second parameter!",
 	"subscribe_remove_help":		"Remove a registered subscription by selecting it with a number which is displayed below:\n\n",
 	"subscribe_format_help":		"Format the message output of a registered subscription by selecting it with a number which is displayed below:\n\n",
@@ -784,7 +784,7 @@
 	"subscribe_channel_help":		"Define a different text channel besides the default one to display a subscription in a separate channel. Select the subscription by writing one of the displayed numbers below:\n\n",
 	"subscribe_no_subscriptions":	"<No registered subscriptions found>",
 	"subscribe_test_help":			"Test a registered subscription by selecting it with a number which is displayed below:\n\n",
-	"subscribe_display_help":		"Here a list with all registered RSS Feeds and Twitter Hashtags/Users:\n\n",
+	"subscribe_display_help":		"Here a list with all registered subscriptions:\n\n",
 	"subscribe_already_done":		"Subscribing not possible because it has been already subscribed!",
 	"subscribe_removed":			"Selection has been removed!",
 	"subscribe_format_updated":		"The display format has been updated!",

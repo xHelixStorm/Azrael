@@ -3,6 +3,7 @@ package de.azrael.rankingSystem;
 import java.io.File;
 import java.util.Calendar;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -22,30 +23,19 @@ import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.ReconnectedEvent;
-import net.dv8tion.jda.api.events.ResumedEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class DoubleExperienceStart extends TimerTask {
 	private final static Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
 
-	private ReadyEvent e;
-	private ReconnectedEvent e2;
-	private ResumedEvent e3;
-	private MessageReceivedEvent e4;
+	private List<Guild> guilds;
 	
-	public DoubleExperienceStart(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3, MessageReceivedEvent _e4) {
-		this.e = _e;
-		this.e2 = _e2;
-		this.e3 = _e3;
-		this.e4 = _e4;
+	public DoubleExperienceStart(List<Guild> guilds) {
+		this.guilds = guilds;
 	}
 	
 	@Override
 	public void run() {
-		var event = (e != null ? e : (e2 != null ? e2 : (e3 != null ? e3 : e4)));
-		for(Guild g : event.getJDA().getGuilds()) {
+		for(Guild g : guilds) {
 			final long guild_id = g.getIdLong();
 			if(Hashes.getTempCache("doubleExp_gu"+guild_id) == null || Hashes.getTempCache("doubleExp_gu"+guild_id).getAdditionalInfo().equals("off")) {
 				final var botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
@@ -79,13 +69,13 @@ public class DoubleExperienceStart extends TimerTask {
 		}
 	}
 	
-	public static void runTask(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3, MessageReceivedEvent _e4) {
+	public static void runTask(List<Guild> guilds) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
 		calendar.set(Calendar.MINUTE, 0);
 		
 		Timer time = new Timer("doubleExpStart");
 		STATIC.addTimer(time);
-		time.schedule(new DoubleExperienceStart(_e, _e2, _e3, _e4), calendar.getTime(), TimeUnit.DAYS.toMillis(1));
+		time.schedule(new DoubleExperienceStart(guilds), calendar.getTime(), TimeUnit.DAYS.toMillis(1));
 	}
 }

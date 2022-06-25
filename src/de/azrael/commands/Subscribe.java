@@ -81,15 +81,15 @@ public class Subscribe implements CommandPublic {
 				StringBuilder out = new StringBuilder();
 				for(String type : subscriptionTypes) {
 					if(Command.SUBSCRIBE_RSS.getColumn().contains(type.toLowerCase()) && rss)
-						out.append(type+"\n");
+						out.append("**"+type+"**\n");
 					else if(Command.SUBSCRIBE_TWITTER.getColumn().contains(type.toLowerCase()) && twitter)
-						out.append(type+"\n");
+						out.append("**"+type+"**\n");
 					else if(Command.SUBSCRIBE_REDDIT.getColumn().contains(type.toLowerCase()) && reddit)
-						out.append(type+"\n");
+						out.append("**"+type+"**\n");
 					else if(Command.SUBSCRIBE_YOUTUBE.getColumn().contains(type.toLowerCase()) && youtube)
-						out.append(type+"\n");
+						out.append("**"+type+"**\n");
 					else if(Command.SUBSCRIBE_TWITCH.getColumn().contains(type.toLowerCase()) && twitch)
-						out.append(type+"\n");
+						out.append("**"+type+"**\n");
 				}
 				if(out.length() > 0) {
 					message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
@@ -108,7 +108,13 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RSS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_RSS)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_RSS);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.RSS_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.RSS_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))).build()).queue();
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "rss"));
 			}
 			else if(!botConfig.getIgnoreMissingPermissions())
@@ -117,7 +123,14 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWITTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_TWITTER)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_TWITTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))).build()).queue();
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "twitter"));
 			}
 			else if(!botConfig.getIgnoreMissingPermissions())
@@ -126,7 +139,13 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REDDIT)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_REDDIT)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_REDDIT);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))).build()).queue();
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "reddit"));
 			}
 			else if(!botConfig.getIgnoreMissingPermissions())
@@ -135,7 +154,13 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YOUTUBE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_YOUTUBE)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_YOUTUBE);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))).build()).queue();
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "youtube"));
 			}
 			else if(!botConfig.getIgnoreMissingPermissions())
@@ -144,7 +169,13 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWITCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_TWITCH)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_TWITCH);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_HELP)).build()).queue();
+				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))).build()).queue();
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "twitch"));
 			}
 			else if(!botConfig.getIgnoreMissingPermissions())

@@ -2,6 +2,7 @@ package de.azrael.listeners;
 
 import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.rankingSystem.DoubleExperienceStart;
+import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.timerTask.ClearHashes;
 import de.azrael.timerTask.VerifyMutedMembers;
 import de.azrael.util.STATIC;
@@ -24,13 +25,14 @@ public class ResumedListener extends ListenerAdapter{
 		//clear all timers
 		STATIC.killAllTimers();
 		//restart all timers
-		DoubleExperienceStart.runTask(null, null, e, null);
+		DoubleExperienceStart.runTask(e.getJDA().getGuilds());
 		for(final var guild : e.getJDA().getGuilds()) {
 			ScheduleExecution.restartTimers(guild);
 		}
+		SubscriptionUtils.startTimer(e.getJDA());
 		//clear temporary Hashes
 		ClearHashes.runTask();
 		//check for users that are still muted even though the time elapsed
-		VerifyMutedMembers.runTask(null, null, e, false);
+		VerifyMutedMembers.runTask(e.getJDA().getGuilds(), false);
 	}
 }

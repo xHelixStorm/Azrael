@@ -776,7 +776,7 @@
     "shutdown_prep":                "Séquence d'arrêt initiée !",
     "shutdown_soon":                "Le Bot va s'éteindre sous peu !",
     
-    "subscribe_help":               "Utilisez cette commande pour vous abonner à ce qui suit. Écrivez-la en même temps que la commande complète ! La commande peut être interrompue à tout moment avec `{}` !\n",
+    "subscribe_help":               "Utilisez cette commande pour vous abonner à ce qui suit. Écrivez-la en même temps que la commande complète ! La commande peut être interrompue à tout moment avec `{}` !\n\n",
     "subscribe_register_help":      "Souhaitez-vous ajouter un Flux RSS ou un Hashtag/Utilisateur Twitter ? Inscrivez soit 1 pour enregistrer un Flux RSS, soit 2 pour enregistrer un Hashtag/Utilisateur Twitter comme second paramètre !",
     "subscribe_remove_help":		"Supprimez un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
     "subscribe_format_help":		"Formatez le message de sortie d'un abonnement enregistré en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
@@ -784,7 +784,7 @@
     "subscribe_channel_help":		"Define a different text channel besides the default one to display a subscription in a separate channel. Select the subscription by writing one of the displayed numbers below:\n\n",
     "subscribe_no_subscriptions":	"<Aucun abonnement enregistré trouvé>",
     "subscribe_test_help":          "Testez un abonnement en le sélectionnant avec un numéro qui s'affiche ci-dessous :\n\n",
-    "subscribe_display_help":       "Voici une liste de tous les flux RSS et des hashtags/utilisateurs de Twitter enregistrés :\n\n",
+    "subscribe_display_help":       "Voici une liste avec tous les abonnements enregistrés :\n\n",
     "subscribe_already_done":       "L'abonnement n'est pas possible car il a déjà été souscrit !",
     "subscribe_removed":            "La sélection a été supprimée !",
     "subscribe_format_updated":     "Le format d'affichage a été mis à jour !",

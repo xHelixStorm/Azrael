@@ -837,7 +837,7 @@ public enum Translation {
 	REDDIT_FORMAT_CURRENT		("reddit_format_current"),
 	
 	YOUTUBE_HELP				("youtube_help"),
-	YOUTUBE_REGISTER			("youtube_add"),
+	YOUTUBE_REGISTER			("youtube_register"),
 	YOUTUBE_ADDED				("youtube_added"),
 	YOUTUBE_INVALID				("youtube_invalid"),
 	YOUTUBE_FORMAT_CURRENT		("youtube_format_current"),

@@ -45,7 +45,7 @@ public class ParseSubscription extends TimerTask {
 				for(Subscription subscription : subscriptions) {
 					final Guild guild = e.getGuildById(subscription.getGuildId());
 					if(guild != null) {
-						var subscriptionChannel = Azrael.SQLgetChannels(subscription.getGuildId()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.RSS.getType())).findAny().orElse(null);
+						var subscriptionChannel = Azrael.SQLgetChannels(subscription.getGuildId()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.SUB.getType())).findAny().orElse(null);
 						if(subscriptionChannel != null || subscriptions.parallelStream().filter(f -> f.getChannelID() > 0).findAny().orElse(null) != null) {
 							long channel_id;
 							boolean defaultChannel = true;
@@ -100,7 +100,6 @@ public class ParseSubscription extends TimerTask {
 					timer = null;
 				}
 				this.cancel();
-				return;
 			}
 		} catch(NullPointerException npe) {
 			logger.error("Subscriptions couldn't be fetched", npe);
@@ -121,6 +120,11 @@ public class ParseSubscription extends TimerTask {
 	
 	public static boolean timerIsRunning() {
 		return (timer != null);
+	}
+	
+	public static void deactivateTimer() {
+		timer.cancel();
+		timer = null;
 	}
 	
 	private static void incrementSubscriptionStatus(Guild guild, Subscription subscription) {

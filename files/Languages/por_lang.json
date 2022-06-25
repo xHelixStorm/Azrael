@@ -776,7 +776,7 @@
     "shutdown_prep":                "Sequência de desligamento iniciada!",
     "shutdown_soon":                "O Bot será encerrado em breve!",
     
-    "subscribe_help":               "Utilize este comando para subscrever o seguinte. Escreva-o juntamente com o comando completo! O comando pode ser interrompido a qualquer momento com `{}`!\n",
+    "subscribe_help":               "Utilize este comando para subscrever o seguinte. Escreva-o juntamente com o comando completo! O comando pode ser interrompido a qualquer momento com `{}`!\n\n",
     "subscribe_register_help":      "Deseja adicionar um RSS Feed ou um Twitter Hashtag / Usuário? \nEscreva 1 para registrar um RSS Feed ou 2 para registrar um Twitter Hashtag / Usuário como segundo parâmetro! ",
     "subscribe_remove_help":		"Remover uma subscrição registada seleccionando-a com um número que é exibido abaixo:\n\n",
     "subscribe_format_help":		"Formatar a saída de mensagem de uma subscrição registada seleccionando-a com um número que é apresentado abaixo:\n\n",
@@ -784,7 +784,7 @@
     "subscribe_channel_help":		"Definir um canal de texto diferente para além do canal padrão para exibir uma assinatura num canal separado. Seleccione a subscrição escrevendo um dos números mostrados abaixo:\n\n",
     "subscribe_no_subscriptions":	"<Não foram encontradas subscrições registadas>",
     "subscribe_test_help":          "Teste uma subscrição registada, seleccionando-a com um número que é apresentado abaixo:\n\n",
-    "subscribe_display_help":       "Aqui está uma lista com todos os RSS Feeds e Hashtags / Usuários do Twitter:\n\n",
+    "subscribe_display_help":       "Aqui uma lista com todas as subscrições registadas:\n\n",
     "subscribe_already_done":       "A inscrição não é possível porque já foi inscrito! ",
     "subscribe_removed":            "A seleção foi removida!",
     "subscribe_format_updated":     "O formato de exibição foi atualizado!",

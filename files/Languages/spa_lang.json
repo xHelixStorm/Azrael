@@ -776,7 +776,7 @@
 	"shutdown_prep":				"¡Secuencia de apagado iniciada!",
 	"shutdown_soon":				"¡El Bot se apagará en breve!",
 	
-	"subscribe_help":				"Utilice este comando para suscribirse a lo siguiente. ¡Escríbalo junto con el comando completo! ¡El comando puede ser interrumpido en cualquier momento con `{}`!\n",
+	"subscribe_help":				"Utilice este comando para suscribirse a lo siguiente. ¡Escríbalo junto con el comando completo! ¡El comando puede ser interrumpido en cualquier momento con `{}`!\n\n",
 	"subscribe_register_help":		"¿Deseas añadir un canal RSS o un hashtag/usuario de Twitter?\nEscribe 1 para registrar una fuente RSS o 2 para registrar un Hashtag/Usuario de Twitter como segundo parámetro.",	
 	"subscribe_remove_help":		"Elimine una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",
 	"subscribe_format_help":		"Formatee la salida de mensajes de una suscripción registrada seleccionándola con un número que se muestra a continuación:\n\n",

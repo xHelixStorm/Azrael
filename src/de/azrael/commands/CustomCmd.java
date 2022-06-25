@@ -136,7 +136,7 @@ public class CustomCmd implements CommandPublic {
 								json = json.getJSONObject("videoRenderer");
 								out = out.replaceAll("\\{youtube_url\\}", YOUTUBEENDPOINT+json.getString("videoId"))
 										.replaceAll("\\{youtube_title\\}", json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text"))
-										.replaceAll("\\{youtube_description\\}", json.getJSONObject("detailedMetadataSnippets").getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text"))
+										.replaceAll("\\{youtube_description\\}", json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text"))
 										.replaceAll("\\{youtube_channel\\}", json.getJSONObject("longBylineText").getJSONArray("runs").getJSONObject(0).getString("text"));
 							}
 							index++;

@@ -184,8 +184,8 @@ public class RedditModel {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
 			}
 		} catch (Exception e1) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
-			logger.error("Subscription couldn't be retrieved from {} in guild {}!", subscription.getURL(), e.getGuild().getId(), e1);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}
 	

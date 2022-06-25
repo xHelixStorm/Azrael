@@ -30,7 +30,9 @@ public class TwitchModel {
 	private final static String TOKEN_REQUEST = "https://id.twitch.tv/oauth2/token?client_id={}&client_secret={}&grant_type=client_credentials&scope=user:read:email";
 	private final static String USER_REQUEST = "https://api.twitch.tv/helix/users?login=";
 	private final static String STREAMS_REQUEST = "https://api.twitch.tv/helix/streams";
+	private final static String VIDEOS_REQUEST = "https://api.twitch.tv/helix/videos";
 	private final static String USER_ID_ENDPOINT = "?user_id=";
+	private final static String FIRST_ENDPOINT = "&first=";
 	
 	private static final String TWITCH_CLIENT_ID = "TWITCH_CLIENT_ID";
 	private static final String TWITCH_CLIENT_SECRET = "TWITCH_CLIENT_SECRET";
@@ -108,13 +110,13 @@ public class TwitchModel {
 		return null;
 	}
 	
-	private static JSONArray fetchLiveStreams(String user_id) throws IOException {
+	private static JSONArray fetchStreamContent(String user_id, boolean liveVideos) throws IOException {
 		if(generateToken()) {
 			URL url = null;
-			if(user_id != null)
+			if(liveVideos)
 				url = new URL(STREAMS_REQUEST+USER_ID_ENDPOINT+user_id);
 			else
-				url = new URL(STREAMS_REQUEST);
+				url = new URL(VIDEOS_REQUEST+USER_ID_ENDPOINT+user_id+FIRST_ENDPOINT+"1");
 			HttpURLConnection con = buildConnection(url, "GET", true, true);
 			
 			if(con.getResponseCode() == 200) {
@@ -133,7 +135,7 @@ public class TwitchModel {
 		if(textChannel != null) {
 			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
 				if(generateToken()) {
-					JSONArray data = fetchLiveStreams(subscription.getURL());
+					JSONArray data = fetchStreamContent(subscription.getURL(), true);
 					if(data != null) {
 						success = true;
 						int count = 0;
@@ -147,7 +149,10 @@ public class TwitchModel {
 								final String title = streamer.getString("title");
 								final String url = "https://twitch.tv/"+streamer.getString("user_login");
 								final String language = streamer.getString("language");
-								final String game = streamer.getString("game_name");
+								String game = streamer.getString("game_name");
+								if(game.trim().length() == 0) {
+									game = STATIC.getTranslation2(guild, Translation.NOT_AVAILABLE);
+								}
 								
 								String out = subscription.getFormat().replace("{title}", title);
 								out = out.replace("{pubDate}", pubDate);
@@ -184,39 +189,44 @@ public class TwitchModel {
 		return success;
 	}
 	
-	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) throws IOException {
-		if(generateToken()) {
-			JSONArray data = fetchLiveStreams(null);
-			if(data != null && data.length() > 0) {
-				JSONObject streamer = data.getJSONObject(0);
-				final String pubDate = streamer.getString("started_at");
-				final String user = streamer.getString("user_name");
-				final String user_id = streamer.getString("user_id");
-				final String title = streamer.getString("title");
-				final String url = "https://twitch.tv/"+streamer.getString("user_login");
-				final String language = streamer.getString("language");
-				final String game = streamer.getString("game_name");
-				
-				String out = subscription.getFormat().replace("{title}", title);
-				out = out.replace("{pubDate}", pubDate);
-				out = out.replace("{user}", user);
-				out = out.replace("{user_id}", user_id);
-				out = out.replace("{title}", title);
-				out = out.replace("{url}", url);
-				out = out.replace("{language}", language);
-				out = out.replace("{game}", game);
-				
-				final String outMessage = EmojiParser.parseToUnicode(out);
-				if(outMessage.length() > 0) {
-					e.getChannel().sendMessage(outMessage).queue();
+	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
+		try {
+			if(generateToken()) {
+				JSONArray data = fetchStreamContent(subscription.getURL(), false);
+				if(data != null && data.length() > 0) {
+					JSONObject streamer = data.getJSONObject(0);
+					final String pubDate = streamer.getString("published_at");
+					final String user = streamer.getString("user_name");
+					final String user_id = streamer.getString("user_id");
+					final String title = streamer.getString("title");
+					final String url = streamer.getString("url");
+					final String language = streamer.getString("language");
+					final String game = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
+					
+					String out = subscription.getFormat().replace("{title}", title);
+					out = out.replace("{pubDate}", pubDate);
+					out = out.replace("{user}", user);
+					out = out.replace("{user_id}", user_id);
+					out = out.replace("{title}", title);
+					out = out.replace("{url}", url);
+					out = out.replace("{language}", language);
+					out = out.replace("{game}", game);
+					
+					final String outMessage = EmojiParser.parseToUnicode(out);
+					if(outMessage.length() > 0) {
+						e.getChannel().sendMessage(outMessage).queue();
+					}
+					else {
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_NO_CONTENT)).build()).queue();
+					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_NO_CONTENT)).build()).queue();
 				}
 			}
-			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_NO_CONTENT)).build()).queue();
-			}
+		} catch (Exception e1) {
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			logger.error("Subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}
 }

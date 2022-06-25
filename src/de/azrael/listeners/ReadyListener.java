@@ -294,11 +294,11 @@ public class ReadyListener extends ListenerAdapter {
 		ParseSubscription.runTask(e.getJDA());
 		
 		//if double experience is enabled, run 2 tasks for the start time and end time
-		DoubleExperienceStart.runTask(e, null, null, null);
+		DoubleExperienceStart.runTask(e.getJDA().getGuilds());
 		
 		ClearHashes.runTask();
 		//check later on if there are any residual muted users which were not unmuted
-		VerifyMutedMembers.runTask(e, null, null, true);
+		VerifyMutedMembers.runTask(e.getJDA().getGuilds(), true);
 		
 		executor.shutdown();
 		

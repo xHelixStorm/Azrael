@@ -369,9 +369,6 @@ public class Hashes {
 	public static CopyOnWriteArrayList<Subscription> getSubscriptions() {
 		return subscriptions;
 	}
-	public static int getSubscriptionSize() {
-		return subscriptions.size();
-	}
 	public static ArrayList<Weapons> getWeaponShopContent(Long key) {
 		return weaponShopContent.get(key);
 	}

@@ -44,6 +44,7 @@ import twitter4j.TwitterFactory;
 
 public class SubscriptionUtils {
 	private final static Logger logger = LoggerFactory.getLogger(SubscriptionUtils.class);
+	private static int BREAKER = 10;
 	
 	/**
 	 * If a subscription channel has been removed during down time, remove it as well from the database
@@ -75,7 +76,7 @@ public class SubscriptionUtils {
 	 * @param jda
 	 */
 	public static void startTimer(JDA jda) {
-		if(Hashes.getSubscriptionSize() == 0 && !ParseSubscription.timerIsRunning()) {
+		if(!ParseSubscription.timerIsRunning()) {
 			Hashes.clearSubscriptions();
 			ParseSubscription.runTask(jda);
 		}
@@ -127,48 +128,17 @@ public class SubscriptionUtils {
 	public static void register(GuildMessageReceivedEvent e, String type) {
 		String message = "";
 		switch(type) {
-			case "rss" -> 		message = STATIC.getTranslation(e.getMember(), Translation.RSS_REGISTER)
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
-									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY));
-			case "twitter" -> 	message = STATIC.getTranslation(e.getMember(), Translation.TWITTER_REGISTER)
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
-									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY));
+			case "rss" -> 		message = STATIC.getTranslation(e.getMember(), Translation.RSS_REGISTER);
+			case "twitter" -> 	message = STATIC.getTranslation(e.getMember(), Translation.TWITTER_REGISTER);
 			case "reddit" -> {
 				StringBuilder methods = new StringBuilder();
 				for(final RedditMethod method : RedditMethod.values()) {
 					methods.append("**"+method.type+"**\n");
 				}
-				message = STATIC.getTranslation(e.getMember(), Translation.REDDIT_REGISTER)
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
-									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))+methods.toString();
+				message = STATIC.getTranslation(e.getMember(), Translation.REDDIT_REGISTER)+methods.toString();
 			}
-			case "youtube" -> 	message = STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_REGISTER)
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
-									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY));
-			case "twitch" -> 	message = STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER)
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))
-									.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_TEST))
-									.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY));
+			case "youtube" -> 	message = STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_REGISTER);
+			case "twitch" -> 	message = STATIC.getTranslation(e.getMember(), Translation.TWITCH_REGISTER);
 		}
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(message).build()).queue();
 		Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "register"));
@@ -223,7 +193,7 @@ public class SubscriptionUtils {
 						message = message.replaceAll("[`]*", "");
 						try {
 							if(message.startsWith("#") && validateHashtag(e, message)) {
-								output = STATIC.getTranslation(e.getMember(), Translation.TWITTER_ADDED);
+								output = STATIC.getTranslation(e.getMember(), Translation.TWITTER_ADDED).replace("{}", message);
 								valid = true;
 							}
 							else if(message.startsWith("@")) {
@@ -292,7 +262,7 @@ public class SubscriptionUtils {
 				subscriptionType = 4;
 				final String url = "https://www.youtube.com/channel/";
 				if(!message.contains(" ") && message.startsWith(url) && message.length() > url.length()) {
-					message = message.substring(url.length()+1);
+					message = message.substring(url.length());
 					try {
 						ChannelListResponse result = GoogleYoutube.searchYouTubeChannel(GoogleYoutube.getService(), message);
 						if(result != null && result.getItems().size() > 0) {
@@ -361,11 +331,17 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void remove(GuildMessageReceivedEvent e, String type) {
 		final Object [] object = getSubscriptionList(e, type);
 		final String out = (String)object[0];
 		if(out.length() > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVE_HELP)+out.toString()).build()).queue();
+			final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+			final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+			final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVE_HELP);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+				STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+			});
 			Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "remove").setObject(object[1]));
 		}
 		else {
@@ -388,16 +364,16 @@ public class SubscriptionUtils {
 			if(selection <= Integer.MAX_VALUE) {
 				ArrayList<Subscription> subscriptionList = subscriptions;
 				if(subscriptionList.size() >= selection+1 && selection >= 0) {
-					final String url = subscriptionList.get((int)selection).getURL();
-					if(Azrael.SQLDeleteSubscription(url, e.getGuild().getIdLong()) > 0) {
+					final String subscription = subscriptionList.get((int)selection).getURL();
+					if(Azrael.SQLDeleteSubscription(subscription, e.getGuild().getIdLong()) > 0) {
 						Hashes.clearSubscriptions();
-						Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+url);
+						Hashes.removeSubscriptionStatus(e.getGuild().getId()+"_"+subscription);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_REMOVED)).build()).queue();
-						logger.info("User {} has removed the subscription {} in guild {}", e.getMember().getUser().getId(), url, e.getGuild().getId());
+						logger.info("User {} has removed the subscription {} in guild {}", e.getMember().getUser().getId(), subscription, e.getGuild().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-						logger.error("The subscription {} couldn't be removed in guild {}", url, e.getGuild().getId());
+						logger.error("The subscription {} couldn't be removed in guild {}", subscription, e.getGuild().getId());
 					}
 					Hashes.clearTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
@@ -412,11 +388,17 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void format(GuildMessageReceivedEvent e, String type) {
 		final Object [] object = getSubscriptionList(e, type);
 		final String out = (String)object[0];
 		if(out.length() > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_HELP)+out.toString()).build()).queue();
+			final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+			final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+			final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_HELP);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+				STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+			});
 			Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "format").setObject(object[1]));
 		}
 		else {
@@ -450,7 +432,7 @@ public class SubscriptionUtils {
 						case "twitch" -> 	format = STATIC.getTranslation(e.getMember(), Translation.TWITCH_FORMAT_CURRENT);
 					}
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_FORMAT_CURRENT).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+" "+format).build()).queue();
-					e.getChannel().sendMessage(subscription.getFormat());
+					e.getChannel().sendMessage(subscription.getFormat()).queue();
 					Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "formatUpdate").setObject(subscription));
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 				}
@@ -486,12 +468,18 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void options(GuildMessageReceivedEvent e, String type) {
 		if(type.equals("twitter")) {
 			final Object [] object = getSubscriptionList(e, type);
 			final String out = (String)object[0];
 			if(out.length() > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_OPTIONS)+out.toString()).build()).queue();
+				final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+				final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+				final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.TWITTER_OPTIONS);
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+					STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+				});
 				Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "options").setObject(object[1]));
 			}
 			else {
@@ -536,6 +524,7 @@ public class SubscriptionUtils {
 	public static void options(GuildMessageReceivedEvent e, String type, String message, Subscription subscription) {
 		boolean printMessage = false;
 		boolean processAttempt = false;
+		message = message.replaceAll("[`]*", "");
 		if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE_PICTURES))) {
 			processAttempt = true;
 			if(Azrael.SQLUpdateSubscriptionPictures(subscription.getURL(), e.getGuild().getIdLong(), true) > 0) {
@@ -619,6 +608,7 @@ public class SubscriptionUtils {
 				if(valid) {
 					final int result = Azrael.SQLInsertChildSubscription(subscription.getURL(), hashtag, e.getGuild().getIdLong()); 
 					if(result > 0) {
+						subscription.addChildTweet(hashtag);
 						logger.info("User {} has added the child hashtag {} to the parent hashtag/user {} in guild {}", e.getMember().getUser().getId(), hashtag, subscription.getURL(), e.getGuild().getId());
 					}
 					else if(result == 0) {
@@ -644,6 +634,7 @@ public class SubscriptionUtils {
 				if(valid) {
 					final int result = Azrael.SQLDeleteChildSubscription(subscription.getURL(), hashtag, e.getGuild().getIdLong());
 					if(result > 0) {
+						subscription.removeChildTweet(hashtag);
 						logger.info("User {} has removed the child hashtag {} from the parent hashtag/user {} in guild {}", hashtag, subscription.getURL(), e.getGuild().getId());
 					}
 					else if(result == 0) {
@@ -676,11 +667,17 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void channel(GuildMessageReceivedEvent e, String type) {
 		final Object [] object = getSubscriptionList(e, type);
 		final String out = (String)object[0];
 		if(out.length() > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_HELP)+out.toString()).build()).queue();
+			final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+			final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+			final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_CHANNEL_HELP);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+				STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+			});
 			Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "channel").setObject(object[1]));
 		}
 		else {
@@ -723,7 +720,7 @@ public class SubscriptionUtils {
 	public static void channel(GuildMessageReceivedEvent e, String message, Subscription subscription) {
 		long channelId = -1;
 		if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE))) {
-			message = message.replaceAll("[<>#]*", "");
+			message = message.replaceAll("[^0-9]*", "");
 			if(message.matches("[0-9]{1,}")) {
 				TextChannel textChannel = e.getGuild().getTextChannelById(message);
 				if(textChannel != null) {
@@ -764,11 +761,17 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void test(GuildMessageReceivedEvent e, String type) {
 		final Object [] object = getSubscriptionList(e, type);
 		final String out = (String)object[0];
 		if(out.length() > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_TEST_HELP)+out.toString()).build()).queue();
+			final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+			final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+			final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_TEST_HELP);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+				STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+			});
 			Hashes.addTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, type, "test").setObject(object[1]));
 		}
 		else {
@@ -797,6 +800,8 @@ public class SubscriptionUtils {
 						case "rss" -> RSSModel.ModelTest(e, subscription);
 						case "twitter" -> TwitterModel.ModelTest(e, subscription);
 						case "reddit" -> RedditModel.ModelTest(e, subscription);
+						case "youtube" -> YouTubeModel.ModelTest(e, subscription);
+						case "twitch" -> TwitchModel.ModelTest(e, subscription);
 					}
 					Hashes.clearTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
@@ -811,11 +816,17 @@ public class SubscriptionUtils {
 	 * @param type
 	 */
 	
+	@SuppressWarnings("unchecked")
 	public static void display(GuildMessageReceivedEvent e, String type) {
 		final Object [] object = getSubscriptionList(e, type);
 		final String out = (String)object[0];
 		if(out.length() > 0) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISPLAY_HELP)+out.toString()).build()).queue();
+			final ArrayList<String> paginationSubscriptions = (ArrayList<String>)object[2];
+			final int maxPage = (paginationSubscriptions.size()/BREAKER)+(paginationSubscriptions.size()%BREAKER > 0 ? 1 : 0);
+			final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISPLAY_HELP);
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+				STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, paginationSubscriptions, appendMessage);
+			});
 		}
 		else {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_NO_SUBSCRIPTIONS)).build()).queue();
@@ -854,11 +865,18 @@ public class SubscriptionUtils {
 			case "youtube" -> subscriptionType = 4;
 			case "twitch" -> subscriptionType = 5;
 		}
+		int count = 0;
 		final ArrayList<Subscription> subscriptions = Azrael.SQLgetSubscriptions(e.getGuild().getIdLong(), subscriptionType);
-		for(Subscription rss : subscriptions) {
-			out.append((counter++)+": **"+rss.getURL()+"**\n");
+		final ArrayList<String> paginationSubscriptions = new ArrayList<String>();
+		for(Subscription subscription : subscriptions) {
+			String name = (subscription.getName() != null ? subscription.getName() : subscription.getURL());
+			if(count < BREAKER)
+				out.append(counter+": **"+name+"**\n");
+			paginationSubscriptions.add(counter+": **"+name+"**");
+			count++;
+			counter++;
 		}
-		Object [] object = {out.toString(), subscriptions}; 
+		Object [] object = {out.toString(), subscriptions, paginationSubscriptions}; 
 		return object;
 	}
 	
@@ -895,6 +913,7 @@ public class SubscriptionUtils {
 	}
 	
 	private static boolean validateHashtag(GuildMessageReceivedEvent e, String hashtag) throws TwitterException {
+		STATIC.loginTwitter();
 		Twitter twitter = STATIC.getTwitterFactory().getInstance();
 		Query query = new Query(hashtag);
 		QueryResult result = twitter.search(query);

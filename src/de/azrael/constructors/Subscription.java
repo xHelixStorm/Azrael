@@ -57,4 +57,10 @@ public class Subscription {
 	public ArrayList<String> getChildTweets() {
 		return this.childTweets;
 	}
+	public void addChildTweet(String hashtag) {
+		childTweets.add(hashtag);
+	}
+	public void removeChildTweet(String hashtag) {
+		childTweets.remove(hashtag);
+	}
 }

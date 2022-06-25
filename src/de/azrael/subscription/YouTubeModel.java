@@ -46,13 +46,13 @@ public class YouTubeModel {
 							json = json.getJSONObject("content");
 							json = json.getJSONObject("verticalListRenderer");
 							JSONArray items = json.getJSONArray("items");
-							for(int index = 0; index < 10 && index < items.length(); i++) {
+							for(int index = 0; index < 10 && index < items.length(); index++) {
 								json = items.getJSONObject(index);
 								if(json.has("videoRenderer")) {
 									json = json.getJSONObject("videoRenderer");
 									if(!Azrael.SQLIsSubscriptionDeleted(json.getString("videoId"))) {
 										String title = json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text");
-										String description = json.getJSONObject("detailedMetadataSnippets").getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
+										String description = json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
 										String videoId = json.getString("videoId");
 										String url = "https://www.youtube.com/watch?v="+videoId;
 										
@@ -109,12 +109,12 @@ public class YouTubeModel {
 						json = json.getJSONObject("content");
 						json = json.getJSONObject("verticalListRenderer");
 						JSONArray items = json.getJSONArray("items");
-						for(int index = 0; index < 1; i++) {
+						for(int index = 0; index < 1; index++) {
 							json = items.getJSONObject(index);
 							if(json.has("videoRenderer")) {
 								json = json.getJSONObject("videoRenderer");
 								String title = json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text");
-								String description = json.getJSONObject("detailedMetadataSnippets").getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
+								String description = json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
 								String videoId = json.getString("videoId");
 								String url = "https://www.youtube.com/watch?v="+videoId;
 								
@@ -140,7 +140,7 @@ public class YouTubeModel {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_NOT_FOUND)).build()).queue();
 			}
 		} catch (Exception e1) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_WEBSERVICE)+e1.getMessage()).build()).queue();
+			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("YouTube subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}

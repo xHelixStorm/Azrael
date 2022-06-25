@@ -364,7 +364,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					//check if the subscribe command has been used
-					final var subscribe = Hashes.getTempCache("rss_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
+					final var subscribe = Hashes.getTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+user_id);
 					if(subscribe != null && !e.getMember().getUser().isBot() && subscribe.getExpiration() - System.currentTimeMillis() > 0) {
 						String type = subscribe.getAdditionalInfo();
 						String task = subscribe.getAdditionalInfo2();
