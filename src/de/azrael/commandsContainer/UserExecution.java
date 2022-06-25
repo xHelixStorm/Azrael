@@ -310,7 +310,7 @@ public class UserExecution {
 								}
 								if(out.length() > 0) {
 									final int maxPage = (nicknames.size()/breaker)+(nicknames.size()%breaker > 0 ? 1 : 0);
-									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_DELETED_MESSAGES));
+									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_DELETED_MESSAGES)).setFooter("1/"+maxPage);
 									e.getChannel().sendMessage(message.setDescription(out.toString()).build()).queue(m -> {
 										STATIC.addPaginationReactions(e, m, maxPage, "3", ""+breaker, eventDescriptions);
 									});
@@ -329,7 +329,7 @@ public class UserExecution {
 								message.setDescription(out);
 								if(out.length() > 0) {
 									final int maxPage = (nicknames.size()/breaker)+(nicknames.size()%breaker > 0 ? 1 : 0);
-									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EVENTS));
+									message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EVENTS)).setFooter("1/"+maxPage);
 									e.getChannel().sendMessage(message.build()).queue(m -> {
 										STATIC.addPaginationReactions(e, m, maxPage, "3", ""+breaker, criticalEvents);
 									});
