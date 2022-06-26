@@ -766,7 +766,7 @@ public class STATIC {
 			try {
 				Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 				cipher.init(Cipher.ENCRYPT_MODE, secret);
-				return new String(cipher.doFinal(Base64.getEncoder().encode(rawMessage.getBytes())));
+				return Base64.getEncoder().encodeToString(cipher.doFinal(rawMessage.getBytes("UTF-8")));
 			} catch (NoSuchPaddingException e) {
 				logger.error("Encryption padding not available", e);
 			} catch (InvalidKeyException e) {
