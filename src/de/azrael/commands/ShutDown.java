@@ -41,6 +41,7 @@ public class ShutDown implements CommandPublic {
 			FileHandler.createFile(Directory.TEMP, System.getProperty("SESSION_NAME")+"running.azr", "0");
 			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
 			for(final Guild guild : e.getJDA().getGuilds()) {
+				botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
 				saveCache(guild, botConfig);
 			}
 			Invites.enableShutdownMode();
