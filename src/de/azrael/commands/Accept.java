@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
+import de.azrael.enums.Category;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -31,7 +32,7 @@ public class Accept implements CommandPublic {
 	@Override
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		//start by looking if a Verification / Waiting category has been set up
-		final var verification = Azrael.SQLgetCategories(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+		final var verification = Azrael.SQLgetCategories(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getType().equals(Category.VER.getType())).findAny().orElse(null);
 		if(verification != null) {
 			final var category = e.getGuild().getCategoryById(verification.getCategoryID());
 			if(category != null) {
