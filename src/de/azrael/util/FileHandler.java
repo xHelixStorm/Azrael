@@ -1,12 +1,14 @@
 package de.azrael.util;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 import org.slf4j.Logger;
@@ -16,16 +18,16 @@ import de.azrael.enums.Directory;
 
 public class FileHandler {
 	private static final Logger logger = LoggerFactory.getLogger(FileHandler.class);
-	private static PrintWriter pw;
 	
 	public static boolean createFile(Directory directory, String name, String content) {
 		final String fileName = directory.getPath()+name;
 		try {
-			pw = new PrintWriter(fileName, "UTF-8");
-			pw.print(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
-			pw.close();
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
+			out.write(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
+			out.flush();
+			out.close();
 			return true;
-		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+		} catch (IOException e) {
 			logger.error("File couldn't be created: {}", fileName, e);
 		}
 		return false;
@@ -34,9 +36,10 @@ public class FileHandler {
 	public static void appendFile(Directory directory, String name, String content) {
 		final String fileName = directory.getPath()+name;
 		try {
-		    FileWriter fw = new FileWriter(fileName, true);
-		    fw.write(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
-		    fw.close();
+			BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName, true), "UTF-8"));
+			out.write(directory.isEncryptionEnabled() ? STATIC.encrypt(content) : content);
+			out.flush();
+			out.close();
 		} catch(IOException ioe) {
 		    logger.error("File couldn't be appended: {}", fileName, ioe);
 		}
@@ -45,13 +48,16 @@ public class FileHandler {
 	public static String readFile(Directory directory, String name) {
 		final String fileName = directory.getPath()+name;
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(fileName));
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"));
 			try {
 				StringBuilder sb = new StringBuilder();
 				String line = br.readLine();
 				
 				while(line != null) {
-					sb.append(line+"\n");
+					if(directory.isEncryptionEnabled())
+						sb.append(line);
+					else
+						sb.append(line+"\n");
 					line = br.readLine();
 				}
 				return directory.isEncryptionEnabled() ? STATIC.decrypt(sb.toString()) : sb.toString();
@@ -64,7 +70,7 @@ public class FileHandler {
 					logger.error("Error on closing file after reading: {}", fileName, e);
 				}
 			}
-		} catch (FileNotFoundException e) {
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
 			logger.error("File not found: {}", fileName, e);
 			return "";
 		}
