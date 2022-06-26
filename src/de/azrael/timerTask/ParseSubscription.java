@@ -2,9 +2,12 @@ package de.azrael.timerTask;
 import java.awt.Color;
 import java.net.SocketTimeoutException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,57 +45,64 @@ public class ParseSubscription extends TimerTask {
 		try {
 			if(subscriptions != null && subscriptions.size() > 0) {
 				logger.info("Fetching subscriptions for all guilds");
-				for(Subscription subscription : subscriptions) {
-					final Guild guild = e.getGuildById(subscription.getGuildId());
-					if(guild != null) {
-						var subscriptionChannel = Azrael.SQLgetChannels(subscription.getGuildId()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.SUB.getType())).findAny().orElse(null);
-						if(subscriptionChannel != null || subscriptions.parallelStream().filter(f -> f.getChannelID() > 0).findAny().orElse(null) != null) {
-							long channel_id;
-							boolean defaultChannel = true;
-							TextChannel textChannel = guild.getTextChannelById(subscription.getChannelID()); 
-							if(textChannel != null) {
-								channel_id = textChannel.getIdLong();
-								defaultChannel = false;
-							}
-							else if(subscriptionChannel != null) {
-								channel_id = subscriptionChannel.getChannel_ID();
+				final Map<Long, List<Subscription>> groupedSubscriptions = subscriptions.parallelStream().collect(Collectors.groupingBy(Subscription::getGuildId));
+				groupedSubscriptions.forEach((k,v) -> {
+					new Thread(() -> {
+						final Guild guild = e.getGuildById(k);
+						for(Subscription subscription : v) {
+							if(guild != null) {
+								var subscriptionChannel = Azrael.SQLgetChannels(subscription.getGuildId()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.SUB.getType())).findAny().orElse(null);
+								if(subscriptionChannel != null || subscriptions.parallelStream().filter(f -> f.getChannelID() > 0).findAny().orElse(null) != null) {
+									long channel_id;
+									boolean defaultChannel = true;
+									TextChannel textChannel = guild.getTextChannelById(subscription.getChannelID()); 
+									if(textChannel != null) {
+										channel_id = textChannel.getIdLong();
+										defaultChannel = false;
+									}
+									else if(subscriptionChannel != null) {
+										channel_id = subscriptionChannel.getChannel_ID();
+									}
+									else {
+										continue;
+									}
+									boolean success = false;
+									try {
+										logger.trace("Retrieving subscription {} in guild {}", subscription.getURL(), e.getGuildById(guild.getIdLong()).getId());
+										if(subscription.getType() == 1)
+											success = RSSModel.ModelParse(STATIC.retrieveWebPageCode(subscription.getURL()), guild, subscription, channel_id, defaultChannel);
+										else if(subscription.getType() == 2)
+											success = TwitterModel.ModelParse(guild, subscription, channel_id, defaultChannel);
+										else if(subscription.getType() == 3)
+											success = RedditModel.ModelParse(guild, subscription, channel_id, defaultChannel);
+										else if(subscription.getType() == 4) 
+											success = YouTubeModel.ModelParse(guild, subscription, channel_id, defaultChannel);
+										else if(subscription.getType() == 5)
+											success = TwitchModel.ModelParse(guild, subscription, channel_id, defaultChannel);
+									} catch(SocketTimeoutException e1){
+										logger.warn("Timeout on subscription {}", subscription.getURL());
+										success = false;
+									} catch (Exception e1) {
+										logger.error("Error on retrieving subscription {}", subscription.getURL(), e1);
+										success = false;
+									}
+									if(success)
+										Hashes.addSubscriptionStatus(guild.getId()+"_"+subscription.getURL(), 0);
+									else
+										incrementSubscriptionStatus(guild, subscription);
+								}
 							}
 							else {
-								continue;
+								if(Azrael.SQLDeleteSubscription(subscription.getURL(), subscription.getGuildId()) > 0) {
+									Hashes.clearSubscriptions();
+									logger.warn("Subscription {} removed because guild {} is not available", subscription.getURL(), subscription.getGuildId());
+								}
+								else
+									logger.error("Subscription {} for the unavailable guild {} couldn't be removed", subscription.getURL(), subscription.getGuildId());
 							}
-							boolean success = false;
-							try {
-								logger.trace("Retrieving subscription {} in guild {}", subscription.getURL(), e.getGuildById(guild.getIdLong()).getId());
-								if(subscription.getType() == 1)
-									success = RSSModel.ModelParse(STATIC.retrieveWebPageCode(subscription.getURL()), guild, subscription, channel_id, defaultChannel);
-								else if(subscription.getType() == 2)
-									success = TwitterModel.ModelParse(guild, subscription, channel_id, defaultChannel);
-								else if(subscription.getType() == 3)
-									success = RedditModel.ModelParse(guild, subscription, channel_id, defaultChannel);
-								else if(subscription.getType() == 4) 
-									success = YouTubeModel.ModelParse(guild, subscription, channel_id, defaultChannel);
-								else if(subscription.getType() == 5)
-									success = TwitchModel.ModelParse(guild, subscription, channel_id, defaultChannel);
-							} catch(SocketTimeoutException e1){
-								logger.warn("Timeout on subscription {}", subscription.getURL());
-								success = false;
-							} catch (Exception e1) {
-								logger.error("Error on retrieving subscription {}", subscription.getURL(), e1);
-								success = false;
-							}
-							if(success)
-								Hashes.addSubscriptionStatus(guild.getId()+"_"+subscription.getURL(), 0);
-							else
-								incrementSubscriptionStatus(guild, subscription);
 						}
-					}
-					else {
-						if(Azrael.SQLDeleteSubscription(subscription.getURL(), subscription.getGuildId()) > 0)
-							logger.warn("Subscription {} removed because guild {} is not available", subscription.getURL(), subscription.getGuildId());
-						else
-							logger.error("Subscription {} for the unavailable guild {} couldn't be removed", subscription.getURL(), subscription.getGuildId());
-					}
-				}
+					}).start();
+				});
 			}
 			else {
 				logger.info("Subscription task interrupted for not having any subscriptions in any guild");

@@ -458,6 +458,7 @@ public class SubscriptionUtils {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("The display format of RSS url {} couldn't be updated in guild {}", subscription.getURL(), e.getGuild().getId());
 			}
+			Hashes.clearTempCache("subscribe_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SUBSCRIBE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
