@@ -72,10 +72,9 @@ public class WriteEditExecution {
 		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.WRITE.getColumn(), e.getMessage().getContentRaw());
 	}
 	
-	public static void editHelp(GuildMessageReceivedEvent e, Cache cache) {
+	public static void editHelp(GuildMessageReceivedEvent e, String channelId, String messageId) {
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_UPDATE)).build()).queue();
-		cache.updateDescription("EE");
-		Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache);
+		Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "EE", channelId, messageId));
 	}
 	
 	public static void runEdit(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -124,10 +123,9 @@ public class WriteEditExecution {
 		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 	}
 	
-	public static void reactionAddHelp(GuildMessageReceivedEvent e, Cache cache) {
+	public static void reactionAddHelp(GuildMessageReceivedEvent e, String channelId, String messageId) {
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_REACTION_ADD_HELP)).build()).queue(message -> {
-			Hashes.addTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()+"me"+message.getId(), new Cache(180000, cache.getAdditionalInfo2(), cache.getAdditionalInfo3()));
-			Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+			Hashes.addTempCache("write_edit_reaction_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()+"me"+message.getId(), new Cache(180000, channelId, messageId));
 		});
 		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
 	}
@@ -136,15 +134,24 @@ public class WriteEditExecution {
 		if(message.equals("yes")) {
 			int count = 0;
 			ArrayList<Long> roles = new ArrayList<Long>();
+			ArrayList<String> allRoles = new ArrayList<String>();
 			StringBuilder out = new StringBuilder();
+			int breaker = 10;
 			for(final var role : e.getGuild().getRoles()) {
 				if(e.getGuild().getSelfMember().canInteract(role) && !role.getName().equals("@everyone")) {
-					out.append(++count+": "+role.getName()+" ("+role.getId()+")\n");
+					if(count < breaker)
+						out.append("**"+(count+1)+"**: "+role.getName()+" ("+role.getId()+")\n");
+					allRoles.add("**"+(count+1)+"**: "+role.getName()+" ("+role.getId()+")");
 					roles.add(role.getIdLong());
+					count++;
 				}
 			}
 			if(roles.size() > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_SELECT_ROLE)+out.toString()).build()).queue();
+				final String appendMessage = STATIC.getTranslation(e.getMember(), Translation.EDIT_SELECT_ROLE);
+				final int maxPage = (allRoles.size()/breaker)+(allRoles.size()%breaker > 0 ? 1 : 0);
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(appendMessage+out.toString()).build()).queue(m -> {
+					STATIC.addPaginationReactions(e, m, maxPage, "3", ""+breaker, allRoles, appendMessage);
+				});
 				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.updateDescription("RA2").setExpiration(180000).setObject(roles));
 			}
 			else {
@@ -184,20 +191,20 @@ public class WriteEditExecution {
 		}
 	}
 	
-	public static void runClearReactions(GuildMessageReceivedEvent e, Cache cache) {
-		e.getGuild().getTextChannelById(cache.getAdditionalInfo2()).retrieveMessageById(cache.getAdditionalInfo3()).queue(message -> {
-			TextChannel textChannel = e.getGuild().getTextChannelById(cache.getAdditionalInfo2());
+	public static void runClearReactions(GuildMessageReceivedEvent e, String channelId, String messageId) {
+		final TextChannel textChannel = e.getGuild().getTextChannelById(channelId);
+		textChannel.retrieveMessageById(messageId).queue(message -> {
 			if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
 				message.clearReactions().queue(success -> {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_REACTIONS_CLEAR)).build()).queue();
 					Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					DiscordRoles.SQLDeleteReactions(Long.parseLong(cache.getAdditionalInfo3()));
-					logger.info("User {} has cleared all reactions and roles from message {} in guild {}", e.getMember().getUser().getId(), cache.getAdditionalInfo3(), e.getGuild().getId());
+					DiscordRoles.SQLDeleteReactions(Long.parseLong(messageId));
+					logger.info("User {} has cleared all reactions and roles from message {} in guild {}", e.getMember().getUser().getId(), messageId, e.getGuild().getId());
 				});
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_MANAGE.getName()).build()).queue();
-				logger.error("MANAGE_MESSAGES permission required for channel {} to remove reactions from a message in guild {}", cache.getAdditionalInfo2(), e.getGuild().getId());
+				logger.error("MANAGE_MESSAGES permission required for channel {} to remove reactions from a message in guild {}", channelId, e.getGuild().getId());
 			}
 		});
 		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());

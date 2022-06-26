@@ -581,17 +581,11 @@ public class GuildMessageListener extends ListenerAdapter {
 						else if(writeEdit.getAdditionalInfo().equals("EE")) {
 							WriteEditExecution.runEdit(e, writeEdit, message);
 						}
-						else if(writeEdit.getAdditionalInfo().equals("RA")) {
-							WriteEditExecution.reactionAddHelp(e, writeEdit);
-						}
 						else if(writeEdit.getAdditionalInfo().equals("RA1")) {
 							WriteEditExecution.reactionAnswer(e, writeEdit, message.toLowerCase());
 						}
 						else if(writeEdit.getAdditionalInfo().equals("RA2")) {
 							WriteEditExecution.reactionBindRole(e, writeEdit, message);
-						}
-						else if(writeEdit.getAdditionalInfo().equals("RC")) {
-							WriteEditExecution.runClearReactions(e, writeEdit);
 						}
 					}
 					

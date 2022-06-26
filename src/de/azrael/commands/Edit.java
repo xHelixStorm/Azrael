@@ -8,8 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.commandsContainer.WriteEditExecution;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -43,22 +41,27 @@ public class Edit implements CommandPublic {
 					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS))).build()).queue();
 		}
 		else if (args.length == 2) {
-			String channel_id = args[0].replaceAll("[<>#]", "");
-			String message_id = args[1].replaceAll("[^0-9]*", "");
-			if(e.getGuild().getTextChannelById(channel_id) != null) {
-				checkMessage(e, channel_id, message_id, "", false);
+			String channelId = args[0].replaceAll("[^0-9]*", "");
+			String messageId = args[1].replaceAll("[^0-9]*", "");
+			if(channelId.length() > 0 && messageId.length() > 0) {
+				if(e.getGuild().getTextChannelById(channelId) != null) {
+					checkMessage(e, channelId, messageId, "", false);
+				}
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
+				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else if(args.length == 3) {
 			if(args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION)) || args[2].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS))) {
-				String channel_id = args[0].replaceAll("[<>#]", "");
-				String message_id = args[1].replaceAll("[^0-9]*", "");
+				String channelId = args[0].replaceAll("[^0-9]*", "");
+				String messageId = args[1].replaceAll("[^0-9]*", "");
 				String parameter = args[2].toLowerCase();
-				if(e.getGuild().getTextChannelById(channel_id) != null) {
-					checkMessage(e, channel_id, message_id, parameter, true);
+				if(e.getGuild().getTextChannelById(channelId) != null) {
+					checkMessage(e, channelId, messageId, parameter, true);
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NO_TEXT_CHANNEL)).build()).queue();
@@ -85,20 +88,23 @@ public class Edit implements CommandPublic {
 		}
 	}
 
-	private static void checkMessage(GuildMessageReceivedEvent e, String channel_id, String message_id, String parameter, final boolean reaction) {
-		if(message_id.length() == 17 || message_id.length() == 18) {
-			TextChannel textChannel = e.getGuild().getTextChannelById(channel_id);
+	private static void checkMessage(GuildMessageReceivedEvent e, String channelId, String messageId, String parameter, final boolean reaction) {
+		if(messageId.length() == 17 || messageId.length() == 18) {
+			TextChannel textChannel = e.getGuild().getTextChannelById(channelId);
 			if((e.getGuild().getSelfMember().hasPermission(textChannel, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.MESSAGE_HISTORY)))) {
-				e.getGuild().getTextChannelById(channel_id).retrieveMessageById(message_id).queue(m -> {
+				textChannel.retrieveMessageById(messageId).queue(m -> {
 					if(!reaction) {
-						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "E", channel_id, message_id));
-						WriteEditExecution.editHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+						WriteEditExecution.editHelp(e, channelId, messageId);
 					}
 					else {
 						final String addReaction = STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_REACTION);
-						Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, (parameter.equals(addReaction) ? "RA" : "RC"), channel_id, message_id));
-						if(parameter.equals(addReaction)) WriteEditExecution.reactionAddHelp(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
-						else WriteEditExecution.runClearReactions(e, Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId()));
+						final String clearReactions = STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR_REACTIONS);
+						if(parameter.equalsIgnoreCase(addReaction)) 
+							WriteEditExecution.reactionAddHelp(e, channelId, messageId);
+						else if(parameter.equalsIgnoreCase(clearReactions)) 
+							WriteEditExecution.runClearReactions(e, channelId, messageId);
+						else
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();					
 					}
 				}, err -> {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EDIT_NOT_EXISTS)).build()).queue();
