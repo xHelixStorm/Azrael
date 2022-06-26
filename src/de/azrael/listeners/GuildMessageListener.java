@@ -103,12 +103,17 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(STATIC.spamDetected(e, botConfig))
 						return;
 					
+					if(e.getMember().getUser().isBot())
+						return;
+					
 					//execute commands
-					if(e.getMessage().getContentRaw().startsWith(botConfig.getCommandPrefix()) && e.getMessage().getAuthor().getId() != e.getJDA().getSelfUser().getId()) {
+					if(e.getMessage().getContentRaw().startsWith(botConfig.getCommandPrefix())) {
 						var prefixLength = botConfig.getCommandPrefix().length();
 						if(!CommandHandler.handleCommand(CommandParser.parser(botConfig.getCommandPrefix(), e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null), botConfig)) {
 							logger.debug("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
+						else
+							return;
 					}
 					
 					//If the channel doesn't allow any text input but only screenshots, then delete
@@ -569,11 +574,8 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					final var writeEdit = Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(writeEdit != null && writeEdit.getExpiration() - System.currentTimeMillis() > 0) {
-						if(writeEdit.getAdditionalInfo().equals("W")) {
-							WriteEditExecution.writeHelp(e, writeEdit);
-						}
-						else if(writeEdit.getAdditionalInfo().equals("WE")) {
+					if(writeEdit != null && !e.getMember().getUser().isBot() && writeEdit.getExpiration() - System.currentTimeMillis() > 0) {
+						if(writeEdit.getAdditionalInfo().equals("WE")) {
 							WriteEditExecution.runWrite(e, writeEdit, message);
 						}
 						else if(writeEdit.getAdditionalInfo().equals("EE")) {

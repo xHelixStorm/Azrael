@@ -26,13 +26,12 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
  *
  */
 
-public class WriteEditExecution implements Runnable {
+public class WriteEditExecution {
 	private final static Logger logger = LoggerFactory.getLogger(WriteEditExecution.class);
 	
-	public static void writeHelp(GuildMessageReceivedEvent e, Cache cache) {
+	public static void writeHelp(GuildMessageReceivedEvent e, String channelId, String delay) {
 		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_UPDATE)).build()).queue();
-		cache.updateDescription("WE");
-		Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache);
+		Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "WE", channelId, delay));
 	}
 	
 	public static void runWrite(GuildMessageReceivedEvent e, Cache cache, String message) {
@@ -40,18 +39,19 @@ public class WriteEditExecution implements Runnable {
 			if(message.length() <= 2000) {
 				TextChannel textChannel = e.getGuild().getTextChannelById(cache.getAdditionalInfo2());
 				if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS, Permission.MESSAGE_ATTACH_FILES))) {
-					if(cache.getAdditionalInfo3().length() == 0) {
+					final String delay = cache.getAdditionalInfo3();
+					if(delay == null) {
 						e.getGuild().getTextChannelById(cache.getAdditionalInfo2()).sendMessage(message).queue(success -> {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_SENT)).build()).queue();
-							Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						});
 					}
 					else {
-						//Delay to send the message
-						new Thread(new WriteEditExecution(e, textChannel.getIdLong(), message, Long.parseLong(cache.getAdditionalInfo3()))).start();
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_DELAYED)).build()).queue();
-						Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+						e.getGuild().getTextChannelById(cache.getAdditionalInfo2()).sendMessage(message).queueAfter(Long.parseLong(delay), TimeUnit.MINUTES, success -> {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_SENT)).build()).queue();
+						});
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_DELAYED).replace("{}", delay)).build()).queue();
 					}
+					Hashes.clearTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_WRITE.getName()).build()).queue();
@@ -201,28 +201,5 @@ public class WriteEditExecution implements Runnable {
 			}
 		});
 		Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.EDIT.getColumn(), e.getMessage().getContentRaw());
-	}
-	
-	private GuildMessageReceivedEvent e;
-	private long channel_id;
-	private String message;
-	private long delay;
-	
-	public WriteEditExecution(GuildMessageReceivedEvent _e, long _channel_id, String _message, long _delay) {
-		this.e = _e;
-		this.channel_id = _channel_id;
-		this.message = _message;
-		this.delay = _delay;
-	}
-
-	@Override
-	public void run() {
-		final long guild_id = e.getGuild().getIdLong();
-		try {
-			Thread.sleep(TimeUnit.MINUTES.toMillis(delay));
-		} catch (InterruptedException e) {
-			logger.trace("Delay timer interrupted for guild {}", guild_id, e);
-		}
-		e.getGuild().getTextChannelById(channel_id).sendMessage(message).queue();
 	}
 }

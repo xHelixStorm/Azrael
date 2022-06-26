@@ -5,9 +5,8 @@ import java.awt.Color;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.commandsContainer.WriteEditExecution;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -37,22 +36,27 @@ public class Write implements CommandPublic {
 			e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.WRITE_HELP)).build()).queue();
 		}
 		else if (args.length >= 1 && args.length <= 2) {
-			String channel_id = args[0].replaceAll("[<>#]", "");
-			if(e.getGuild().getTextChannelById(channel_id) != null) {
-				String delay = "";
-				if(args.length == 2) {
-					if(args[1].replaceAll("[0-9]*", "").length() == 0) {
-						delay = args[1];
+			String channelId = args[0].replaceAll("[^0-9]*", "");
+			if(channelId.length() > 0) {
+				if(e.getGuild().getTextChannelById(channelId) != null) {
+					String delay = null;
+					if(args.length == 2) {
+						if(args[1].replaceAll("[0-9]*", "").length() == 0) {
+							delay = args[1];
+						}
+						else {
+							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+							return true;
+						}
 					}
-					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
-						return true;
-					}
+					WriteEditExecution.writeHelp(e, channelId, delay);
 				}
-				Hashes.addTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "W", channel_id, delay));
+				else {
+					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TEXT_CHANNEL_NOT_EXISTS)).build()).queue();
+				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.TEXT_CHANNEL_NOT_EXISTS)).build()).queue();
+				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
