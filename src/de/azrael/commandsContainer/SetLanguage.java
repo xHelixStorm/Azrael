@@ -21,11 +21,10 @@ public class SetLanguage {
 		if(languages != null && languages.size() > 0) {
 			StringBuilder out = new StringBuilder();
 			StringBuilder out2 = new StringBuilder();
-			for(final var language : languages) {
-				final String [] langSplit = language.split("-");
-				out.append("**"+langSplit[0]+"**\n");
-				out2.append(langSplit[1]+"\n");
-			}
+			languages.forEach((k,v) -> {
+				out.append("**"+k+"**\n");
+				out2.append(v+"\n");
+			});
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LANGUAGE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 		}
 		else {
@@ -37,7 +36,7 @@ public class SetLanguage {
 	public static void runTask(GuildMessageReceivedEvent e, String [] args) {
 		if(args.length == 2 && args[1].length() == 3) {
 			final var lang = args[1];
-			if(Azrael.SQLisLanguageTranslated(lang, STATIC.getLanguage(e.getMember()))) {
+			if(Azrael.SQLisLanguageTranslated(lang)) {
 				if(Azrael.SQLUpdateLanguage(e.getGuild().getIdLong(), lang) != -1) {
 					Hashes.setLanguage(e.getGuild().getIdLong(), lang);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LANGUAGE_SUCCESS)).build()).queue();

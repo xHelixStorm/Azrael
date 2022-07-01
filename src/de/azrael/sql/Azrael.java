@@ -9,6 +9,7 @@ import java.sql.Types;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -3296,9 +3297,9 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetLanguages(String lang) {
+	public static LinkedHashMap<String, String> SQLgetLanguages(String lang) {
 		logger.trace("SQLgetLanguages launched. Params passed {}", lang);
-		ArrayList<String> langs = new ArrayList<String>();
+		LinkedHashMap<String, String> langs = new LinkedHashMap<String, String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3307,8 +3308,10 @@ public class Azrael {
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetLanguages);
 			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
-			while(rs.next()) {
-				langs.add(rs.getString(1)+"-"+rs.getString(2));
+			if(rs.next()) {
+				for(int i=3; i <= rs.getMetaData().getColumnCount(); i++) {
+					langs.put(rs.getMetaData().getColumnName(i), rs.getString(i));
+				}
 			}
 			return langs;
 		} catch (SQLException e) {
@@ -3321,19 +3324,29 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetTranslatedLanguages(String lang) {
+	public static LinkedHashMap<String, String> SQLgetTranslatedLanguages(String lang) {
 		logger.trace("SQLgetTranslatedLanguages launched. Params passed {}", lang);
-		ArrayList<String> langs = new ArrayList<String>();
+		LinkedHashMap<String, String> langs = new LinkedHashMap<String, String>();
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLgetTranslatedLanguages);
-			stmt.setString(1, lang);
 			rs = stmt.executeQuery();
+			ArrayList<String> notTranslated = new ArrayList<String>();
 			while(rs.next()) {
-				langs.add(rs.getString(1)+"-"+rs.getString(2));
+				final String fetchedLang = rs.getString(1);
+				if(!rs.getBoolean(2)) {
+					langs.remove(fetchedLang);
+					notTranslated.add(fetchedLang);
+				}
+				else if(fetchedLang.equals(lang)) {
+					for(int i=3; i<= rs.getMetaData().getColumnCount(); i++) {
+						if(!notTranslated.contains(fetchedLang))
+							langs.put(rs.getMetaData().getColumnName(i), rs.getString(i));
+					}
+				}
 			}
 			return langs;
 		} catch (SQLException e) {
@@ -3346,8 +3359,8 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLisLanguageTranslated(String lang, String lang2) {
-		logger.trace("SQLisLanguageTranslated launched. Params passed {}, {}", lang, lang2);
+	public static boolean SQLisLanguageTranslated(String lang) {
+		logger.trace("SQLisLanguageTranslated launched. Params passed {}", lang);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3355,7 +3368,6 @@ public class Azrael {
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLisLanguageTranslated);
 			stmt.setString(1, lang);
-			stmt.setString(2, lang2);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				return true;

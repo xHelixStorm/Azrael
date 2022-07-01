@@ -173,11 +173,10 @@ public class Set implements CommandPublic {
 					if(langs != null && langs.size() > 0) {
 						StringBuilder out = new StringBuilder();
 						StringBuilder out2 = new StringBuilder();
-						for(final var lang : langs) {
-							final String [] split = lang.split("-");
-							out.append("**"+split[0]+"**\n");
-							out2.append("*"+split[1]+"*\n");
-						}
+						langs.forEach((k,v) -> {
+							out.append("**"+k+"**\n");
+							out2.append("*"+v+"*\n");
+						});
 						e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 					}
 					else {

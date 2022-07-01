@@ -31,11 +31,10 @@ public class Language implements CommandPublic {
 			if(languages != null && languages.size() > 0) {
 				StringBuilder out = new StringBuilder();
 				StringBuilder out2 = new StringBuilder();
-				for(final var language : languages) {
-					final String [] langSplit = language.split("-");
-					out.append("**"+langSplit[0]+"**\n");
-					out2.append(langSplit[1]+"\n");
-				}
+				languages.forEach((k,v) -> {
+					out.append("**"+k+"**\n");
+					out2.append(v+"\n");
+				});
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LANGUAGE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 			}
 			else {
@@ -44,7 +43,7 @@ public class Language implements CommandPublic {
 			}
 		}
 		else if(args.length == 1 && args[0].length() == 3) {
-			if(Azrael.SQLisLanguageTranslated(args[0], STATIC.getLanguage(e.getMember()))) {
+			if(Azrael.SQLisLanguageTranslated(args[0])) {
 				if(Azrael.SQLUpdateUserLanguage(e.getMember().getUser().getIdLong(), args[0]) != -1) {
 					Hashes.setLanguage(e.getMember().getUser().getIdLong(), args[0]);
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.LANGUAGE_CHANGED)).build()).queue();

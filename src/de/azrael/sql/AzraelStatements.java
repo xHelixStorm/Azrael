@@ -145,9 +145,9 @@ class AzraelStatements {
 	final static String SQLInsertReminder = STATIC.decrypt("u3fr4vGKsYCjGwVH5s9IhG5uQKidsTHYota6NXZ+ReTmD6h57/H2SMORiKaBEinKCRvUEg45jIn+NgzpGMJiB8Iw8C3Z/ahwYrq/u6nei6btQ8YJF2S80UK5n2bumpGp3ot/xqnha44Tz8bXZ54g4D9uURcqsIkEl199q48kLDeuRoYPeAiF6eP6Miika1msq2CR2zoSFe1ZdmFVV9T0MZ9/6m0/pe5GjfpO4dCJsKqKh31convODE/w70pgNvFk7yIauD5yXRjp/jJCpCZ9+sTdjUI4DVGl/64wMea4Y/k=");
 	final static String SQLgetRejoinTask = STATIC.decrypt("kuU7e0nBzhQCbNSLNXJB30cPQXWqqN9BKNfNenuFfREWArjE2JaSYFFnlUlT1jG2YAF7rKteM/PYX/x/K7pAcw==");
 	final static String SQLDeleteRejoinTask = STATIC.decrypt("75MKWu9Q0mrHko+i6UqQ0DVX0bXLCWyODDPESHsFnPS0IHrkD0gLpzmPuKwNIAE9Inyv5Zblms6W9NrcPh+Eyw==");
-	final static String SQLgetLanguages = STATIC.decrypt("W++1wskQzf5swtno9ba9AtBr8Y5/Nv/20593DuuyFumkzKHFz8DRtV4D5dz/9r0ALpRqKjlw/Pe4I+TInRy8Ba77FxXuvE1PL1PcDVMNjig=");
-	final static String SQLgetTranslatedLanguages = STATIC.decrypt("W++1wskQzf5swtno9ba9AtBr8Y5/Nv/20593DuuyFumkzKHFz8DRtV4D5dz/9r0ALpRqKjlw/Pe4I+TInRy8BfYBWfEYSj8cICt3LntsOj8L5Ex7urkD8rH0E2nr8Zci");
-	final static String SQLisLanguageTranslated = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgKTMocXPwNG1XgPl3P/2vQBaeOE66tz2wFwcs7RmzNsLDZlgaVg/l9dmrUiS07lKCn+Op3G3GGEsPLfAlyzQ2uA3nqPLb6VPjHsGizLXpj2H");
+	final static String SQLgetLanguages = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA8xBhD8FcFVa2PIw3TdUK+tkCIqdKD2FuTxLS0pirnI4/YYX5VoKQgPDWZIdCKoCbo=");
+	final static String SQLgetTranslatedLanguages = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA+NtAF2nhQgI4VPti1Ft/W1TsQrLdu/UtcMh5LAFoSewGjDQb1hYhcgBChRnbaRb2E=");
+	final static String SQLisLanguageTranslated = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA8xBhD8FcFVa2PIw3TdUK+tZQ1xLLs+IuZ5QbiwhlBljXQpByFsaFbI4OJJPgzko+g=");
 	final static String SQLInsertSubscriptionLog = STATIC.decrypt("nvBbp9ZbcBrO/qBBp+YHTC/ihVED9LPwwIAauEAJELVxiaKK8RwLLkf9DSFsx9jgF0VnSwoOGAyplkYbZQTNrkjhfxXmlwDKSDDewvvaYZw=");
 	final static String SQLUpdateSubscriptionLogDeleted = STATIC.decrypt("y7wHYwyTyt1z8kQwebU/easTrPnuqLkxAusoddR/yrCiDTAXlTJQbZurni2uN1Gxmd9AURgOihQYXeyIOSJMmA==");
 	final static String SQLIsSubscriptionDeleted = STATIC.decrypt("53F7gsk5xFDKpPn4nmtGqC1HExCdqEAbPqqVzBmhkV9ZTqUC969puCTh48mZGVo+dFhl+Gv+s0nqeOnVaS6vVDB6QL/a0g8hr9IkJ9l86Gk=");

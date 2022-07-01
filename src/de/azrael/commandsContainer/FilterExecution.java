@@ -4,7 +4,9 @@ import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.slf4j.Logger;
@@ -701,7 +703,7 @@ public class FilterExecution {
 					if(selectedLang != null) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT)+" "+langInsert.toUpperCase());
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
-						cache.updateDescription("lang-insert-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
+						cache.updateDescription("lang-insert-word-filter").updateDescription2(selectedLang).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
@@ -716,7 +718,7 @@ public class FilterExecution {
 					if(selectedLang != null) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE)+" "+langRemove.toUpperCase());
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_WORD)).build()).queue();
-						cache.updateDescription("lang-remove-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
+						cache.updateDescription("lang-remove-word-filter").updateDescription2(selectedLang).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
@@ -731,7 +733,7 @@ public class FilterExecution {
 					if(selectedLang != null) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE)+" "+addLangLoad.toUpperCase());
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
-						cache.updateDescription("lang-add-load-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
+						cache.updateDescription("lang-add-load-word-filter").updateDescription2(selectedLang).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
@@ -746,7 +748,7 @@ public class FilterExecution {
 					if(selectedLang != null) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE)+" "+langLoad.toUpperCase());
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_FILE)).build()).queue();
-						cache.updateDescription("lang-load-word-filter").updateDescription2(selectedLang.split("-")[0]).setExpiration(180000);
+						cache.updateDescription("lang-load-word-filter").updateDescription2(selectedLang).setExpiration(180000);
 						Hashes.addTempCache(key, cache);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
 					}
@@ -1493,10 +1495,9 @@ public class FilterExecution {
 	private static void callFilterLangContent(GuildMessageReceivedEvent e, EmbedBuilder message, final String key, final String lang, Cache cache) {
 		final var selectedLang = langCheck(e, message, lang, key, cache);
 		if(selectedLang != null) {
-			var actualLang = selectedLang.split("-")[0];
 			var langAbbreviation = "";
 			var definitiveLang = "";
-			switch(actualLang) {
+			switch(selectedLang) {
 				case "eng" 	-> {langAbbreviation = "eng";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_ENG);}
 				case "ger" 	-> {langAbbreviation = "ger";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_GER);}
 				case "fre" 	-> {langAbbreviation = "fre";  definitiveLang = STATIC.getTranslation(e.getMember(), Translation.LANG_FRE);}
@@ -1517,7 +1518,7 @@ public class FilterExecution {
 					final String finalLang = definitiveLang;
 					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
 						if(FileHandler.createFile(Directory.TEMP, e.getGuild().getId()+"_"+definitiveLang+"_word_filter.txt", out.toString())) {
-							e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_"+definitiveLang+"_word_filter.txt"), definitiveLang.toUpperCase()+STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER).toUpperCase()+".txt").queue(m -> {
+							e.getChannel().sendFile(new File(Directory.TEMP.getPath()+e.getGuild().getId()+"_"+definitiveLang+"_word_filter.txt"), definitiveLang.toUpperCase()+"-"+STATIC.getTranslation(e.getMember(), Translation.PARAM_WORD_FILTER).toUpperCase()+".txt").queue(m -> {
 								FileHandler.deleteFile(Directory.TEMP, e.getGuild().getId()+"_"+finalLang+"_word_filter.txt");
 							});
 						}
@@ -1695,11 +1696,11 @@ public class FilterExecution {
 	}
 	
 	private static String langCheck(final GuildMessageReceivedEvent e, final EmbedBuilder message, final String lang, final String key, Cache cache) {
-		final var langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
+		final LinkedHashMap<String, String> langs = Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember()));
 		if(langs != null && langs.size() > 0) {
-			final var selectedLang = langs.parallelStream().filter(f -> f.split("-")[1].equalsIgnoreCase(lang)).findAny().orElse(null);
+			final var selectedLang = langs.values().parallelStream().filter(f -> f.equalsIgnoreCase(lang)).findAny().orElse(null);
 			if(selectedLang != null) {
-				return selectedLang;
+				return langs.entrySet().parallelStream().filter(entry -> entry.getValue().equals(selectedLang)).map(Map.Entry::getKey).findAny().orElse(null);
 			}
 			else {
 				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LIST_LANG_NA)).build()).queue();
