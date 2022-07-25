@@ -1472,7 +1472,7 @@
 	"prune_status_err":				"Neste momento, os membros não estão a ser podados!",
     
     "warn_help":                    "Escreva uma mensagem de aviso para um usuário mencionando o usuário ou escrevendo a id do usuário como primeiro parâmetro e, em seguida, o motivo começando com o segundo parâmetro! O usuário receberá o motivo do aviso em mensagem privada! ",
-    "warn_sent":                    "Você está recebendo um aviso para **{}** de {}. Por favor, corrija seu comportamento ou sua punição se tornará mais severa! ",
+    "warn_sent":                    "Recebeu um aviso de {}.**{}**",
     "warn_sent_2":                  "Aviso foi enviado para {}!",
     "warn_err":                     "O usuário {} bloqueou suas mensagens privadas e não pôde receber seu aviso! ",
     "warn_err_2":                   "Você não pode enviar uma mensagem de aviso para um usuário que tem privilégios mais altos do que o Bot! Ação negada!",

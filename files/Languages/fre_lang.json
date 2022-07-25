@@ -1472,7 +1472,7 @@
 	"prune_status_err":				"Les membres ne sont pas élagués pour l'instant !",
     
     "warn_help":                    "Écrivez un message d'avertissement à un utilisateur en mentionnant l'utilisateur ou en écrivant l'identifiant de l'utilisateur comme premier paramètre et ensuite la raison commençant avec le deuxième paramètre ! L'utilisateur recevra la raison de l'avertissement dans un message privé.!",
-    "warn_sent":                    "Vous recevez un avertissement pour **{}** de {}. Veuillez corriger votre comportement ou votre punition sera plus sévère !",
+    "warn_sent":                    "Vous avez reçu un avertissement de {}.\n**{}**",
     "warn_sent_2":                  "Un avertissement a été envoyé à {} !",
     "warn_err":                     "L'utilisateur {} a vu ses messages privés verrouillés et n'a pas pu recevoir votre avertissement !",
     "warn_err_2":                   "Vous ne pouvez pas envoyer un message d'avertissement à un utilisateur qui a des privilèges plus élevés que le Bot ! Action refusée !",

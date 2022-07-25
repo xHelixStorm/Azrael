@@ -1472,7 +1472,7 @@
 	"prune_status_err":				"Die Mitglieder werden zu diesem Zeitpunkt nicht gestrichen!",
 	
 	"warn_help":					"Schreiben Sie eine Warnung an einen Benutzer, indem Sie den Benutzer erwähnen oder indem Sie die Benutzer-ID als ersten Parameter und dann den Grund ab dem zweiten Parameter schreiben! Der Benutzer erhält den Warngrund in einer privaten Nachricht!",
-	"warn_sent":					"Sie erhalten eine Verwarnung für **{}** von {}. Bitte korrigieren Sie Ihr Verhalten, sonst wird Ihre Strafe härter ausfallen!",
+	"warn_sent":					"Sie haben eine Warnung von {} erhalten.\n**{}**",
 	"warn_sent_2":					"Warnung wurde an {} gesendet!",
 	"warn_err":						"Benutzer {} hat seine privaten Nachrichten gesperrt und konnte Ihre Warnung nicht erhalten!",
 	"warn_err_2":					"Sie können keine Warnung an einen Benutzer senden, der höhere Berechtigungen hat als der Bot! Aktion verweigert!",

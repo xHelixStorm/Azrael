@@ -1472,7 +1472,7 @@
 	"prune_status_err":				"Members are not being pruned at this point of time!",
 	
 	"warn_help":					"Write a warning message to a user by mentioning the user or by writing the user id as first parameter and then the reason starting with the second parameter! The user will receive the warning reason in private message!",
-	"warn_sent":					"You're receiving a warning for **{}** from {}. Please correct your behaviour or your punishment will become more severe!",
+	"warn_sent":					"You have received a warning from {}.\n**{}**",
 	"warn_sent_2":					"Warning has been sent to {}!",
 	"warn_err":						"User {} got his private messages locked and couldn't receive your warning!",
 	"warn_err_2":					"You can't send a warning message to a user who has higher privileges than the Bot! Action denied!",
