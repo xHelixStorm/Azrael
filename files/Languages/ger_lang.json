@@ -1485,6 +1485,7 @@
 	"invites_create_complete":		"{} Einladungen sind erstellt worden!",
 	"invites_create_err":			"Es ist ein interner Fehler aufgetreten! Die erstellten One Time Use Invites wurden erstellt, konnten aber nicht gespeichert werden!",
 	"invites_create_err_2":			"Die Anzahl der zu erstellenden Einladungen muss zwischen 1 und 1000 liegen!",
+	"invites_create_err_3":			"Die Gesamtzahl der Einladungen mit der neuen Anfrage übersteigt 1000! Mehr Einladungen als diese Anzahl können nicht erstellt werden. Aktuelle Anzahl der erstellten Einladungen: **{}**",
 	"invites_already_running":		"Es werden gerade Einladungen erstellt oder entfernt. Bitte warten Sie, bevor Sie den Befehl erneut verwenden!\nAnzahl der bereits erstellten oder entfernten Einladungen: **{}**/**{}**",
 	"invites_remove_help":			"Bestätigen Sie die Ausführung mit dem Parameter *{}*, indem Sie ihn zusammen mit dem gesamten Befehl schreiben!",
 	"invites_remove_start":			"Die Einladungen werden entfernt. Bitte warten Sie!",

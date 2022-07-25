@@ -1490,6 +1490,7 @@ public enum Translation {
 	INVITES_CREATE_COMPLETE		("invites_create_complete"),
 	INVITES_CREATE_ERR			("invites_create_err"),
 	INVITES_CREATE_ERR_2		("invites_create_err_2"),
+	INVITES_CREATE_ERR_3		("invites_create_err_3"),
 	INVITES_ALREADY_RUNNING		("invites_already_running"),
 	INVITES_REMOVE_HELP			("invites_remove_help"),
 	INVITES_REMOVE_START		("invites_remove_start"),

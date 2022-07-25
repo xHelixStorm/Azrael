@@ -1485,6 +1485,7 @@
 	"invites_create_complete":		"{} invites have been created!",
 	"invites_create_err":			"An internal error occurred! The created one time use invites have been created but could not be saved!",
 	"invites_create_err_2":			"The number of invites to create have to be between 1 and 1000!",
+	"invites_create_err_3":			"The amount of total invites with the new request exceeds 1000! More invites than that number can't be created. Current number of created invites: **{}**",
 	"invites_already_running":		"Invites are currently being created or removed. Please wait before using the command again!\nNumber of invites already created or removed: **{}**/**{}**",
 	"invites_remove_help":			"Confirm the execution with the *{}* parameter by writing it together with the whole command!",
 	"invites_remove_start":			"Invites are being removed. Please wait!",

@@ -1485,6 +1485,7 @@
     "invites_create_complete":      "{} les invitations ont été créées !",
     "invites_create_err":           "Une erreur interne s'est produite ! Les invitations à usage unique ont été créées mais n'ont pas pu être sauvegardées !",
     "invites_create_err_2":         "Le nombre d'invitations à créer doit être compris entre 1 et 1000 !",
+    "invites_create_err_3":			"Le nombre total d'invitations avec la nouvelle demande dépasse 1000 ! Il est impossible de créer plus d'invitations que ce nombre. Nombre actuel d'invitations créées : **{}**",
     "invites_already_running":      "Des invitations sont en cours de création ou de suppression. Veuillez patienter avant d'utiliser à nouveau cette commande !\nNombre d'invitations déjà créées ou supprimées : **{}**/**{}**",
     "invites_remove_help":          "Confirmez l'exécution avec le paramètre *{}* en l'écrivant avec l'ensemble de la commande !",
     "invites_remove_start":         "Les invitations sont en cours de suppression. Veuillez patienter !",

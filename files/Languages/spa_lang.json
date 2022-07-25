@@ -1485,6 +1485,7 @@
 	"invites_create_complete": 		"Se han creado {} invitaciones!",
 	"invites_create_err": 			"Se ha producido un error interno! Las invitaciones creadas de un solo uso se han creado, pero no se pudieron guardar!",
 	"invites_create_err_2": 		"El número de invitaciones a crear tiene que estar entre 1 y 1000!",
+	"invites_create_err_3":			"¡La cantidad de invitaciones totales con la nueva solicitud supera los 1000! No se pueden crear más invitaciones que ese número. Número actual de invitaciones creadas: **{}**",
 	"invites_already_running": 		"Actualmente se están creando o eliminando invitaciones. Por favor, espera antes de usar el comando de nuevo!\nNúmero de invitaciones ya creadas o eliminadas: **{}**/**{}**",
 	"invites_remove_help": 			"Confirme la ejecución con el parametro *{}* escribiéndolo junto con todo el comando!",
 	"invites_remove_start": 		"Se están eliminando las invitaciones. ¡Espera!",

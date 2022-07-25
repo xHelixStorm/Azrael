@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,54 +54,61 @@ public class Invites implements CommandPublic {
 					if(!shutdownMode) {
 						final long total = Long.parseLong(args[1]);
 						if(total > 0 && total <= 1000) {
-							try {
-								STATIC.addThread(Thread.currentThread(), "invites_gu"+e.getGuild().getId());
-								
-								inviteStatus.put(e.getGuild().getIdLong(), new InviteManagement(total));
-								final TextChannel textChannel = e.getGuild().getTextChannels().stream().filter(f -> e.getGuild().getSelfMember().hasPermission(f, Permission.MESSAGE_READ)).findAny().orElse(null);
-								if(textChannel != null) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_START)).build()).queue();
-									final ArrayList<String> invites = new ArrayList<String>();
-									for(int i = 0; i < total; i++) {
-										try {
-											final Invite invite = textChannel.createInvite().setMaxAge(0).setTemporary(false).setUnique(true).complete();
-											logger.info("Invite {} created in guild {}", invite.getUrl(), e.getGuild().getId());
-											invites.add(invite.getUrl());
-											inviteStatus.put(e.getGuild().getIdLong(), inviteStatus.get(e.getGuild().getIdLong()).incrementInviteCount());
-										} catch(Exception e1) {
-											logger.error("An invite couldn't be created in guild {}", e.getGuild().getId());
-										}
-									}
-									if(Azrael.SQLBatchInsertInvites(e.getGuild().getIdLong(), invites)) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_COMPLETE).replace("{}", invites.size()+"")).build()).queue();
-										logger.info("User {} has created {} invites in guild {}", e.getMember().getUser().getId(), invites.size(), e.getGuild().getId());
+							e.getGuild().retrieveInvites().queue(createdInvites -> {
+								if(createdInvites.size() + total <= 1000) {
+									try {
+										STATIC.addThread(Thread.currentThread(), "invites_gu"+e.getGuild().getId());
 										
-										//execute spreadsheet google request
-										if(botConfig.getGoogleFunctionalities()) {
-											final var array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.INVITES.id, "");
-											final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-											final var values = GoogleSheets.spreadsheetInvitesRequest(array, e.getGuild(), "", "", timestamp, "", "", invites, timestamp);
-											if(values != null) {
-												GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), array[0], values, array[1], "ROWS");
+										inviteStatus.put(e.getGuild().getIdLong(), new InviteManagement(total));
+										final TextChannel textChannel = e.getGuild().getTextChannels().stream().filter(f -> e.getGuild().getSelfMember().hasPermission(f, Permission.MESSAGE_READ)).findAny().orElse(null);
+										if(textChannel != null) {
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_START)).build()).queue();
+											final ArrayList<String> invites = new ArrayList<String>();
+											for(int i = 0; i < total; i++) {
+												try {
+													Invite invite = textChannel.createInvite().setMaxAge(0).setTemporary(false).setUnique(true).submit().get();
+													logger.info("Invite {} created in guild {}", invite.getUrl(), e.getGuild().getId());
+													invites.add(invite.getUrl());
+													inviteStatus.put(e.getGuild().getIdLong(), inviteStatus.get(e.getGuild().getIdLong()).incrementInviteCount());
+												} catch(Exception e1) {
+													logger.error("An invite couldn't be created in guild {}", e.getGuild().getId());
+												}
+											}
+											if(Azrael.SQLBatchInsertInvites(e.getGuild().getIdLong(), invites)) {
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_COMPLETE).replace("{}", invites.size()+"")).build()).queue();
+												logger.info("User {} has created {} invites in guild {}", e.getMember().getUser().getId(), invites.size(), e.getGuild().getId());
+												
+												//execute spreadsheet google request
+												if(botConfig.getGoogleFunctionalities()) {
+													final var array = Azrael.SQLgetGoogleFilesAndEvent(e.getGuild().getIdLong(), 2, GoogleEvent.INVITES.id, "");
+													final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+													final var values = GoogleSheets.spreadsheetInvitesRequest(array, e.getGuild(), "", "", timestamp, "", "", invites, timestamp);
+													if(values != null) {
+														GoogleSheets.appendRawDataToSpreadsheet(GoogleSheets.getSheetsClientService(), array[0], values, array[1], "ROWS");
+													}
+												}
+											}
+											else {
+												e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_ERR)).build()).queue();
+												logger.error("Generated invites couldn't be saved in guild {}", e.getGuild().getId());
 											}
 										}
-									}
-									else {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_ERR)).build()).queue();
-										logger.error("Generated invites couldn't be saved in guild {}", e.getGuild().getId());
+										else {
+											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+											logger.error("A text channel with normal message read permission couldn't be retrieved in guild {}", e.getGuild().getId());
+										}
+									} catch(Exception e1) {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										logger.error("An unknown error occurred while creating one time use invites in guild {}", e.getGuild().getId());
+									} finally {
+										STATIC.removeThread(Thread.currentThread());
+										inviteStatus.remove(e.getGuild().getIdLong());
 									}
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-									logger.error("A text channel with normal message read permission couldn't be retrieved in guild {}", e.getGuild().getId());
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_ERR_3).replace("{}", ""+createdInvites.size())).build()).queue();
 								}
-							} catch(Exception e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
-								logger.error("An unknown error occurred while creating one time use invites in guild {}", e.getGuild().getId());
-							} finally {
-								STATIC.removeThread(Thread.currentThread());
-								inviteStatus.remove(e.getGuild().getIdLong());
-							}
+							});
 						}
 						else {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVITES_CREATE_ERR_2)).build()).queue();
@@ -141,7 +149,7 @@ public class Invites implements CommandPublic {
 										final Invite invite = retrievedInvites.parallelStream().filter(f -> f.getUrl().equals(inviteUrl)).findAny().orElse(null);
 										if(invite != null) {
 											try {
-												invite.delete().complete();
+												invite.delete().submit().get();
 												logger.info("Invite {} removed in guild {}", inviteUrl, e.getGuild().getId());
 												deleteInvites.add(inviteUrl);
 												inviteStatus.put(e.getGuild().getIdLong(), inviteStatus.get(e.getGuild().getIdLong()).incrementInviteCount());
