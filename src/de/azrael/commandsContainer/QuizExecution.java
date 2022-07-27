@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class QuizExecution {
 	private static final Logger logger = LoggerFactory.getLogger(QuizExecution.class);
 	
-	public static void registerRewards(GuildMessageReceivedEvent e, String link) {
+	public static void registerRewards(GuildMessageReceivedEvent e) {
 		//check if a txt file has been provided and then
 		//split the returned String in an array
 		final var attachments = e.getMessage().getAttachments();
@@ -38,13 +38,15 @@ public class QuizExecution {
 				}
 				if(file != null && file.exists()) {
 					String [] rewards = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+					FileHandler.deleteFile(Directory.TEMP, fileName);
 					int index = 1;
 					boolean interrupted = false;
 					Quizes quiz;
 					//Insert the rewards into the HashMap
+					Azrael.SQLgetQuizData(e.getGuild().getIdLong());
 					for(String reward: rewards) {
 						if(reward.length() > 0) {
-							if(!reward.equals("START") && !reward.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
+							if(!reward.equals("START") && !reward.matches("(1|2|3|4|5|6|7|8|9)[0-9]*\\..{1,}")) {
 								if(Hashes.getQuiz(e.getGuild().getIdLong(), index) == null) {
 									quiz = new Quizes();
 								}
@@ -73,8 +75,8 @@ public class QuizExecution {
 						if(integrity.equals("0")) {
 							//Overwrite table
 							if(Azrael.SQLOverwriteQuizData(e.getGuild().getIdLong()) == 1) {
-								e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_REGISTERED)).queue();
-								logger.info("User {} has registered the quiz rewards with the pastebin url {} in guild {}", e.getMember().getUser().getId(), link, e.getGuild().getId());
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_REWARDS_REGISTERED)).build()).queue();
+								logger.info("User {} has registered the quiz rewards by file in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -106,7 +108,6 @@ public class QuizExecution {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).build()).queue();
 						clearRewards(e, 1);
 					}
-					FileHandler.deleteFile(Directory.TEMP, fileName);
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -117,10 +118,11 @@ public class QuizExecution {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			}
+			Hashes.clearTempCache("quiz_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
-	public static void registerQuestions(GuildMessageReceivedEvent e, String link) {
+	public static void registerQuestions(GuildMessageReceivedEvent e) {
 		//check if a txt file has been provided and then
 		//split the returned String in an array
 		final var attachments = e.getMessage().getAttachments();
@@ -136,6 +138,7 @@ public class QuizExecution {
 				}
 				if(file != null && file.exists()) {
 					String [] content = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+					FileHandler.deleteFile(Directory.TEMP, fileName);
 					if(content != null && content.length > 0) {
 						int index = 1;
 						int answers = 0;
@@ -143,6 +146,7 @@ public class QuizExecution {
 						int rewards = 0;
 						Quizes quiz = new Quizes();
 						//Insert questions, answers and hints into the HashMap
+						Azrael.SQLgetQuizData(e.getGuild().getIdLong());
 						for(String line : content) {
 							if(line.length() > 0) {
 								if(line.contains("START")) {
@@ -155,7 +159,7 @@ public class QuizExecution {
 										quiz = Hashes.getQuiz(e.getGuild().getIdLong(), index);
 									}
 								}
-								else if(line.matches("(1|2|3|4|5|6|7|8|9)[0-9]*[.][\\s\\d\\w?!.\\,/+-]*")) {
+								else if(line.matches("(1|2|3|4|5|6|7|8|9)[0-9]*\\..{1,}")) {
 									quiz.setQuestion(line);
 									answers = 0;
 									hints = 0;
@@ -195,8 +199,8 @@ public class QuizExecution {
 						if(integrity.equals("0")) {
 							//Overwrite table
 							if(Azrael.SQLOverwriteQuizData(e.getGuild().getIdLong()) == 1) {
-								e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_REGISTERED)).queue();
-								logger.info("User {} has registered quiz questions with the pastebin url {} in guild {}", e.getMember().getUser().getId(), link, e.getGuild().getId());
+								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_QUESTIONS_REGISTERED)).build()).queue();
+								logger.info("User {} has registered quiz questions by file in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 							}
 							else {
 								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
@@ -226,9 +230,8 @@ public class QuizExecution {
 					else {
 						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
 						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.QUIZ_NO_SETTINGS)).build()).queue();
-						logger.warn("Quiz information couldn't be retrieved from pastebin url {} in guild {}", link, e.getGuild().getId());
+						logger.warn("Quiz information couldn't be retrieved from file in guild {}", e.getGuild().getId());
 					}
-					FileHandler.deleteFile(Directory.TEMP, fileName);
 				}
 				else {
 					EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
@@ -239,6 +242,7 @@ public class QuizExecution {
 				EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
 				e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			}
+			Hashes.clearTempCache("quiz_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 		}
 	}
 	
@@ -266,7 +270,7 @@ public class QuizExecution {
 					errorFound = true;
 				}
 			}
-			else if(quiz.getQuestion().length() == 0) {
+			else if(quiz.getQuestion() == null || quiz.getQuestion().length() == 0) {
 				//check if answers and hints are inserted while there's no question
 				if(quiz.getAnswer1() != null || quiz.getAnswer2() != null || quiz.getAnswer3() != null) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_3).replace("{}", ""+index));
@@ -281,7 +285,8 @@ public class QuizExecution {
 			//check if rewards are available and if questions are available but no rewards,
 			//then write into error log.
 			if(quiz.getReward() != null) {
-				if(Hashes.getQuiz(e.getGuild().getIdLong(), (index-1)) != null && Hashes.getQuiz(e.getGuild().getIdLong(), (index-1)).getQuestion().length() > 0 && quiz.getQuestion().length() == 0) {
+				var compareQuiz = Hashes.getQuiz(e.getGuild().getIdLong(), (index-1));
+				if(compareQuiz != null && compareQuiz.getQuestion() != null && compareQuiz.getQuestion().length() > 0 && (quiz.getQuestion() == null || quiz.getQuestion().length() == 0)) {
 					sb.append(STATIC.getTranslation(e.getMember(), Translation.QUIZ_ERR_5).replace("{}", ""+index));
 					errorFound = true;
 				}
@@ -304,6 +309,7 @@ public class QuizExecution {
 			if(quiz != null && quiz.getQuestion().length() > 0) {
 				quiz.setReward(null);
 				quiz.setUsed(false);
+				Hashes.addQuiz(e.getGuild().getIdLong(), index, quiz);
 			}
 			else {
 				Hashes.removeQuiz(e.getGuild().getIdLong(), index);
@@ -324,6 +330,7 @@ public class QuizExecution {
 				quiz.setHint1(null);
 				quiz.setHint2(null);
 				quiz.setHint3(null);
+				Hashes.addQuiz(e.getGuild().getIdLong(), index, quiz);
 			}
 			else {
 				Hashes.removeQuiz(e.getGuild().getIdLong(), index);

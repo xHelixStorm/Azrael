@@ -172,7 +172,6 @@
 	"bot_now_operational":			"Der Bot ist jetzt einsatzbereit!",
 	"not_bot_channel": 			 	" Ich darf im diesem Kanal keine Befehle ausführen, bitte schreiben Sie es noch einmal in ",
 	"wrong_channel":				" Ich darf im diesem Kanal diesen Befehl nicht ausführen, bitten schreiben Sie es noch einmal in ",
-	"not_quiz_channel":				"Es wurde noch kein Quiz-Kanal registriert!",
 	"no_tra_channel":				"Ein Papierkorb-Kanal muss registriert werden, bevor diese Funktionalität genutzt werden kann!",
 	"no_roles":						"Keine Rollen verfügbar!",
 	"level_system_not_enabled":	 	"Das Stufensystem muss aktiviert werden, bevor dieser Befehl verwendet werden kann!",

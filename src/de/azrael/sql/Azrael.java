@@ -3830,6 +3830,7 @@ public class Azrael {
 	
 	public static boolean SQLgetQuizData(long guild_id) {
 		logger.trace("SQLgetQuizData launched. Params passed {}", guild_id);
+		Hashes.clearQuiz(guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -4716,6 +4717,7 @@ public class Azrael {
 					stmt.setNull(9, Types.VARCHAR);
 				
 				stmt.addBatch();
+				index++;
 			}
 			final var result = stmt.executeBatch();
 			if(result[0] != -1) {

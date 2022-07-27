@@ -23,6 +23,7 @@ import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
 import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
+import de.azrael.commandsContainer.QuizExecution;
 import de.azrael.commandsContainer.RegisterRole;
 import de.azrael.commandsContainer.RoomExecution;
 import de.azrael.commandsContainer.ScheduleExecution;
@@ -445,7 +446,18 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 					}
 					
-					//check if the quiz command has been used
+					//check if the quiz command has been used for the configuration
+					final var quizSetup = Hashes.getTempCache("quiz_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+user_id);
+					if(quizSetup != null && quizSetup.getExpiration() - System.currentTimeMillis() > 0) {
+						if(quizSetup.getAdditionalInfo().equals("r")) {
+							QuizExecution.registerRewards(e);
+						}
+						else if(quizSetup.getAdditionalInfo().equals("q")) {
+							QuizExecution.registerQuestions(e);
+						}
+					}
+					
+					//check if the quiz is running
 					final var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					if(quiz != null && quiz.getExpiration() - System.currentTimeMillis() > 0) {
 						String content = quiz.getAdditionalInfo();
@@ -458,8 +470,6 @@ public class GuildMessageListener extends ListenerAdapter {
 							long quiChannel = 0;
 							if(log_channel != null)
 								logChannel = log_channel.getChannel_ID();
-							else
-								logChannel = e.getChannel().getIdLong();
 							if(qui_channel != null)
 								quiChannel = qui_channel.getChannel_ID();
 							else
@@ -473,35 +483,32 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 					
 					//check if a quiz session is running
-					final var runquiz = Hashes.getTempCache("quiztime"+e.getGuild().getId());
-					if(runquiz != null) {
-						String content = runquiz.getAdditionalInfo();
+					final var runquiz = Hashes.getTempCache("quiztime_gu"+e.getGuild().getId());
+					if(runquiz != null && !e.getMember().getUser().isBot() && runquiz.getAdditionalInfo().equals(e.getChannel().getId())) {
+						String content = RunQuiz.quizState.get(e.getGuild().getIdLong());
 						//continue as long a question shouldn't be skipped or the quiz shouldn't be interrupted
-						if(!content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || !content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
-							//verify that there is a registered quiz channel
-							var qui_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.QUI.getType())).findAny().orElse(null);
-							if(qui_channel != null && qui_channel.getChannel_ID() == e.getChannel().getIdLong() && !e.getMember().getUser().isBot()) {
-								//check if an administrator or moderator wishes to skip a question or interrupt all questions
-								if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
-									if(UserPrivs.comparePrivilege(e.getMember(), Quiz.getCommandLevel(guild_id))) {
-										RunQuiz.quizState.put(e.getGuild().getIdLong(), message);
-										STATIC.killThread("quiz_gu"+e.getGuild().getId());
-										Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.QUIZ.getColumn(), message);
-									}
+						if(!content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) && !content.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+							//check if an administrator or moderator wishes to skip a question or interrupt all questions
+							if(message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_SKIP_QUESTION)) || message.equalsIgnoreCase(STATIC.getTranslation2(e.getGuild(), Translation.PARAM_INTERRUPT_QUESTIONS))) {
+								if(UserPrivs.comparePrivilege(e.getMember(), Quiz.getCommandLevel(guild_id))) {
+									RunQuiz.quizState.put(e.getGuild().getIdLong(), message);
+									STATIC.killThread("quiz_gu"+e.getGuild().getId());
+									Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.QUIZ.getColumn(), message);
 								}
-								if(!(content.length() == 7) || !(content.length() == 8)) {
-									final String answer1 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer1();
-									final String answer2 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer2();
-									final String answer3 = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content)).getAnswer3();
-									//check if the given answer is the same of one of three provided possible answers
-									if((answer1 != null && answer1.trim().equalsIgnoreCase(message)) ||
-									   (answer2 != null && answer2.trim().equalsIgnoreCase(message)) ||
-									   (answer3 != null && answer3.trim().equalsIgnoreCase(message))) {
-										//check if this user had won something before during the same quiz session
-										Integer hash = Hashes.getQuizWinners(e.getMember());
-										if(hash == null) {
-											RunQuiz.quizState.put(e.getGuild().getIdLong(), e.getMember().getUser().getId());
-										}
+							}
+							if(!content.matches("[\\d]{17,18}")) {
+								var question = Hashes.getQuiz(e.getGuild().getIdLong(), Integer.parseInt(content));
+								final String answer1 = question.getAnswer1();
+								final String answer2 = question.getAnswer2();
+								final String answer3 = question.getAnswer3();
+								//check if the given answer is the same of one of three provided possible answers
+								if((answer1 != null && answer1.trim().equalsIgnoreCase(message)) ||
+								   (answer2 != null && answer2.trim().equalsIgnoreCase(message)) ||
+								   (answer3 != null && answer3.trim().equalsIgnoreCase(message))) {
+									//check if this user had won something before during the same quiz session
+									Integer hash = Hashes.getQuizWinners(e.getMember());
+									if(hash == null) {
+										RunQuiz.quizState.put(e.getGuild().getIdLong(), e.getMember().getUser().getId());
 									}
 								}
 							}

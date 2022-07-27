@@ -172,7 +172,6 @@
     "bot_now_operational":			"Le robot est maintenant opérationnel !",
     "not_bot_channel":       		" Je ne suis pas autorisé à exécuter des commandes dans ce canal, s’il vous plaît écrivez-le à nouveau dans",
     "wrong_channel":                " Je ne suis pas autorisé à exécuter ce type de commande dans ce canal, veuillez l’écrire à nouveau dans  ",
-    "not_quiz_channel":             "Aucun canal de Quiz n’a encore été enregistré !",
     "no_tra_channel":               "Un canal poubelle doit être enregistré avant que cette fonctionnalité puisse être utilisée !",
     "no_roles":                     "Aucun rôle disponible !",
     "level_system_not_enabled":     "Le système de niveau doit être activé avant que cette commande puisse être utilisée ! ",

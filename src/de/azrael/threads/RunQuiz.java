@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.Cache;
 import de.azrael.constructors.Quizes;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
@@ -23,14 +24,14 @@ public class RunQuiz implements Runnable{
 	public final static ConcurrentMap<Long, String> quizState = new ConcurrentHashMap<Long, String>();
 	
 	private GuildMessageReceivedEvent e;
-	private long channel_id;
-	private long log_channel_id;
+	private long quizChannel;
+	private long logChannel;
 	private int mode;
 	
-	public RunQuiz(GuildMessageReceivedEvent _e, long _channel_id, long _log_channel_id, int _mode) {
+	public RunQuiz(GuildMessageReceivedEvent _e, long _quizChannel, long _logChannel, int _mode) {
 		this.e = _e;
-		this.channel_id = _channel_id;
-		this.log_channel_id = _log_channel_id;
+		this.quizChannel = _quizChannel;
+		this.logChannel = _logChannel;
 		this.mode = _mode;
 	}
 	
@@ -38,8 +39,8 @@ public class RunQuiz implements Runnable{
 	public void run() {
 		try {
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REWARD_SENT_TITLE));
-			final TextChannel quizChannel = e.getGuild().getTextChannelById(channel_id);
-			final TextChannel logChannel = e.getGuild().getTextChannelById(log_channel_id);
+			final TextChannel quizChannel = e.getGuild().getTextChannelById(this.quizChannel);
+			final TextChannel logChannel = this.logChannel > 0 ? e.getGuild().getTextChannelById(this.logChannel) : null;
 			int modality = mode;
 			quizState.put(e.getGuild().getIdLong(), ""+0);
 			//send the beginning messages after short delays
@@ -64,6 +65,7 @@ public class RunQuiz implements Runnable{
 					
 					//Start to print questions
 					quizChannel.sendMessage("**"+quiz.getQuestion()+"**").queue();
+					Hashes.addTempCache("quiztime_gu"+e.getGuild().getId(), new Cache(quizChannel.getId()));
 					//allow this timer to be interrupted when a question has to be skipped or when the quiz has to be interrupted
 					STATIC.addThread(Thread.currentThread(), "quiz_gu"+e.getGuild().getId());
 					try {
@@ -84,6 +86,7 @@ public class RunQuiz implements Runnable{
 					} finally {
 						STATIC.removeThread(Thread.currentThread());
 					}
+					Hashes.clearTempCache("quiztime_gu"+e.getGuild().getId());
 					
 					//check the created file if someone was able to answer the question
 					final Member member = e.getGuild().getMemberById(quizState.get(e.getGuild().getIdLong()));
@@ -96,13 +99,15 @@ public class RunQuiz implements Runnable{
 							pchannel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_DM)
 									+ "**"+quiz.getReward()+"**").queue(success -> {
 										Azrael.SQLUpdateUsedQuizReward(e.getGuild().getIdLong(), quiz.getReward());
-										logChannel.sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
+										if(logChannel != null)
+											logChannel.sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
 										pchannel.close().queue();
 									}, error -> {
 										//When the reward couldn't be sent, throw this error.
 										Azrael.SQLUpdateUsedQuizReward(e.getGuild().getIdLong(), quiz.getReward());
 										EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REWARD_SEND_ERR));
-										logChannel.sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION_2).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
+										if(logChannel != null)
+											logChannel.sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION_2).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
 										pchannel.close().queue();
 									});
 						});

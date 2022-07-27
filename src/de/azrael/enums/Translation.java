@@ -177,7 +177,6 @@ public enum Translation {
 	BOT_NOW_OPERATIONAL			("bot_now_operational"),
 	NOT_BOT_CHANNEL				("not_bot_channel"),
 	WRONG_CHANNEL				("wrong_channel"),
-	NOT_QUIZ_CHANNEL			("not_quiz_channel"),
 	NO_TRA_CHANNEL				("no_tra_channel"),
 	NO_ROLES					("no_roles"),
 	LEVEL_SYSTEM_NOT_ENABLED	("level_system_not_enabled"),

@@ -172,7 +172,6 @@
 	"bot_now_operational":			"Bot is now operational!",
 	"not_bot_channel": 			 	" I'm not allowed to execute commands in this channel, please write it again in ",
 	"wrong_channel":				" I'm not allowed to execute this command type in this channel, please write it again in ",
-	"not_quiz_channel":				"No Quiz channel has been registered yet!",
 	"no_tra_channel":				"A trash channel has to be registered, before this functionality can be used!",
 	"no_roles":						"No roles available!",
 	"level_system_not_enabled":	 	"The level system needs to be enabled before this command can be used!",

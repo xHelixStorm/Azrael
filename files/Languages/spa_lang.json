@@ -172,7 +172,6 @@
 	"bot_now_operational":			"¡El bot ya está operativo!",
 	"not_bot_channel": 			 	" No tengo permiso para ejecutar comandos en este canal, por favor vuelve a escribirlo de nuevo en ",
 	"wrong_channel":				" I'm not allowed to execute this command type in this channel, please write it again in ",
-	"not_quiz_channel":				"¡Aún no se ha registrado ningún canal de concursos!",
 	"no_tra_channel":				"¡Se debe registrar un canal de basura antes de poder utilizar esta funcionalidad!",
 	"no_roles":						"¡No hay roles disponibles!",
 	"level_system_not_enabled":	 	"¡El sistema de niveles debe estar habilitado antes de poder usar este comando!",
