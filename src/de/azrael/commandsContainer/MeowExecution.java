@@ -29,7 +29,7 @@ public class MeowExecution {
 		
 		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
 			if(variable.length == 0) {
-				e.getChannel().sendMessage(messageBuild.setDescription(MeowUsage.getMeowInfos(e)).build()).queue();
+				e.getChannel().sendMessage(messageBuild.setDescription(MeowUsage.getMeowInfos(e)+"\n\n[Pinterest](https://www.pinterest.de/caicaijade08/pusheen-pugly/)").build()).queue();
 			}
 			else {
 				Hashes.addTempCache("meowDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId(), new Cache(30000));
