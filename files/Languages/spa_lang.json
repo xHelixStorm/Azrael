@@ -238,7 +238,7 @@
 	"about_field_1": 			 	"VERSIÓN DEL BOT",
 	"about_field_2": 			 	"DESARROLLADORES",
 	"about_field_3":			 	"FUNCIONALIDADES",
-	"about_field_3_desc":		 	"- Gran cantidad de herramientas de moderación como la censura de chat.\n- Gestión de roles a través de reacciones.\n- Manejo de permisos administrativos basados en roles.\n- Sistema de niveles con páginas de perfil y aspectos de diseño propio.\n- Tienda para compras de aspectos de nivel, diarías y muchos más...\n\nTodos los comandos disponibles se pueden ver con _{}commands_.",
+	"about_field_3_desc":		 	"- Gran cantidad de herramientas de moderación como la censura de chat.\n- Gestión de roles a través de reacciones.\n- Manejo de permisos administrativos basados en roles.\n- Sistema de niveles con páginas de perfil y aspectos de diseño propio.\n- Tienda para compras de aspectos de nivel, diarías y muchos más...\n\nTodos los comandos disponibles se pueden ver con _{}help_.",
 	"about_field_4": 			 	"CÓDIGO FUENTE",
 	"about_field_4_desc":		 	"¡Consulta las últimas actualizaciones de Azrael en GitHub!",
 	

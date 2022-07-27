@@ -238,7 +238,7 @@
     "about_field_1":                "VERSÃO BOT",
     "about_field_2":                "DESENVOLVEDOR",
     "about_field_3":                "FUNCIONALIDADES",
-    "about_field_3_desc":           "- Grande número de ferramentas de moderação, como censura de bate-papo.\n- Gerenciamento de funções por meio de reações.\n- Tratamento de permissões administrativas com base em funções.\n- Sistema de níveis com skins e páginas de perfil auto-projetadas.\n- Compre skin de nível, Diários e muito mais ...\n\nTodos os comandos disponíveis podem ser vistos com _{} comandos_. ",
+    "about_field_3_desc":           "- Grande número de ferramentas de moderação, como censura de bate-papo.\n- Gerenciamento de funções por meio de reações.\n- Tratamento de permissões administrativas com base em funções.\n- Sistema de níveis com skins e páginas de perfil auto-projetadas.\n- Compre skin de nível, Diários e muito mais ...\n\nTodos os comandos disponíveis podem ser vistos com _{}help_. ",
     "about_field_4":                "CÓDIGO FONTE",
     "about_field_4_desc":           "Verifique as últimas atualizações do Azrael no GitHub!",
     

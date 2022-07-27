@@ -238,7 +238,7 @@
     "about_field_1":                "VERSION DU BOT",
     "about_field_2":                "DÉVELOPPEUR",
     "about_field_3":                "FONCTIONNALITÉS",
-    "about_field_3_desc":           "- Un grand nombre d’outils de modération tels que la censure des chats. \n - Gestion des rôles par le biais de réactions. \n - Gestion des autorisations administratives en fonction des rôles. \n - Système de niveaux avec pages de profil et apparences personnalisées. \n - Boutique pour l’achat d'apparences de niveau, les quotidiens et bien plus encore… \n\n - Toutes les commandes disponibles peuvent être visualisées avec _{}commands_. ",
+    "about_field_3_desc":           "- Un grand nombre d’outils de modération tels que la censure des chats. \n - Gestion des rôles par le biais de réactions. \n - Gestion des autorisations administratives en fonction des rôles. \n - Système de niveaux avec pages de profil et apparences personnalisées. \n - Boutique pour l’achat d'apparences de niveau, les quotidiens et bien plus encore… \n\n - Toutes les commandes disponibles peuvent être visualisées avec _{}help_. ",
     "about_field_4":                "CODE SOURCE",
     "about_field_4_desc":           "Consultez les dernières mises à jour d’Azrael sur GitHub!",
     

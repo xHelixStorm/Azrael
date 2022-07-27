@@ -238,7 +238,7 @@
 	"about_field_1": 			 	"BOT VERSION",
 	"about_field_2": 			 	"ENTWICKLER",
 	"about_field_3":			 	"FUNKTIONEN",
-	"about_field_3_desc":		 	"- Große Anzahl von Moderationswerkzeugen wie Chat-Zensierung.\n- Rollenmanagement durch Reaktionen.\n- Administrative Rechteverwaltung basierend auf Rollen.\n- Levelsystem mit selbst gestalteten Profilseiten und Skins.\n- Shop für den Kauf von Level-Skins, tägliche Belohnungen und vieles mehr...\n\n Alle verfügbaren Befehle können mit _{}commands_ eingesehen werden.",
+	"about_field_3_desc":		 	"- Große Anzahl von Moderationswerkzeugen wie Chat-Zensierung.\n- Rollenmanagement durch Reaktionen.\n- Administrative Rechteverwaltung basierend auf Rollen.\n- Levelsystem mit selbst gestalteten Profilseiten und Skins.\n- Shop für den Kauf von Level-Skins, tägliche Belohnungen und vieles mehr...\n\n Alle verfügbaren Befehle können mit _{}help_ eingesehen werden.",
 	"about_field_4": 			 	"Quellcode",
 	"about_field_4_desc":		 	"Sehen Sie sich die neuesten Aktualisierungen von Azrael auf GitHub an!",
 	

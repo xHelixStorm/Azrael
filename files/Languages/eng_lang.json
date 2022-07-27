@@ -238,7 +238,7 @@
 	"about_field_1": 			 	"BOT VERSION",
 	"about_field_2": 			 	"DEVELOPER",
 	"about_field_3":			 	"FUNCTIONALITIES",
-	"about_field_3_desc":		 	"- Great number of moderation tools such as chat censoring.\n- Role management through reactions.\n- Administrative permission handling based on roles.\n- Level system with self designed profile pages and skins.\n- Shop for level skin purchases, Dailies and much more...\n\nAll available commands can be seen with _{}commands_.",
+	"about_field_3_desc":		 	"- Great number of moderation tools such as chat censoring.\n- Role management through reactions.\n- Administrative permission handling based on roles.\n- Level system with self designed profile pages and skins.\n- Shop for level skin purchases, Dailies and much more...\n\nAll available commands can be seen with _{}help_.",
 	"about_field_4": 			 	"SOURCE CODE",
 	"about_field_4_desc":		 	"Check the latest updates of Azrael on GitHub!",
 	
