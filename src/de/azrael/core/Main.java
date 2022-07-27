@@ -87,7 +87,6 @@ import de.azrael.listeners.NicknameListener;
 import de.azrael.listeners.PrivateMessageListener;
 import de.azrael.listeners.PrivateMessageReactionAddListener;
 import de.azrael.listeners.ReadyListener;
-import de.azrael.listeners.ReconnectedListener;
 import de.azrael.listeners.ResumedListener;
 import de.azrael.listeners.RoleCreateListener;
 import de.azrael.listeners.RoleListener;
@@ -392,7 +391,6 @@ public class Main {
 			new GuildMessageReactionAddListener(),
 			new GuildMessageReactionRemoveListener(),
 			new StatusListener(),
-			new ReconnectedListener(),
 			new ResumedListener(),
 			new RoleCreateListener(),
 			new TextChannelListener(),

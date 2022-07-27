@@ -351,7 +351,8 @@ public class STATIC {
 		for(Timer timer : timers) {
 			timer.cancel();
 		}
-		ParseSubscription.deactivateTimer();
+		if(ParseSubscription.timerIsRunning())
+			ParseSubscription.deactivateTimer();
 		timers.clear();
 	}
 	

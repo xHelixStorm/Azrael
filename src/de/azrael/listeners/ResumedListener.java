@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class ResumedListener extends ListenerAdapter{
 	
 	@Override
-	public void onResume(ResumedEvent e) {
+	public void onResumed(ResumedEvent e) {
 		//clear all timers
 		STATIC.killAllTimers();
 		//restart all timers
