@@ -17,6 +17,7 @@ class RankingSystemStatements {
 	final static String SQLUpdateUsersDefaultIconSkin = STATIC.decrypt("uPW/TSgy8Kse1ag2ojCPp0r7eND7Nja3sjsw/z24enMJmcssh8nRDjifNuBiDv8lHEATwA/lhnGgvsxgn9CAxJl7fGOO/5yiceKw5nd/Zm7rlukM9ROEGWS1x+ijgWEZ");
 	final static String SQLInsertGuild = STATIC.decrypt("xT8feoGbkwVNwScURTdaHzA3pMP4Ro34++j5iMWdbra5/Pd8aSTyjlUpfpRRClo1pD10E3ZcLu/1RdDf5zowbKiH7d+UJizXap3Vx8/cuh9Y7wVEgf4TUGf+XmnekSKn/SxYB9F30eA07sUn/YvKXqRD0QTSTRrEfBYEvqtjNVJ5lHwnY4z9dpN2i8n+d7IK6HSf3Me+/eDcQtLWjHodvQ==");
 	final static String SQLUpdateMaxExperience = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLv6XLEzdjD+TpxlZuth3Lz2nbUTc4T+u0wcpn0PVrfjqljKOD8ArKuveDsdWYcVdoOuW6Qz1E4QZZLXH6KOBYRk=");
+	final static String SQLUpdateMaxLevel = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLlgRd+1piKp8B2Pqy2wXZ5eCFzwrQ32SDyBXjPwCQSJ5wHDFoIiSBrm66KlcGvJuTA==");
 	final static String SQLUpdateRankingSystem = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLqm0hEQSvd7f/EOExJBzsWk7c/UPywwa6pS0VABR+xz34cDOkM8c9C6Wf5SsHYjVZfYYX5VoKQgPDWZIdCKoCbo=");
 	final static String SQLUpdateLevelDefaultSkin = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLmJUaPQN5HotCt3GoEq3yXQO+/CS3L+gYVBWxt7KqNKNoNah2ZW+4G+Ot8PbFzBXTg==");
 	final static String SQLUpdateRankDefaultSkin = STATIC.decrypt("oqdLnmodbFLkeaPkZRuaLrm2q7rjK/ebVC58rQgHgAOXV2DOjiHm8YvAXTVtkIhiz6m4SN44ISTnZclsQPrKkg==");

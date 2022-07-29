@@ -26,7 +26,8 @@ public class SetRankingSystem {
 			ranking_state = true;
 			message = STATIC.getTranslation(e.getMember(), Translation.SET_RANKING_ENABLE);
 			Hashes.removeRankingLevels(e.getGuild().getIdLong());
-			if(RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).size() == 0) {
+			final var levels = RankingSystem.SQLgetLevels(e.getGuild().getIdLong());
+			if(levels.size() == 0) {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_RANK_ROLE_WARN)).build()).queue();
 				logger.error("Ranking levels couldn't be called and cached in guild {}", e.getGuild().getId());
 				return;
@@ -53,6 +54,10 @@ public class SetRankingSystem {
 					Hashes.initializeGuildRanking(e.getGuild().getIdLong());
 					Hashes.removeRankingRoles(e.getGuild().getIdLong());
 					RankingSystem.SQLgetRoles(e.getGuild().getIdLong());
+					final int maxLevel = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().mapToInt(v -> v.getLevel()).max().getAsInt();
+					if(RankingSystem.SQLUpdateMaxLevel(maxLevel, e.getGuild().getIdLong()) > 0);
+						guild.setMaxLevel(maxLevel);
+					Hashes.addStatus(e.getGuild().getIdLong(), guild);
 					new Thread(new CollectUsers(e, true)).start();
 				}
 				else {

@@ -134,7 +134,7 @@ public class RankingSystem {
 				if(icon_skin != 0)
 					stmt.setInt(6, icon_skin);
 				else
-					stmt.setInt(6, Types.INTEGER);
+					stmt.setNull(6, Types.INTEGER);
 				stmt.setLong(7, member.getGuild().getIdLong());
 				stmt.addBatch();
 			}
@@ -370,6 +370,25 @@ public class RankingSystem {
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLUpdateMaxExperience Exception", e);
+			return 0;
+		} finally {
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLUpdateMaxLevel(int level, long guild_id) {
+		logger.trace("SQLUpdateMaxLevel launched. Passed params {}, {}", level, guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(2);
+			stmt = myConn.prepareStatement(RankingSystemStatements.SQLUpdateMaxLevel);
+			stmt.setInt(1, level);
+			stmt.setLong(2, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLUpdateMaxLevel Exception", e);
 			return 0;
 		} finally {
 		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
