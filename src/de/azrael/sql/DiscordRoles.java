@@ -121,7 +121,7 @@ public class DiscordRoles {
 	
 	public static ArrayList<Roles> SQLgetRoles(long guild_id) {
 		final var cachedRoles = Hashes.getDiscordRole(guild_id);
-		if(cachedRoles == null) {
+		if(cachedRoles == null || cachedRoles.size() == 0) {
 			logger.trace("SQLgetRoles launched. Passed params {}", guild_id);
 			ArrayList<Roles> roles = new ArrayList<Roles>();
 			Connection myConn = null;
@@ -160,7 +160,7 @@ public class DiscordRoles {
 	
 	public static ArrayList<Roles> SQLgetReactionRoles(long guild_id) {
 		final var roles = Hashes.getReactionRoles(guild_id);
-		if(roles == null) {
+		if(roles == null || roles.size() == 0) {
 			logger.trace("SQLgetReactionRoles launched. Passed params {}", guild_id);
 			ArrayList<Roles> reactionRoles = new ArrayList<Roles>();
 			Connection myConn = null;

@@ -1506,7 +1506,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetChannel_Filter(long channel_id) {
 		final var censor = Hashes.getFilterLang(channel_id);
-		if(censor == null) {
+		if(censor == null || censor.size() == 0) {
 			logger.trace("SQLgetChannel_Filter launched. Passed params {}", channel_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1536,7 +1536,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetFilter(String filter_lang, long guild_id) {
 		final var query = Hashes.getQueryResult(filter_lang+"_"+guild_id);
-		if(query == null) {
+		if(query == null || query.size() == 0) {
 			logger.trace("SQLgetFilter launched. Passed params {}, {}", filter_lang, guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1663,7 +1663,7 @@ public class Azrael {
 	
 	public synchronized static ArrayList<String> SQLgetStaffNames(long guild_id) {
 		final var query = Hashes.getQueryResult("staff-names_"+guild_id);
-		if(query == null) {
+		if(query == null || query.size() == 0) {
 			logger.trace("SQLgetStaffNames launched. Passed params {}", guild_id);
 			ArrayList<String> staff_names = new ArrayList<String>();
 			Connection myConn = null;
@@ -1823,7 +1823,7 @@ public class Azrael {
 	
 	public static ArrayList<String> SQLgetFunnyNames(long guild_id) {
 		final var query = Hashes.getQueryResult("funny-names_"+guild_id);
-		if(query == null) {
+		if(query == null || query.size() == 0) {
 			ArrayList<String> names = new ArrayList<String>();
 			logger.trace("SQLgetFunnyNames launched. Passed params {}", guild_id);
 			Connection myConn = null;
@@ -1891,7 +1891,7 @@ public class Azrael {
 	
 	public static ArrayList<NameFilter> SQLgetNameFilter(long guild_id) {
 		final var namesFilter = Hashes.getNameFilter(guild_id); 
-		if(namesFilter == null) {
+		if(namesFilter == null || namesFilter.size() == 0) {
 			logger.trace("SQLgetNameFilter launched. Passed params {}", guild_id);
 			ArrayList<NameFilter> names = new ArrayList<NameFilter>();
 			Connection myConn = null;
@@ -2395,7 +2395,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetURLBlacklist(long guild_id) {
 		final var blacklist = Hashes.getURLBlacklist(guild_id); 
-		if(blacklist == null) {
+		if(blacklist == null || blacklist.size() == 0) {
 			logger.trace("SQLgetURLBlacklist launched. Passed params {}", guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -2462,7 +2462,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetURLWhitelist(long guild_id) {
 		final var whitelist = Hashes.getURLWhitelist(guild_id);
-		if(whitelist == null) {
+		if(whitelist == null || whitelist.size() == 0) {
 			logger.trace("SQLgetURLWhitelist launched. Passed params {}", guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -2529,7 +2529,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<String> SQLgetSubscriptionBlacklist(long guild_id) {
 		final var blacklist = Hashes.getTweetBlacklist(guild_id);
-		if(blacklist == null) {
+		if(blacklist == null || blacklist.size() == 0) {
 			logger.trace("SQLgetSubscriptionBlacklist launched. Passed params {}", guild_id);
 			ArrayList<String> urls = new ArrayList<String>();
 			Connection myConn = null;
@@ -3504,7 +3504,7 @@ public class Azrael {
 	
 	public static ArrayList<CategoryConf> SQLgetCategories(long guild_id) {
 		final var cachedCategories = Hashes.getCategories(guild_id);
-		if(cachedCategories == null) {
+		if(cachedCategories == null || cachedCategories.size() == 0) {
 			logger.trace("SQLgetCategories launched. Params passed {}", guild_id);
 			ArrayList<CategoryConf> categories = new ArrayList<CategoryConf>();
 			Connection myConn = null;

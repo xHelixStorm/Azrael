@@ -550,7 +550,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Roles> SQLgetRoles(long guild_id) {
 		final var cachedRoles = Hashes.getRankingRoles(guild_id);
-		if(cachedRoles == null) {
+		if(cachedRoles == null || cachedRoles.size() == 0) {
 			logger.trace("SQLgetRoles launched. Passed params {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -851,7 +851,7 @@ public class RankingSystem {
 	public static ArrayList<UserLevel> SQLgetRankingLevelList(long guild_id) {
 		ArrayList<UserLevel> levelList = new ArrayList<UserLevel>();
 		final var skins = Hashes.getLevelSkins(guild_id);
-		if(skins == null) {
+		if(skins == null || skins.size() == 0) {
 			logger.trace("SQLgetRankingLevelList launched. Params passed {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -915,7 +915,7 @@ public class RankingSystem {
 	public static ArrayList<UserRank> SQLgetRankingRankList(long guild_id) {
 		ArrayList<UserRank> skinList = new ArrayList<UserRank>();
 		final var skins = Hashes.getRankSkins(guild_id);
-		if(skins == null) {
+		if(skins == null || skins.size() == 0) {
 			logger.trace("SQLgetRankingRankList launched. Params passed {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -990,7 +990,7 @@ public class RankingSystem {
 	public static ArrayList<UserProfile> SQLgetRankingProfileList(long guild_id) {
 		ArrayList<UserProfile> skinList = new ArrayList<UserProfile>();
 		final var skins = Hashes.getProfileSkins(guild_id);
-		if(skins == null) {
+		if(skins == null || skins.size() == 0) {
 			logger.trace("SQLgetRankingProfileList launched. Params passed {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1074,7 +1074,7 @@ public class RankingSystem {
 	public static ArrayList<UserIcon> SQLgetRankingIconsList(long guild_id) {
 		ArrayList<UserIcon> skinList = new ArrayList<UserIcon>();
 		final var skins = Hashes.getIconSkins(guild_id);
-		if(skins == null) {
+		if(skins == null || skins.size() == 0) {
 			logger.trace("SQLgetRankingIconsList launched. Params passed {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1697,7 +1697,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Level> SQLgetLevels(long guild_id) {
 		final var levelList = Hashes.getRankingLevels(guild_id);
-		if(levelList == null) {
+		if(levelList == null || levelList.size() == 0) {
 			logger.trace("SQLgetLevels launched. Passed params {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1728,7 +1728,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long guild_id) {
 		final var shop = Hashes.getShopContent(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetSkinshopContentAndType launched. Params passed {}", guild_id);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -1766,7 +1766,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Skins> SQLgetSkinshopContentAndType(long guild_id, boolean enabled) {
 		final var shop = Hashes.getShopContent(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetSkinshopContentAndType launched. Params passed {}, {}", guild_id, enabled);
 			Connection myConn = null;
 			PreparedStatement stmt = null;
@@ -2157,7 +2157,7 @@ public class RankingSystem {
 	
 	public static ArrayList<Dailies> SQLgetDailiesAndType(long guild_id) {
 		final var dailyItems = Hashes.getDailyItems(guild_id);
-		if(dailyItems == null) {
+		if(dailyItems == null || dailyItems.size() == 0) {
 			logger.trace("SQLgetDailiesAndType launched. Params passed {}", guild_id);
 			ArrayList<Dailies> dailies = new ArrayList<Dailies>();
 			Connection myConn = null;

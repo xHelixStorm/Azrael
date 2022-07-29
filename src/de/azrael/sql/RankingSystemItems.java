@@ -233,7 +233,7 @@ public class RankingSystemItems {
 	//weapon_category
 	public static ArrayList<String> SQLgetWeaponCategories(long guild_id, boolean overrideSkill) {
 		final var weaponCategories = Hashes.getWeaponCategories(guild_id);
-		if(weaponCategories == null) {
+		if(weaponCategories == null || weaponCategories.size() == 0) {
 			logger.trace("SQLgetWeaponCategories launched. Params passed {}, {}", guild_id, overrideSkill);
 			ArrayList<String> categories = new ArrayList<String>();
 			Connection myConn = null;
@@ -264,7 +264,7 @@ public class RankingSystemItems {
 	//weapon_abbreviation
 	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long guild_id) {
 		final var weapons = Hashes.getWeaponAbbreviations(guild_id);
-		if(weapons == null) {
+		if(weapons == null || weapons.size() == 0) {
 			logger.trace("SQLgetWeaponAbbvs launched. Params passed {}", guild_id);
 			ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 			Connection myConn = null;
@@ -322,7 +322,7 @@ public class RankingSystemItems {
 	//JOINS
 	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long guild_id) {
 		final var shop = Hashes.getWeaponShopContent(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetWholeWeaponShop launched. Params passed {}", guild_id);
 			ArrayList<Weapons> weapons = new ArrayList<Weapons>();
 			Connection myConn = null;
@@ -457,7 +457,7 @@ public class RankingSystemItems {
 	
 	public static ArrayList<Skills> SQLgetSkills(long guild_id) {
 		final var shop = Hashes.getSkillShop(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetSkills launched. Params passed {}", guild_id);
 			ArrayList<Skills> skills = new ArrayList<Skills>();
 			Connection myConn = null;
