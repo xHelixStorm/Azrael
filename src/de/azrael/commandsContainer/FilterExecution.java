@@ -204,9 +204,10 @@ public class FilterExecution {
 					if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_DISPLAY));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
-							out.append(lang+"\n");
-						}
+						Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember())).forEach((k,v) -> {
+							if(!k.equals("all"))
+								out.append(v+"\n");
+						});
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("display-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -215,9 +216,10 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_INSERT))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_INSERT));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
-							out.append(lang+"\n");
-						}
+						Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember())).forEach((k,v) -> {
+							if(!k.equals("all"))
+								out.append(v+"\n");
+						});
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("insert-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -226,9 +228,10 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REMOVE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_REMOVE));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
-							out.append(lang+"\n");
-						}
+						Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember())).forEach((k,v) -> {
+							if(!k.equals("all"))
+								out.append(v+"\n");
+						});
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("remove-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -237,9 +240,10 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ADD_FILE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_ADD_FILE));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
-							out.append(lang+"\n");
-						}
+						Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember())).forEach((k,v) -> {
+							if(!k.equals("all"))
+								out.append(v+"\n");
+						});
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("add-load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);
@@ -248,9 +252,10 @@ public class FilterExecution {
 					else if(_message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_LOAD_FILE))) {
 						message.setTitle("WORD-FILTER "+STATIC.getTranslation(e.getMember(), Translation.FILTER_LOAD_FILE));
 						StringBuilder out = new StringBuilder();
-						for(String lang : Azrael.SQLgetFilterLanguages(STATIC.getLanguage(e.getMember()))) {
-							out.append(lang+"\n");
-						}
+						Azrael.SQLgetLanguages(STATIC.getLanguage(e.getMember())).forEach((k,v) -> {
+							if(!k.equals("all"))
+								out.append(v+"\n");
+						});
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_LANG_SELECTION)+"**"+(out.length() > 0 ? out.toString() : STATIC.getTranslation(e.getMember(), Translation.FILTER_NO_LANGS))+"**").build()).queue();
 						cache.updateDescription("load-word-filter").setExpiration(180000);
 						Hashes.addTempCache(key, cache);

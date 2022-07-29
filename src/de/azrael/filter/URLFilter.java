@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,13 +52,11 @@ public class URLFilter implements Runnable{
 
 	Message message;
 	Member member;
-	List<String> lang;
 	List<Channels> allChannels;
 	
-	public URLFilter(Message _message, Member _member, List<String> _lang, List<Channels> _allChannels) {
+	public URLFilter(Message _message, Member _member, List<Channels> _allChannels) {
 		this.message = _message;
 		this.member = _member;
-		this.lang = _lang;
 		this.allChannels = _allChannels;
 	}
 	
@@ -175,7 +174,8 @@ public class URLFilter implements Runnable{
 		
 		//check if Bot has the manage messages permission
 		if(member.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(member.getGuild(), message.getTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
-			Hashes.addTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getTextChannel().getId()+"us"+member.getUser().getId(), new Cache(180000));
+			Hashes.addTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getTextChannel().getId()+"us"+member.getUser().getId(), new Cache(TimeUnit.MINUTES.toMillis(3)));
+			Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 			//delete message which contains the url
 			message.delete().queue(success -> {
 				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
@@ -198,6 +198,7 @@ public class URLFilter implements Runnable{
 				//when the message already has been removed, usually by another bot
 				logger.info("Message containing the url {} has been already deleted in guild {}", foundURL, member.getGuild().getId());
 				Hashes.clearTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getTextChannel().getId()+"us"+member.getUser().getId());
+				Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 			});
 		}
 		else {

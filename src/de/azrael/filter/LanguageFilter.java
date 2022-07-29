@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -69,6 +70,7 @@ public class LanguageFilter implements Runnable {
 						message.delete().reason("Message removed due to bad manner!").queue(success -> {}, error -> {
 							logger.warn("Message {} already removed in guild {}", message.getId(), message.getGuild().getId());
 						});
+						Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 						STATIC.handleRemovedMessages(message.getMember(), message.getTextChannel(), output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 						if(tra_channel != null) {
@@ -165,6 +167,7 @@ public class LanguageFilter implements Runnable {
 	private static void deleteHeavyCensoringMessage(Message message, List<Channels> allChannels, String name, String channel, String getMessage) {
 		Hashes.addTempCache("message-removed-filter_gu"+message.getGuild().getId()+"ch"+message.getChannel().getId()+"us"+message.getMember().getUser().getId(), new Cache(10000));
 		message.delete().reason("Message removed due to heavy censoring!").queue();
+		Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 		StringBuilder out = new StringBuilder();
 		for(final Attachment attachment : message.getAttachments()) {
 			out.append(attachment.getProxyUrl()+"\n");

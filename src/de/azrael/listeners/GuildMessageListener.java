@@ -100,8 +100,54 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(STATIC.spamDetected(e, botConfig))
 						return;
 					
-					if(e.getMember().getUser().isBot())
-						return;
+					if(!e.getMember().getUser().isBot()) {
+						Thread threadLanguage = null;
+						Thread threadUrl = null;
+						//check if the language filter is enabled for this channel and retrieve all languages
+						var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
+						if(filter_lang != null && filter_lang.size() > 0) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+								threadLanguage = new Thread(new LanguageFilter(e.getMessage(), filter_lang, allChannels));
+								threadLanguage.start();
+								//if url censoring is enabled, also run the url censoring thread
+								if(currentChannel != null && currentChannel.getURLCensoring()) {
+									threadUrl = new Thread(new URLFilter(e.getMessage(), e.getMember(), allChannels));
+									threadUrl.start();
+								}
+							}
+							else {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+								logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+						}
+						//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
+						else if(currentChannel != null && currentChannel.getURLCensoring()) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+								threadUrl = new Thread(new URLFilter(e.getMessage(), e.getMember(), allChannels));
+								threadUrl.start();
+							}
+							else {
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+								logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+							}
+						}
+						
+						try {
+							if(threadLanguage != null)
+								threadLanguage.join();
+							if(threadUrl != null)
+								threadUrl.join();
+							
+							final var key = "messageDeleted_me"+e.getMessageId();
+							var messageDeleted = Hashes.getTempCache(key);
+							if(messageDeleted != null) {
+								Hashes.clearTempCache(key);
+								return;
+							}
+						} catch (InterruptedException e1) {
+							e1.printStackTrace();
+						}
+					}
 					
 					//execute commands
 					if(e.getMessage().getContentRaw().startsWith(botConfig.getCommandPrefix())) {
@@ -828,32 +874,6 @@ public class GuildMessageListener extends ListenerAdapter {
 					}
 				}).start();
 				
-				//check if the language filter is enabled for this channel and retrieve all languages
-				var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
-				if(filter_lang != null && filter_lang.size() > 0) {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
-						new Thread(new LanguageFilter(e.getMessage(), filter_lang, allChannels)).start();
-						//if url censoring is enabled, also run the url censoring thread
-						if(currentChannel != null && currentChannel.getURLCensoring())
-							new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
-					}
-					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
-					}
-				}
-				//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
-				else if(currentChannel != null && currentChannel.getURLCensoring()) {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
-						ArrayList<String> lang = new ArrayList<String>();
-						lang.add("eng");
-						new Thread(new URLFilter(e.getMessage(), e.getMember(), filter_lang, allChannels)).start();
-					}
-					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
-						logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
-					}
-				}
 				//check if the channel log and cache log is enabled and if one of the two or bot is/are enabled then write message to file or/and log to system cache
 				if((botConfig.getChannelLog() || botConfig.getCacheLog()) && !e.getMember().getUser().isBot()) {
 					StringBuilder image_url = new StringBuilder();
