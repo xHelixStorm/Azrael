@@ -5,8 +5,6 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -24,7 +22,6 @@ import de.azrael.commandsContainer.JoinExecution;
 import de.azrael.commandsContainer.PruneExecution;
 import de.azrael.commandsContainer.PurchaseExecution;
 import de.azrael.commandsContainer.QuizExecution;
-import de.azrael.commandsContainer.RegisterRole;
 import de.azrael.commandsContainer.RoomExecution;
 import de.azrael.commandsContainer.ScheduleExecution;
 import de.azrael.commandsContainer.SetWarning;
@@ -98,9 +95,8 @@ public class GuildMessageListener extends ListenerAdapter {
 				var currentChannel = allChannels.parallelStream().filter(f -> f.getChannel_ID() == channel_id).findAny().orElse(null);
 				BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
 				
-				//allow to run only one thread at the same time
-				ExecutorService executor = Executors.newSingleThreadExecutor();
-				executor.execute(() -> {
+				//create a second sub thread to handle commands and ranking system
+				new Thread(() -> {
 					if(STATIC.spamDetected(e, botConfig))
 						return;
 					
@@ -127,27 +123,21 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//if the warning parameter has been used under the set command, then forward the user for the next step
 					final var warning = Hashes.getTempCache("warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(warning != null) {
+					if(warning != null && !e.getMember().getUser().isBot()) {
 						SetWarning.performUpdate(e, message, warning, "warnings_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+						return;
 					}
 					
 					//if the filter command has been used, forward the user for the next step
 					final var filter = Hashes.getTempCache("filter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(filter != null) {
+					if(filter != null && !e.getMember().getUser().isBot()) {
 						FilterExecution.performAction(e, message, filter);
-					}
-					
-					//for some cases do additional actions after registering a role
-					final var roleRegistered = Hashes.getTempCache("register_role_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(roleRegistered != null && roleRegistered.getExpiration() - System.currentTimeMillis() > 0 && !e.getMember().getUser().isBot()) {
-						if(roleRegistered.getAdditionalInfo().equals("ver")) {
-							RegisterRole.assignVerifiedRoleToMembers(e, roleRegistered);
-						}
+						return;
 					}
 					
 					//if the shop command has been used, help the user to navigate through the shop easily
 					final var shop = Hashes.getTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(shop != null && shop.getExpiration() - System.currentTimeMillis() > 0) {
+					if(shop != null && !e.getMember().getUser().isBot() && shop.getExpiration() - System.currentTimeMillis() > 0) {
 						//verify if the user whishes to close the shop
 						if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE_EXIT)).build()).queue();
@@ -246,12 +236,14 @@ public class GuildMessageListener extends ListenerAdapter {
 								ShopExecution.displaySkills(e, guild_settings);
 							}
 						}
+						return;
 					}
 					
 					//check if the user command has been used and forward the user for the next steps
 					final var user = Hashes.getTempCache("user_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(user != null) {
+					if(user != null && !e.getMember().getUser().isBot()) {
 						UserExecution.performAction(e, message, user, allChannels, botConfig);
+						return;
 					}
 					
 					//check if the inventory command has been used and if yes, append reactions when there are multiple pages to jump into
@@ -334,6 +326,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							logger.error("MESSAGE_ADD_REACTION permission required to vote on text channel {} in guild {}", e.getChannel(), e.getGuild().getId());
 							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_ADD_REACTION.getName())+e.getChannel().getName(), Channel.LOG.getType());
 						}
+						return;
 					}
 					
 					//check if the randomshop command has been used
@@ -444,6 +437,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						else {
 							SubscriptionUtils.interrupt(e, message);
 						}
+						return;
 					}
 					
 					//check if the quiz command has been used for the configuration
@@ -455,13 +449,13 @@ public class GuildMessageListener extends ListenerAdapter {
 						else if(quizSetup.getAdditionalInfo().equals("q")) {
 							QuizExecution.registerQuestions(e);
 						}
+						return;
 					}
 					
 					//check if the quiz is running
-					final var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
-					if(quiz != null && quiz.getExpiration() - System.currentTimeMillis() > 0) {
-						String content = quiz.getAdditionalInfo();
-						if(e.getMember().getUser().getId().equals(content) && (message.equals("1") || message.equals("2") || message.equals("3"))) {
+					final var quiz = Hashes.getTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
+					if(quiz != null && !e.getMember().getUser().isBot() && quiz.getExpiration() - System.currentTimeMillis() > 0) {
+						if((message.equals("1") || message.equals("2") || message.equals("3"))) {
 							//run the quiz in a thread. // retrieve the log channel and quiz channel at the same time and pass them over to the new Thread
 							var channels = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.LOG.getType()) || f.getChannel_Type().equals(Channel.QUI.getType())).collect(Collectors.toList());
 							var log_channel = channels.parallelStream().filter(f -> f.getChannel_Type().equals(Channel.LOG.getType())).findAny().orElse(null);
@@ -480,6 +474,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							//remove the entry from cache after starting 
 							Hashes.clearTempCache("quizstarter_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 						}
+						return;
 					}
 					
 					//check if a quiz session is running
@@ -513,6 +508,7 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 							}
 						}
+						return;
 					}
 					
 					//check if the google command has been used
@@ -578,6 +574,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							Hashes.clearTempCache(key);
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
 						}
+						return;
 					}
 					
 					final var writeEdit = Hashes.getTempCache("write_edit_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
@@ -594,16 +591,18 @@ public class GuildMessageListener extends ListenerAdapter {
 						else if(writeEdit.getAdditionalInfo().equals("RA2")) {
 							WriteEditExecution.reactionBindRole(e, writeEdit, message);
 						}
+						return;
 					}
 					
 					final var userProfile = Hashes.getTempCache("userProfile_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(userProfile != null && !message.startsWith(botConfig.getCommandPrefix()) && userProfile.getExpiration() - System.currentTimeMillis() > 0) {
+					if(userProfile != null && !e.getMember().getUser().isBot() && !message.startsWith(botConfig.getCommandPrefix()) && userProfile.getExpiration() - System.currentTimeMillis() > 0) {
 						if(userProfile.getAdditionalInfo().equals("name")) {
 							JoinExecution.registerName(e, userProfile);
 						}
 						else if(userProfile.getAdditionalInfo().equals("server")) {
 							JoinExecution.registerServer(e, userProfile);
 						}
+						return;
 					}
 					
 					final var clan = Hashes.getTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
@@ -682,13 +681,14 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 							}
 						}
+						return;
 					}
 					else if(clan != null && clan.getExpiration() - System.currentTimeMillis() < 0) {
 						Hashes.clearTempCache("clan_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					}
 					
 					final var room = Hashes.getTempCache("room_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(room != null && room.getExpiration()-System.currentTimeMillis() > 0) {
+					if(room != null && !e.getMember().getUser().isBot() && room.getExpiration()-System.currentTimeMillis() > 0) {
 						String [] args = e.getMessage().getContentRaw().split(" ");
 						switch(room.getAdditionalInfo()) {
 							case "1" -> {
@@ -713,13 +713,14 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 							}
 						}
+						return;
 					}
 					else {
 						Hashes.clearTempCache("room_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 					}
 					
 					final var schedule = Hashes.getTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
-					if(schedule != null && schedule.getExpiration() - System.currentTimeMillis() > 0) {
+					if(schedule != null && !e.getMember().getUser().isBot() && schedule.getExpiration() - System.currentTimeMillis() > 0) {
 						if(!message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
 							if(schedule.getAdditionalInfo().length() == 0) {
 								if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DISPLAY))) {
@@ -758,10 +759,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 						}
+						return;
 					}
 					
 					final var prune = Hashes.getTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
-					if(prune != null && prune.getExpiration() - System.currentTimeMillis() > 0) {
+					if(prune != null && !e.getMember().getUser().isBot() && prune.getExpiration() - System.currentTimeMillis() > 0) {
 						if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 							//Execute prune
 							PruneExecution.runTask(e, prune);
@@ -773,58 +775,58 @@ public class GuildMessageListener extends ListenerAdapter {
 							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PRUNE.getColumn(), e.getMessage().getContentRaw());
 						}
+						return;
 					}
-				});
-				
-				//run a separate thread for the ranking system
-				executor.execute(() -> {
-					//check if the ranking system is enabled and that there's currently no message timeout
-					final var cache = Hashes.getTempCache("expGain_gu"+guild_id+"us"+user_id);
-					if(guild_settings != null && guild_settings.getRankingState() == true && (cache == null || (cache != null && cache.getExpiration() - System.currentTimeMillis() < 0) || botConfig.getExpRateLimit() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
-						//remember the user for a determined time, if there should be delays between gaining experience points
-						if(botConfig.getExpRateLimit() != 0)
-							Hashes.addTempCache("expGain_gu"+guild_id+"us"+user_id, new Cache(TimeUnit.MINUTES.toMillis(botConfig.getExpRateLimit())));
-						
-						//retrieve all details from the user
-						Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
-						if(user_details == null) {
-							//if no user details have been found, insert the user into the users table and into the user details table
-							if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
-								RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
+					
+					//execute ranking system only for non Bot users
+					if(!e.getMember().getUser().isBot()) {
+						//check if the ranking system is enabled and that there's currently no message timeout
+						final var cache = Hashes.getTempCache("expGain_gu"+guild_id+"us"+user_id);
+						if(guild_settings != null && guild_settings.getRankingState() == true && (cache == null || (cache != null && cache.getExpiration() - System.currentTimeMillis() < 0) || botConfig.getExpRateLimit() == 0) && !UserPrivs.isUserMuted(e.getMember())) {
+							//remember the user for a determined time, if there should be delays between gaining experience points
+							if(botConfig.getExpRateLimit() != 0)
+								Hashes.addTempCache("expGain_gu"+guild_id+"us"+user_id, new Cache(TimeUnit.MINUTES.toMillis(botConfig.getExpRateLimit())));
+							
+							//retrieve all details from the user
+							Ranking user_details = RankingSystem.SQLgetWholeRankView(user_id, guild_id);
+							if(user_details == null) {
+								//if no user details have been found, insert the user into the users table and into the user details table
+								if(RankingSystem.SQLInsertUser(user_id, guild_id, e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator(), guild_settings.getLevelID(), guild_settings.getRankID(), guild_settings.getProfileID(), guild_settings.getIconID()) > 0) {
+									RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
+								}
+								else {
+									RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
+								}
 							}
 							else {
-								RankingSystem.SQLInsertUserDetails(user_id, guild_id, 0, 0, guild_settings.getStartCurrency(), 0);
-							}
-						}
-						else {
-							//exclude bot and quiz channels for experience gain
-							if(!e.getMember().getUser().isBot() && (currentChannel == null || currentChannel.getChannel_Type() == null || (currentChannel.getChannel_Type() != null && !currentChannel.getChannel_Type().equals(Channel.BOT.getType()) && !currentChannel.getChannel_Type().equals(Channel.QUI.getType())))) {
-								int roleAssignLevel = 0;
-								long role_id = 0;
-								//check if there's a ranking role to unlock when the user reaches the next level
-								final var ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel() == (user_details.getLevel()+1)).findAny().orElse(null);
-								if(ranking_levels != null) {
-									roleAssignLevel = ranking_levels.getLevel();
-									role_id = ranking_levels.getRole_ID();
+								//exclude bot and quiz channels for experience gain
+								if(!e.getMember().getUser().isBot() && (currentChannel == null || currentChannel.getChannel_Type() == null || (currentChannel.getChannel_Type() != null && !currentChannel.getChannel_Type().equals(Channel.BOT.getType()) && !currentChannel.getChannel_Type().equals(Channel.QUI.getType())))) {
+									int roleAssignLevel = 0;
+									long role_id = 0;
+									//check if there's a ranking role to unlock when the user reaches the next level
+									final var ranking_levels = RankingSystem.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getLevel() == (user_details.getLevel()+1)).findAny().orElse(null);
+									if(ranking_levels != null) {
+										roleAssignLevel = ranking_levels.getLevel();
+										role_id = ranking_levels.getRole_ID();
+									}
+									
+									//check if the user has an item to boost the experience points
+									long percentMultiplier = 0;
+									final var itemEffects = RankingSystem.SQLgetItemEffects(guild_id);
+									for(final var booster : RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id)) {
+										if(!itemEffects.isEmpty() && itemEffects.containsKey(booster))
+											percentMultiplier += itemEffects.get(booster);
+										else
+											logger.error("Booster setup of {} is incomplete in guild {}", booster, guild_id);
+									}
+									
+									//run method to gain experience points or level up
+									RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percentMultiplier, user_details, guild_settings, botConfig);
 								}
-								
-								//check if the user has an item to boost the experience points
-								long percentMultiplier = 0;
-								final var itemEffects = RankingSystem.SQLgetItemEffects(guild_id);
-								for(final var booster : RankingSystem.SQLExpBoosterExistsInInventory(user_id, guild_id)) {
-									if(!itemEffects.isEmpty() && itemEffects.containsKey(booster))
-										percentMultiplier += itemEffects.get(booster);
-									else
-										logger.error("Booster setup of {} is incomplete in guild {}", booster, guild_id);
-								}
-								
-								//run method to gain experience points or level up
-								RankingThreadExecution.setProgress(e, user_id, guild_id, message, roleAssignLevel, role_id, percentMultiplier, user_details, guild_settings, botConfig);
 							}
 						}
 					}
-				});
-				executor.shutdown();
+				}).start();
 				
 				//check if the language filter is enabled for this channel and retrieve all languages
 				var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);

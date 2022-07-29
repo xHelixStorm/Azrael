@@ -2,6 +2,7 @@ package de.azrael.commandsContainer;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -9,7 +10,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.constructors.Cache;
 import de.azrael.constructors.Roles;
 import de.azrael.constructors.Thumbnails;
 import de.azrael.core.Hashes;
@@ -129,7 +129,7 @@ public class RegisterRole {
 								}
 								else if(category_abv.equals("ver")) {
 									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_NOTICE)).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_YES), "", true).addField(STATIC.getTranslation(e.getMember(), Translation.USER_REASON_NO), "", true).build()).queue();
-									Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "ver"));
+									new Thread(() -> { assignVerifiedRoleToMembers(e); }).start();
 								}
 								else if(category_abv.equals("key")) {
 									if(!Azrael.SQLisGiveawayAvailable(e.getGuild().getIdLong())) {
@@ -168,7 +168,7 @@ public class RegisterRole {
 		return false;
 	}
 	
-	public static void assignVerifiedRoleToMembers(GuildMessageReceivedEvent e, Cache cache) {
+	public static void assignVerifiedRoleToMembers(GuildMessageReceivedEvent e) {
 		if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YES))) {
 			if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 				final var ver_role = DiscordRoles.SQLgetRoles(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("ver")).findAny().orElse(null);
@@ -178,33 +178,32 @@ public class RegisterRole {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ASSIGN_START)).build()).queue();
 						List<Member> members = e.getGuild().loadMembers().get().parallelStream().filter(m -> !m.getRoles().contains(role)).collect(Collectors.toList());
 						members.parallelStream().forEach(m -> {
-							e.getGuild().addRoleToMember(m, role).queue();
+							try {
+								e.getGuild().addRoleToMember(m, role).submit().get();
+							} catch (InterruptedException | ExecutionException e1) {
+								logger.error("User {} couldn't receive the verified role in guild {}", m.getUser().getId(), e.getGuild().getId());
+							}
 						});
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_DONE)).build()).queue();
-						Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 					else {
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Role {} doesn't exist anymore in guild {}", ver_role.getRole_ID(), e.getGuild().getId());
-						Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 					}
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Registered verified role couldn't be retrieved in guild {}", e.getGuild().getId());
-					Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 				}
 			}
 			else {
 				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_ERR).replace("{}", Permission.MANAGE_ROLES.getName())).build()).queue();
 				logger.error("MANAGE_ROLES permission required to assign roles in guild {}", e.getGuild().getId());
-				Hashes.addTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), cache.setExpiration(180000));
 			}
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REGISTER_ROLE.getColumn(), e.getMessage().getContentRaw());
 		}
 		else if(e.getMessage().getContentRaw().equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_ROLE_DONE)).build()).queue();
-			Hashes.clearTempCache("register_role_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.REGISTER_ROLE.getColumn(), e.getMessage().getContentRaw());
 		}
 	}
