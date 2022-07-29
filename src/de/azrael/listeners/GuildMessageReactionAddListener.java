@@ -622,18 +622,6 @@ public class GuildMessageReactionAddListener extends ListenerAdapter {
 		//Derived from H!display voice-channels
 		else if(item instanceof VoiceChannel)
 			return "**"+((VoiceChannel)item).getName()+"** ("+((VoiceChannel)item).getId()+")\n";
-		//Derived from H!display registered-channels
-		else if(item instanceof Channels) {
-			Channels channel = (Channels)item;
-			if(itemObjectValidation(item, prevItem))
-				return (prevItem != null ? "\n\n" : "")+"**"+channel.getChannel_Name()+"** ("+channel.getChannel_ID()+")\n"
-						+ STATIC.getTranslation(member, Translation.DISPLAY_CHANNEL_TYPE)+(channel.getChannel_Type_Name() != null ? channel.getChannel_Type_Name() : STATIC.getTranslation(member, Translation.NOT_AVAILABLE))+"\n"
-						+ STATIC.getTranslation(member, Translation.DISPLAY_URL_CENSORING)+(channel.getURLCensoring() ? STATIC.getTranslation(member, Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(member, Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
-						+ STATIC.getTranslation(member, Translation.DISPLAY_TEXT_CENSORING)+(channel.getTxtRemoval() ? STATIC.getTranslation(member, Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(member, Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
-						+ STATIC.getTranslation(member, Translation.DISPLAY_LANG_CENSORING)+(channel.getLang_Filter() != null ? channel.getLang_Filter() : STATIC.getTranslation(member, Translation.NOT_AVAILABLE));
-			else
-				return ", "+channel.getLang_Filter();
-		}
 		//Derived from H!display dailies
 		else if(item instanceof Dailies)
 			return "**"+((Dailies)item).getDescription()+"**\n"+STATIC.getTranslation(member, Translation.DISPLAY_PROBABILITY)+((Dailies)item).getWeight()+"%\n\n";

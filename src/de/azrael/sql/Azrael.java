@@ -1394,7 +1394,7 @@ public class Azrael {
 	
 	public static synchronized ArrayList<Channels> SQLgetChannels(long guild_id) {
 		final var cachedChannels = Hashes.getChannels(guild_id);
-		if(cachedChannels == null) {
+		if(cachedChannels == null || cachedChannels.size() == 0) {
 			logger.trace("SQLgetChannels launched. Passed params {}", guild_id);
 			ArrayList<Channels> channels = new ArrayList<Channels>();
 			Connection myConn = null;
@@ -1423,7 +1423,7 @@ public class Azrael {
 				return channels;
 			} catch (SQLException e) {
 				logger.error("SQLgetChannels Exception", e);
-				return null;
+				return channels;
 			} finally {
 				try { rs.close(); } catch (Exception e) { /* ignored */ }
 			    try { stmt.close(); } catch (Exception e) { /* ignored */ }

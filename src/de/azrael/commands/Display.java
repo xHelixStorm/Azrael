@@ -3,6 +3,7 @@ package de.azrael.commands;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ public class Display implements CommandPublic{
 	private final static Logger logger = LoggerFactory.getLogger(Display.class);
 	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
 	private static EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
+	private static final int BREAKER = 3;
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
@@ -50,7 +52,6 @@ public class Display implements CommandPublic{
 	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
 		long guild_id = e.getGuild().getIdLong();
 		StringBuilder out = new StringBuilder();
-		StringBuilder sb = new StringBuilder();
 		
 		//if no arguments have been added to the command, print a list of all available parameters
 		if(args.length == 0) {
@@ -138,6 +139,7 @@ public class Display implements CommandPublic{
 				}
 			}
 			
+			StringBuilder sb = new StringBuilder();
 			sb.append((displayRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRolesLevel)) 								? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_1).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLES)) : "")
 					+ (displayRegisteredRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRegisteredRolesLevel)) 			? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_2).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTERED_ROLES)) : "")
 					+ (displayRankingRoles && (UserPrivs.comparePrivilege(e.getMember(), displayRankingRolesLevel)) 				? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP_3).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING_ROLES)) : "")
@@ -164,15 +166,15 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), rolesLevel)) {
 				//retrieve roles from the server
 				final var roles = e.getGuild().getRoles();
-				int count = 1;
+				int count = 0;
 				for(Role r : roles) {
-					if(count == 10) break;
+					if(count == BREAKER) break;
 					out.append("**"+r.getName() + "** (" + r.getId() + ") \n");
 					count++;
 				}
-				final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
+				final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
 				e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-					STATIC.addPaginationReactions(e, m, maxPage, "1", "10", roles);
+					STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, roles);
 				});
 			}
 			else {
@@ -185,21 +187,20 @@ public class Display implements CommandPublic{
 			final var registeredRolesLevel = STATIC.getCommandLevel(e.getGuild(), Command.DISPLAY_REGISTERED_ROLES);
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredRolesLevel)) {
 				//retrieve roles from table
-				final var roles = DiscordRoles.SQLgetRoles(guild_id);
-				int count = 1;
+				final var roles = DiscordRoles.SQLgetRoles(guild_id).stream().filter(f -> !f.getCategory_ABV().equals("def")).collect(Collectors.toList());
+				int count = 0;
 				for(Roles r : roles) {
-					if(count == 10) break;
-					if(!r.getCategory_ABV().equals("def"))
-						out.append("**"+r.getRole_Name() + "** (" + r.getRole_ID() + ") \n"
+					if(count == BREAKER) break;
+					out.append("**"+r.getRole_Name() + "** (" + r.getRole_ID() + ") \n"
 							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_ROLE_TYPE)+r.getCategory_Name()+"\n"
 							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_PERMISSION_LEVEL)+r.getLevel()+"\n"
 							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_PERSISTANT)+(r.isPersistent() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_PERSISTANT) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_PERSISTANT))+"\n\n");
-					count++;
+						count++;
 				}
 				if(out.length() > 0) {
-					final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", roles);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, roles);
 					});
 				}
 				else {
@@ -219,16 +220,16 @@ public class Display implements CommandPublic{
 				if(RankingSystem.SQLgetGuild(guild_id).getRankingState()) {
 					//retrieve all ranking roles from table
 					final var roles = RankingSystem.SQLgetRoles(guild_id);
-					int count = 1;
+					int count = 0;
 					for(final var r : roles) {
-						if(count == 10) break;
+						if(count == BREAKER) break;
 						out.append("**"+r.getRole_Name() + "** (" + r.getRole_ID() + ") \n"+STATIC.getTranslation(e.getMember(), Translation.DISPLAY_UNLOCK_LEVEL) + r.getLevel() + "\n");
 						count++;
 					}
 					if(out.length() > 0) {
-						final int maxPage = (roles.size()/10)+(roles.size()%10 > 0 ? 1 : 0);
+						final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
 						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-							STATIC.addPaginationReactions(e, m, maxPage, "2", "10", roles);
+							STATIC.addPaginationReactions(e, m, maxPage, "2", ""+BREAKER, roles);
 						});
 					}
 					else {
@@ -250,16 +251,16 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), categoriesLevel)) {
 				//retrieve all categories from the server
 				final var categories = e.getGuild().getCategories();
-				int count = 1;
+				int count = 0;
 				for(Category ct : categories) {
-					if(count == 10) break;
+					if(count == BREAKER) break;
 					out.append("**"+ct.getName()+ "** (" + ct.getId() + ") \n");
 					count++;
 				}
 				if(out.length() > 0) {
-					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (categories.size()/BREAKER)+(categories.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, categories);
 					});
 				}
 				else {
@@ -277,11 +278,11 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredCategoriesLevel)) {
 				//retrieve all registered text channels from table
 				final var categories =  Azrael.SQLgetCategories(guild_id);
-				int count = 1;
+				int count = 0;
 				for(final CategoryConf ct : categories) {
 					Category category = e.getGuild().getCategoryById(ct.getCategoryID());
 					if(category != null) {
-						if(count <= 10)
+						if(count < BREAKER)
 							out.append("**"+category.getName()+"** ("+category.getId()+")\n"+STATIC.getTranslation(e.getMember(), Translation.DISPLAY_CATEGORY_TYPE)+ct.getType()+"\n\n");
 					}
 					else {
@@ -292,9 +293,9 @@ public class Display implements CommandPublic{
 					
 				}
 				if(out.length() > 0) {
-					final int maxPage = (categories.size()/10)+(categories.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (categories.size()/BREAKER)+(categories.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", categories);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, categories);
 					});
 				}
 				else {
@@ -312,16 +313,16 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), textChannelsLevel)) {
 				//retrieve all text channels from the server
 				final var textChannels = e.getGuild().getTextChannels();
-				int count = 1;
+				int count = 0;
 				for(TextChannel tc : textChannels) {
-					if(count == 10) break;
+					if(count == BREAKER) break;
 					out.append("**"+tc.getName() + "** (" + tc.getId() + ") \n");
 					count++;
 				}
 				if(out.length() > 0) {
-					final int maxPage = (textChannels.size()/10)+(textChannels.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (textChannels.size()/BREAKER)+(textChannels.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", textChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, textChannels);
 					});
 				}
 				else {
@@ -339,16 +340,16 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), voiceChannelsLevel)) {
 				//retrieve all voice channels from the server
 				final var voiceChannels = e.getGuild().getVoiceChannels();
-				int count = 1;
+				int count = 0;
 				for(VoiceChannel vc : voiceChannels) {
-					if(count == 10) break;
+					if(count == BREAKER) break;
 					out.append("**"+vc.getName() + "** (" + vc.getId() + ") \n");
 					count++;
 				}
 				if(out.length() > 0) {
-					final int maxPage = (voiceChannels.size()/10)+(voiceChannels.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (voiceChannels.size()/BREAKER)+(voiceChannels.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", voiceChannels);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, voiceChannels);
 					});
 				}
 				else {
@@ -366,31 +367,43 @@ public class Display implements CommandPublic{
 			if(UserPrivs.comparePrivilege(e.getMember(), registeredChannelsLevel)) {
 				long prevChannelID = 0;
 				//retrieve all registered text channels from table
-				final var channels = Azrael.SQLgetChannels(guild_id);
-				int count = 1;
+				final var channels = Azrael.SQLgetChannels(guild_id).stream().filter(f -> f.getLang_Filter() == null || (f.getLang_Filter() != null && !f.getLang_Filter().equals("all"))).collect(Collectors.toList());
+				final ArrayList<String> totChannels = new ArrayList<String>();
+				StringBuilder sb = new StringBuilder();
+				int count = 0;
 				for(Channels ch : channels) {
-					if(count == 10) break;
-					if(ch.getLang_Filter().equals("all"))
-						continue;
 					if(prevChannelID != ch.getChannel_ID()) {
+						if(prevChannelID != 0) {
+							totChannels.add(sb.toString());
+							sb.setLength(0);
+						}
 						prevChannelID = ch.getChannel_ID();
-						if(out.length() > 0)
+						if(out.length() > 0) {
 							out.append("\n\n");
-						out.append("**"+ch.getChannel_Name() + "** (" + ch.getChannel_ID() + ") \n"
-							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_CHANNEL_TYPE)+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"\n"
-							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_URL_CENSORING)+(ch.getURLCensoring() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
-							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_TEXT_CENSORING)+(ch.getTxtRemoval() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
-							+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_LANG_CENSORING)+(ch.getLang_Filter() != null ? ch.getLang_Filter() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE)));
-						count++;
+							sb.append("\n");
+							count++;
+						}
+						final String curChannel = "**"+ch.getChannel_Name() + "** (" + ch.getChannel_ID() + ") \n"
+								+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_CHANNEL_TYPE)+(ch.getChannel_Type_Name() != null ? ch.getChannel_Type_Name() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE))+"\n"
+								+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_URL_CENSORING)+(ch.getURLCensoring() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
+								+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_TEXT_CENSORING)+(ch.getTxtRemoval() ? STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_ENABLED) : STATIC.getTranslation(e.getMember(), Translation.DISPLAY_IS_NOT_ENABLED))+"\n"
+								+ STATIC.getTranslation(e.getMember(), Translation.DISPLAY_LANG_CENSORING)+(ch.getLang_Filter() != null ? ch.getLang_Filter() : STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE));
+						if(count < BREAKER)
+							out.append(curChannel);
+						sb.append(curChannel);
 					}
 					else {
-						out.append(", "+ch.getLang_Filter());
+						if(count <= BREAKER)
+							out.append(", "+ch.getLang_Filter());
+						sb.append(", "+ch.getLang_Filter());
 					}
 				}
+				totChannels.add(sb.toString());
+				
 				if(out.length() > 0) {
-					final int maxPage = (channels.size()/10)+(channels.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (totChannels.size()/BREAKER)+(totChannels.size()%BREAKER > 0 ? 1 : 0);
 					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", channels);
+						STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, totChannels);
 					});
 				}
 				else {
@@ -409,16 +422,16 @@ public class Display implements CommandPublic{
 				//retrieve all daily rewards from table
 				final var dailies = RankingSystem.SQLgetDailiesAndType(guild_id);
 				if(dailies != null) {
-					int count = 1;
+					int count = 0;
 					for(Dailies daily : dailies) {
-						if(count == 10) break;
+						if(count == BREAKER) break;
 						out.append("**"+daily.getDescription()+"**\n"+STATIC.getTranslation(e.getMember(), Translation.DISPLAY_PROBABILITY)+daily.getWeight()+"%\n\n");
 						count++;
 					}
 					if(out.length() > 0) {
-						final int maxPage = (dailies.size()/10)+(dailies.size()%10 > 0 ? 1 : 0);
+						final int maxPage = (dailies.size()/BREAKER)+(dailies.size()%BREAKER > 0 ? 1 : 0);
 						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
-							STATIC.addPaginationReactions(e, m, maxPage, "1", "10", dailies);
+							STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, dailies);
 						});
 					}
 					else {
@@ -446,18 +459,18 @@ public class Display implements CommandPublic{
 				else {
 					watchedUsers = Azrael.SQLgetWholeWatchlist(e.getGuild().getIdLong(), true);
 				}
-				int count = 1;
+				int count = 0;
 				//list the watched users
 				for(final var watchedUser : watchedUsers) {
-					if(count == 10) break;
+					if(count == BREAKER) break;
 					out.append("**"+watchedUser+"**\n");
 					count++;
 				}
 				if(out.length() > 0) {
-					final int maxPage = (watchedUsers.size()/10)+(watchedUsers.size()%10 > 0 ? 1 : 0);
+					final int maxPage = (watchedUsers.size()/BREAKER)+(watchedUsers.size()%BREAKER > 0 ? 1 : 0);
 					final var users = watchedUsers;
 					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
-						STATIC.addPaginationReactions(e, m, maxPage, "1", "10", users);
+						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, users);
 					});
 				}
 				else {
