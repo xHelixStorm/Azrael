@@ -1983,31 +1983,6 @@ public class Azrael {
 		}
 	}
 	
-	public static ArrayList<String> SQLgetFilterLanguages(String lang) {
-		logger.trace("SQLgetFilterLanguages launched. Params passed {}", lang);
-		ArrayList<String> filter_lang = new ArrayList<String>();
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
-			stmt.setString(1, lang);
-			rs = stmt.executeQuery();
-			while(rs.next()) {
-				filter_lang.add(rs.getString(1));
-			}
-			return filter_lang;
-		} catch (SQLException e) {
-			logger.error("SQLgetFilterLanguages Exception", e);
-			return filter_lang;
-		} finally {
-			try { rs.close(); } catch (Exception e) { /* ignored */ }
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
 	public static ArrayList<String> SQLgetFilterLanguages() {
 		logger.trace("SQLgetFilterLanguages launched. No params passed");
 		ArrayList<String> filter_lang = new ArrayList<String>();
@@ -2016,7 +1991,7 @@ public class Azrael {
 		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages2);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLgetFilterLanguages);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				filter_lang.add(rs.getString(1));
