@@ -37,10 +37,10 @@ public class ShutdownListener extends ListenerAdapter {
 		final String fileName = sessionName+"running.azr";
 		final String pid = ""+ProcessHandle.current().pid();
 		
-		//retrieve the file with the bot state (e.g. running / not running)
+		//retrieve the file with the bot pid value
 		String fileContent = FileHandler.readFile(Directory.TEMP, fileName);
 		
-		//execute if the bot is labeled as running
+		//execute if the retrieved pid is the same as of current pid
 		if(!fileContent.isBlank() && fileContent.contains(""+pid)) {
 			FileHandler.deleteFile(Directory.TEMP, fileName);
 			try {
