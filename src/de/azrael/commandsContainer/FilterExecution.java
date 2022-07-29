@@ -804,6 +804,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								var queryResult = Azrael.SQLReplaceNameFilter(words, false, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(queryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
@@ -850,7 +851,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_FILTER.getColumn(), fileName);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-name-kick" -> {
@@ -900,6 +900,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								var queryResult = Azrael.SQLReplaceNameFilter(words, true, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(queryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
@@ -947,7 +948,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_NAME_KICK.getColumn(), fileName);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-funny-names" -> {
@@ -997,6 +997,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								var queryResult = Azrael.SQLReplaceFunnyNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(queryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
@@ -1043,7 +1044,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_FUNNY_NAMES.getColumn(), fileName);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-staff-names" -> {
@@ -1094,6 +1094,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								var queryResult = Azrael.SQLReplaceStaffNames(words, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 								if(queryResult == 0) {
 									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
@@ -1140,7 +1141,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_STAFF_NAMES.getColumn(), fileName);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-prohibited-urls" -> {
@@ -1198,6 +1198,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								List<String> checkedURLs = new ArrayList<String>();
 								for(var link : url) {
 									if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1260,7 +1261,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_URLS.getColumn(), _message);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-allowed-urls" -> {
@@ -1318,6 +1318,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] url = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								List<String> checkedURLs = new ArrayList<String>();
 								for(var link : url) {
 									if(link.matches("^(http:\\/\\/|https:\\/\\/)[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}$")) {
@@ -1380,7 +1381,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_ALLOWED_URLS.getColumn(), _message);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 				case "insert-prohibited-subs" -> {
@@ -1430,6 +1430,7 @@ public class FilterExecution {
 							}
 							if(file != null && file.exists()) {
 								String [] usernames = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+								FileHandler.deleteFile(Directory.TEMP, fileName);
 								if(usernames.length > 0) {
 									var queryResult = Azrael.SQLReplaceProhibitedSubscriptions(usernames, e.getGuild().getIdLong(), (cache.getAdditionalInfo().split("-")[0].equals("add") ? false : true));
 									if(queryResult == 0) {
@@ -1482,7 +1483,6 @@ public class FilterExecution {
 						}
 						Hashes.clearTempCache(key);
 						Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_PROHIBITED_SUBS.getColumn(), _message);
-						FileHandler.deleteFile(Directory.TEMP, fileName);
 					}
 				}
 			}
@@ -1599,6 +1599,7 @@ public class FilterExecution {
 				}
 				if(file != null && file.exists()) {
 					String [] words = FileHandler.readFile(Directory.TEMP, fileName).split("[\\r\\n]+");
+					FileHandler.deleteFile(Directory.TEMP, fileName);
 					var queryResult = Azrael.SQLReplaceWordFilter(langAbbreviation, words, e.getGuild().getIdLong(), replace);
 					if(queryResult == 0) {
 						e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.FILTER_WRITE_ADD_FILE)).build()).queue();
@@ -1646,7 +1647,6 @@ public class FilterExecution {
 			}
 			Hashes.clearTempCache(key);
 			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.FILTER_WORD_FILTER.getColumn(), _message);
-			FileHandler.deleteFile(Directory.TEMP, fileName);
 		}
 	}
 	
