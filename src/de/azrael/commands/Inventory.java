@@ -1,7 +1,6 @@
 package de.azrael.commands;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.EnumSet;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import de.azrael.constructors.InventoryContent;
 import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
-import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.inventory.InventoryBuilder;
@@ -52,17 +50,17 @@ public class Inventory implements CommandPublic {
 			var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 			if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 				//print the inventory in text format, if the inventory image is not available
-				if(!new File(Directory.INVENTORY+"inventory_blank.png").exists()) {
+				if(guild_settings.getInventoryId() == 0) {
 					StringBuilder out = new StringBuilder();
 					final var items = RankingSystem.SQLgetInventoryAndDescriptionWithoutLimit(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
-					int count = 1;
+					int count = 0;
 					for(InventoryContent inventory : items) {
 						if(count == 10) break;
 						out.append((inventory.getDescription() != null ? inventory.getDescription() : inventory.getWeaponDescription()+" "+inventory.getStat())+"\n");
 						count++;
 					}
 					if(out.length() == 0)
-						out.append(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY));
+						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY)).build()).queue();
 					else {
 						final int maxPage = (items.size()/10)+(items.size()%10 > 0 ? 1 : 0);
 						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {

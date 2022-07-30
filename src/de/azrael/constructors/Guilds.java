@@ -22,6 +22,7 @@ public class Guilds {
 	private long randomshop_price;
 	private long start_currency;
 	
+	private int inventory_id;
 	private int inventory_startx;
 	private int inventory_starty;
 	private int inventory_tabx;
@@ -126,6 +127,9 @@ public class Guilds {
 	}
 	public void setStartCurrency(long _start_currency) {
 		this.start_currency = _start_currency;
+	}
+	public void setInventoryId(int _inventory_id) {
+		this.inventory_id = _inventory_id;
 	}
 	public void setInventoryStartX(int _inventory_startx) {
 		this.inventory_startx = _inventory_startx;
@@ -313,6 +317,9 @@ public class Guilds {
 	}
 	public long getStartCurrency() {
 		return this.start_currency;
+	}
+	public int getInventoryId() {
+		return this.inventory_id;
 	}
 	public int getInventoryStartX() {
 		return this.inventory_startx;
