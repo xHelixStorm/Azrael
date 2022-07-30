@@ -41,7 +41,7 @@ public class Display implements CommandPublic{
 	private final static Logger logger = LoggerFactory.getLogger(Display.class);
 	private static EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.MAGENTA);
 	private static EmbedBuilder error = new EmbedBuilder().setColor(Color.RED);
-	private static final int BREAKER = 3;
+	private static final int BREAKER = 10;
 
 	@Override
 	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
