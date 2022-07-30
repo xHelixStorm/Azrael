@@ -1690,14 +1690,15 @@ public class RankingSystem {
 					guild.setRandomshopMaxItems(rs.getInt(52));
 					guild.setRandomshopRewardItemSizeX(rs.getInt(53));
 					guild.setRandomshopRewardItemSizeY(rs.getInt(54));
-					guild.setDailyRewardX(rs.getInt(55));
-					guild.setDailyRewardY(rs.getInt(56));
-					guild.setDailyTextFontSize(rs.getInt(57));
-					guild.setDailyDescriptionMode(rs.getInt(58));
-					guild.setDailyDescriptionX(rs.getInt(59));
-					guild.setDailyDescriptionY(rs.getInt(60));
-					guild.setDailyDescriptionStartX(rs.getInt(61));
-					guild.setDailyFieldSizeX(rs.getInt(62));
+					guild.setDailyId(rs.getInt(55));
+					guild.setDailyRewardX(rs.getInt(56));
+					guild.setDailyRewardY(rs.getInt(57));
+					guild.setDailyTextFontSize(rs.getInt(58));
+					guild.setDailyDescriptionMode(rs.getInt(59));
+					guild.setDailyDescriptionX(rs.getInt(60));
+					guild.setDailyDescriptionY(rs.getInt(61));
+					guild.setDailyDescriptionStartX(rs.getInt(62));
+					guild.setDailyFieldSizeX(rs.getInt(63));
 					Hashes.addStatus(guild_id, guild);
 					return guild;
 				}

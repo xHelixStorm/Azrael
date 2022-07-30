@@ -300,6 +300,7 @@
     "daily_empty":                  "Pour l’instant, la commande quotidienne ne contient pas d’éléments à obtenir !",
     "daily_cooldown":               "Attendez, ralentissez ! Vous pouvez ouvrir votre prochaine récompense quotidienne dans **{}** heures et  **{}** minutes!",
     "daily_rivet":                  "Mes excuses… Vous n’avez rien gagné cette fois-ci. Ne perdez pas espoir et réessayez demain !",
+    "daily_err":					"La récompense ne peut pas être obtenue car cette commande n'a pas fini de s'installer ! Veuillez réessayer ultérieurement.",
     
     "display_input_not_found":      "Rien n’a été trouvé pour l’entrée demandée !",
     "display_help":                 "Utilisez l’un des paramètres disponibles, avec la commande pour afficher des informations supplémentaires :\n\n",

@@ -57,6 +57,7 @@ public class Guilds {
 	private int randomshop_reward_item_sizex;
 	private int randomshop_reward_item_sizey;
 	
+	private int daily_id;
 	private int daily_rewardx;
 	private int daily_rewardy;
 	private int daily_text_font_size;
@@ -224,6 +225,9 @@ public class Guilds {
 	}
 	public void setRandomshopRewardItemSizeY(int _randomshop_reward_item_sizey) {
 		this.randomshop_reward_item_sizey = _randomshop_reward_item_sizey;
+	}
+	public void setDailyId(int daily_id) {
+		this.daily_id = daily_id;
 	}
 	public void setDailyRewardX(int _daily_rewardx) {
 		this.daily_rewardx = _daily_rewardx;
@@ -408,6 +412,9 @@ public class Guilds {
 	}
 	public int getRandomshopRewardItemSizeY() {
 		return this.randomshop_reward_item_sizey;
+	}
+	public int getDailyId() {
+		return daily_id;
 	}
 	public int getDailyRewardX() {
 		return this.daily_rewardx;

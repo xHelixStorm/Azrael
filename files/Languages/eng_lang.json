@@ -300,6 +300,7 @@
 	"daily_empty":				 	"For now, the daily command doesn't contain any items to obtain!",
 	"daily_cooldown":			 	"Wait, slow down! You can open your next daily in **{}** hours and **{}** minutes!",
 	"daily_rivet":					"My apologies... you have won nothing this time. Don't lose heart and try again tomorrow!",
+	"daily_err":					"Reward can not be obtained because this command has not been finished setting up! Please try again at a later time.",
 	
 	"display_input_not_found":	 	"Nothing has been found for the requested input!",
 	"display_help":				 	"Use one of the available parameters, together with the command, to display further information:\n\n",

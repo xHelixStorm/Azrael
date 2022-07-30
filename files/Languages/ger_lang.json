@@ -300,6 +300,7 @@
 	"daily_empty":				 	"Momentan enthält der Daily Befehl keine Belohnungen!",
 	"daily_cooldown":			 	"Sie haben ihre tägliche Belohnung heute bereits erhalten! Warten Sie **{}** Stunden und **{}** Minuten für die nächste Ziehung!",
 	"daily_rivet":					"Ich bitte um Entschuldigung... Sie haben diesmal nichts gewonnen. Verlieren Sie nicht den Mut und versuchen Sie es morgen noch einmal!",
+	"daily_err":					"Die Belohnung kann nicht erhalten werden, da dieser Befehl noch nicht fertiggestellt wurde! Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
 	
 	"display_input_not_found":	 	"Es wurde nichts für die angeforderte Eingabe gefunden!",
 	"display_help":				 	"Verwenden Sie einen der verfügbaren Parameter zusammen mit dem Befehl, um weitere Informationen anzuzeigen:\n\n",

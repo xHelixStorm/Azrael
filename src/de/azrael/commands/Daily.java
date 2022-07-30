@@ -111,12 +111,19 @@ public class Daily implements CommandPublic {
 										list.add(this_daily);
 									}
 								}
-								//get the index of an array depending on the random number and draw the reward into the screen
-								if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
-									DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
+								
+								if(guild_settings.getDailyId() > 0) {
+									//get the index of an array depending on the random number and draw the reward into the screen
+									if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
+										DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
+									else {
+										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+										logger.error("Permission MESSAGE_ATTACH_FILES required to display the dailies for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+									}
+								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
-									logger.error("Permission MESSAGE_ATTACH_FILES required to display the dailies for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
+									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERR)).build()).queue();
+									return true;
 								}
 								
 								//set the daily reset to next midnight time

@@ -300,6 +300,7 @@
 	"daily_empty":				 	"A partir de ahora, el comando diario no contiene ningún elemento para obtener!",
 	"daily_cooldown":			 	"¡Espera, más despacio! ¡Puedes abrir tu próximo comando diario en **{}** horas y **{}** minutos!",
 	"daily_rivet":					"Mis disculpas... no has ganado nada esta vez. ¡No te desanimes y vuelve a intentarlo mañana!",
+	"daily_err":					"No se puede obtener la recompensa porque este comando no se ha terminado de configurar. Por favor, inténtelo de nuevo en otro momento.",
 	
 	"display_input_not_found":	 	"¡No se ha encontrado nada para la entrada solicitada!",
 	"display_help":				 	"Utiliza uno de los parámetros disponibles, junto con el comando, para mostrar más información.:\n\n",
