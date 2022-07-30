@@ -126,7 +126,7 @@ public class Profile implements CommandPublic {
 					
 					//print the profile page, if the current experience isn't in the negative area
 					if(currentExperience >= 0) {
-						if(user_details.getRankingProfile() > 0 && user_details.getRankingIcon() > 0) {
+						if(user_details.getRankingProfile() > 0) {
 							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
 								RankingMethods.getProfile(e, name, avatar, convertedExperience, rank, (int)currentExperience, (int)rankUpExperience, user_details);
 							}
@@ -137,8 +137,6 @@ public class Profile implements CommandPublic {
 						}
 						else {
 							EmbedBuilder message = new EmbedBuilder();
-							if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() == 0)
-								message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_NO_ICONS));
 							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PROFILE_TITLE))
 								.setColor(Color.MAGENTA).setAuthor(name, avatar, avatar)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel())+"**", true)

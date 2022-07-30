@@ -61,7 +61,7 @@ public class SetRankingSystem {
 					new Thread(new CollectUsers(e, true)).start();
 				}
 				else {
-					Hashes.removeGuildRanking(e.getGuild().getIdLong());
+					Hashes.clearGuildRanking(e.getGuild().getIdLong());
 				}
 			}
 			else {

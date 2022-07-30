@@ -55,7 +55,7 @@ public class RankingMethods extends ListenerAdapter {
 	public static void getRankUp(GuildMessageReceivedEvent e, Ranking user_details, int rankIcon) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingLevel(user_details.getRankingLevel(), e.getGuild().getIdLong());
-		if(skinIcon == null || skin == null) {
+		if(skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			logger.error("RankUp couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
@@ -63,7 +63,9 @@ public class RankingMethods extends ListenerAdapter {
 		
 		try {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
-			BufferedImage rank = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage rank = null;
+			if(skinIcon != null)
+				rank = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			String name = e.getMember().getEffectiveName();
 			int characterCounter = name.length();
 			int level = (user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel());
@@ -102,7 +104,7 @@ public class RankingMethods extends ListenerAdapter {
 				BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
 				Graphics2D g = overlay.createGraphics();
 				g.drawImage(rankUp, 0, 0, null);
-				if(skin.getIconX() > 0 || skin.getIconY() > 0) {
+				if(rank != null && (skin.getIconX() > 0 || skin.getIconY() > 0)) {
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 					g.drawImage(rank, skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 				}
@@ -131,7 +133,7 @@ public class RankingMethods extends ListenerAdapter {
 					BufferedImage overlay = new BufferedImage(rankUpW, rankUpH, BufferedImage.TYPE_4BYTE_ABGR);
 					Graphics2D g = overlay.createGraphics();
 					g.drawImage(rankUp, 0, 0, null);
-					if(skin.getIconX() > 0 || skin.getIconY() > 0) {
+					if(rank != null && (skin.getIconX() > 0 || skin.getIconY() > 0)) {
 						g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
 						g.drawImage(rank, skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					}
@@ -233,7 +235,7 @@ public class RankingMethods extends ListenerAdapter {
 	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, Ranking user_details) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingRank(user_details.getRankingRank(), e.getGuild().getIdLong());
-		if(skinIcon == null || skin == null) {
+		if(skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			logger.error("Rank couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
@@ -243,14 +245,16 @@ public class RankingMethods extends ListenerAdapter {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experience != 0 && skin.getBarColor() > 0) {
-				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR+"exp"+skin.getBarColor()+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR.getPath()+"exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, 2*_experience, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage level = null;
+			if(skinIcon != null)
+				level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -276,7 +280,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.drawImage(rank, 0, 0, null);
 				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
-				if(skin.getIconX() > 0 || skin.getIconY() > 0)
+				if(level != null && (skin.getIconX() > 0 || skin.getIconY() > 0))
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 				if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
 					g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
@@ -312,7 +316,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 					g.drawImage(rank, 0, 0, null);
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
-					if(skin.getIconX() > 0 || skin.getIconY() > 0)
+					if(level != null && (skin.getIconX() > 0 || skin.getIconY() > 0))
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
 						g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
@@ -419,7 +423,7 @@ public class RankingMethods extends ListenerAdapter {
 	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, Ranking user_details) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingProfile(user_details.getRankingProfile(), e.getGuild().getIdLong());
-		if(skinIcon == null || skin == null) {
+		if(skin == null) {
 			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			logger.error("Profile couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
@@ -429,14 +433,16 @@ public class RankingMethods extends ListenerAdapter {
 			final String font = (skin.getFont() != null ? skin.getFont() : "Nexa Bold");
 			BufferedImage experienceBar;
 			if(_experiencePercentage != 0 && skin.getBarColor() > 0) {
-				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR+"exp"+skin.getBarColor()+"_"+100+".png"));
+				experienceBar = ImageIO.read(new File(Directory.EXPERIENCEBAR.getPath()+"exp"+skin.getBarColor()+"_"+100+".png"));
 				experienceBar = experienceBar.getSubimage(0, 0, (experienceBar.getWidth()*_experiencePercentage)/100, experienceBar.getHeight());
 			}
 			else {
 				experienceBar = null;
 			}
 			int rankIcon = RankingSystem.SQLgetLevels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getLevel() == user_details.getLevel()).findAny().orElse(null).getRankIcon();
-			BufferedImage level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
+			BufferedImage level = null;
+			if(skinIcon != null)	
+				level = ImageIO.read(new File((skinIcon.getSource() == null ? Directory.RANK.getPath()+"level_"+user_details.getRankingIcon()+"_"+rankIcon+"."+skinIcon.getFileType() : skinIcon.getSource()+"_"+rankIcon+"."+skinIcon.getFileType())));
 			
 			final URL url = new URL(_avatar);
 			final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -465,7 +471,7 @@ public class RankingMethods extends ListenerAdapter {
 				g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 				if(experienceBar != null)
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
-				if(skin.getIconX() > 0 || skin.getIconY() > 0)
+				if(level != null && (skin.getIconX() > 0 || skin.getIconY() > 0))
 					g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 				if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
 					g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);
@@ -548,7 +554,7 @@ public class RankingMethods extends ListenerAdapter {
 					g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 					g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 					g.drawImage(experienceBar, skin.getBarX(), skin.getBarY(), null);
-					if(skin.getIconX() > 0 || skin.getIconY() > 0)
+					if(level != null && (skin.getIconX() > 0 || skin.getIconY() > 0))
 						g.drawImage(blurImage(level), skin.getIconX(), skin.getIconY(), skin.getIconWidth(), skin.getIconHeight(), null);
 					if(skin.getAvatarX() > 0 || skin.getAvatarY() > 0)
 						g.drawImage(avatarPicture, skin.getAvatarX(), skin.getAvatarY(), skin.getAvatarWidth(), skin.getAvatarHeight(), null);

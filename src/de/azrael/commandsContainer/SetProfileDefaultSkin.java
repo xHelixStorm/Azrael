@@ -20,10 +20,12 @@ public class SetProfileDefaultSkin {
 	
 	public static void runTask(GuildMessageReceivedEvent e, int defaultSkin, int lastTheme, ArrayList<UserProfile> skins) {
 		if(defaultSkin >= 0 && defaultSkin <= lastTheme) {
-			final var skin = skins.parallelStream().filter(f -> f.getLine() == defaultSkin).findAny().orElse(null);
+			UserProfile skin = null;
+			if(defaultSkin > 0)
+				skin = skins.get(defaultSkin-1);
 			if(skin != null || defaultSkin == 0) {
 				final var skinId = (skin != null ? skin.getSkin() : defaultSkin);
-				final var skinDescription = (skin != null ? skin.getDescriptionMode() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
+				final var skinDescription = (skin != null ? skin.getSkinDescription() : STATIC.getTranslation(e.getMember(), Translation.PARAM_NONE).toUpperCase());
 				if(RankingSystem.SQLUpdateProfileDefaultSkin(e.getGuild().getIdLong(), e.getGuild().getName(), skinId) > 0) {
 					logger.info("User {} has set the default profile skin to {} in guild {}", e.getMember().getUser().getId(), skinId, e.getGuild().getId());
 					Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
@@ -37,6 +39,7 @@ public class SetProfileDefaultSkin {
 					}
 					Hashes.removeStatus(e.getGuild().getIdLong());
 					Hashes.addOldGuildSettings(e.getGuild().getIdLong(), guild_settings);
+					Hashes.removeGuildRanking(e.getGuild().getIdLong());
 				}
 				else {
 					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();

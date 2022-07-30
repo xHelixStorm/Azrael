@@ -508,6 +508,13 @@ public class Hashes {
 		name_filter.clear();
 	}
 	public static void removeGuildRanking(long key) {
+		final var ranking = guild_ranking.get(key);
+		if(ranking != null) {
+			ranking.clear();
+			guild_ranking.put(key, ranking);
+		}
+	}
+	public static void clearGuildRanking(long key) {
 		guild_ranking.remove(key);
 	}
 	public static void removeReactionRoles(Long key) {

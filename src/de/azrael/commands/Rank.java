@@ -127,7 +127,7 @@ public class Rank implements CommandPublic {
 					//print the rank page, if the current experience isn't in the negative area
 					if(currentExperience >= 0) {
 						//draw rank skin if it isn't 0
-						if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() > 0) {
+						if(user_details.getRankingRank() > 0) {
 							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
 								RankingMethods.getRank(e, name, avatar, convertedExperience, rank, user_details);
 							}
@@ -139,15 +139,14 @@ public class Rank implements CommandPublic {
 						//send an embed if it's 0
 						else {
 							EmbedBuilder message = new EmbedBuilder();
-							if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() == 0)
-								message.setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_NO_ICONS));
 							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.RANK_TITLE))
 								.setColor(Color.MAGENTA).setAuthor(name, avatar, avatar)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel())+"**", true)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.RANK_RANK), "**"+rank+"**", true)
 								.addBlankField(true)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_EXPERIENCE), "**"+(long)currentExperience+"/"+(long)rankUpExperience+"**", true)
-								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TOT_EXPERIENCE), "**"+user_details.getExperience()+"**", true).build()).queue();
+								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_TOT_EXPERIENCE), "**"+user_details.getExperience()+"**", true)
+								.addBlankField(true).build()).queue();
 						}
 					}
 					else {
