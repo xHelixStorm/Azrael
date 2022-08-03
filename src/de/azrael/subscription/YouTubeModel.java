@@ -33,7 +33,7 @@ public class YouTubeModel {
 				if(contents != null && contents.length() > 0) {
 					String channelId = "";
 					String channelName = "";
-					for(int i = 0; i < 2; i++) {
+					for(int i = 0; i < contents.length(); i++) {
 						JSONObject curJson = contents.getJSONObject(i);
 						if(!success && curJson.has("channelRenderer") && curJson.getJSONObject("channelRenderer").getString("channelId").equals(subscription.getURL())) {
 							JSONObject channel = curJson.getJSONObject("channelRenderer");
@@ -74,6 +74,7 @@ public class YouTubeModel {
 									}
 								}
 							}
+							break;
 						}
 					}
 				}
@@ -130,6 +131,24 @@ public class YouTubeModel {
 								e.getChannel().sendMessage(outMessage).queue();
 							}
 						}
+					}
+					else if(success && curJson.has("videoRenderer")) {
+						JSONObject json = curJson.getJSONObject("videoRenderer");
+						String title = json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text");
+						String description = json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
+						String videoId = json.getString("videoId");
+						String url = "https://www.youtube.com/watch?v="+videoId;
+						
+						String format = subscription.getFormat();
+						String out = format.replace("{channel}", channelName);
+						out = out.replace("{channel_id}", channelId);
+						out = out.replace("{title}", title);
+						out = out.replace("{description}", description);
+						out = out.replace("{url}", url);
+						out = out.replace("{video_id}", videoId);
+						
+						final String outMessage = EmojiParser.parseToUnicode(out);
+						e.getChannel().sendMessage(outMessage).queue();
 					}
 				}
 				if(!success) {

@@ -81,9 +81,16 @@ public class GoogleYoutube {
 			json = json.getJSONObject("twoColumnSearchResultsRenderer");
 			json = json.getJSONObject("primaryContents");
 			json = json.getJSONObject("sectionListRenderer");
-			json = json.getJSONArray("contents").getJSONObject(0);
-			json = json.getJSONObject("itemSectionRenderer");
-			return json.getJSONArray("contents");
+			JSONArray array = json.getJSONArray("contents");
+			for(int i = 0; i < array.length(); i++) {
+				json = array.getJSONObject(i);
+				json = json.getJSONObject("itemSectionRenderer");
+				JSONArray contents = json.getJSONArray("contents");
+				json = contents.getJSONObject(0);
+				if(json.has("channelRenderer") || json.has("videoRenderer")) {
+					return contents;
+				}
+			}
 		}
 		return null;
 	}
