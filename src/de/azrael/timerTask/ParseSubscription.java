@@ -93,12 +93,7 @@ public class ParseSubscription extends TimerTask {
 								}
 							}
 							else {
-								if(Azrael.SQLDeleteSubscription(subscription.getURL(), subscription.getGuildId()) > 0) {
-									Hashes.clearSubscriptions();
-									logger.warn("Subscription {} removed because guild {} is not available", subscription.getURL(), subscription.getGuildId());
-								}
-								else
-									logger.error("Subscription {} for the unavailable guild {} couldn't be removed", subscription.getURL(), subscription.getGuildId());
+								logger.warn("Guild {} not found while fetching subscriptions", k);
 							}
 						}
 					}).start();

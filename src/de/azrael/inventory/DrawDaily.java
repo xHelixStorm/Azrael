@@ -28,8 +28,8 @@ public class DrawDaily {
 	
 	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
-			BufferedImage daily = ImageIO.read(new File(Directory.DAILIES+"daily_blank.png"));
-			BufferedImage reward = ImageIO.read(new File(Directory.DAILIES+obtained+".png"));
+			BufferedImage daily = ImageIO.read(new File(Directory.DAILIES.getPath()+"daily_blank.png"));
+			BufferedImage reward = ImageIO.read(new File(Directory.DAILIES.getPath()+obtained+".png"));
 			
 			final int rewardX = guild_settings.getDailyRewardX();
 			final int rewardY = guild_settings.getDailyRewardY();

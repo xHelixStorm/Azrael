@@ -31,10 +31,10 @@ public class InventoryBuilder {
 	
 	public static void DrawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		String lastItem = "";
-		if(new File(Directory.INVENTORY+"inventory_blank.png").exists()) {
+		if(new File(Directory.INVENTORY.getPath()+"inventory_blank.png").exists()) {
 			try {
-				BufferedImage blank_inventory = ImageIO.read(new File(Directory.INVENTORY+"inventory_blank.png"));
-				BufferedImage inventory_tab = ImageIO.read(new File(Directory.INVENTORY+"inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
+				BufferedImage blank_inventory = ImageIO.read(new File(Directory.INVENTORY.getPath()+"inventory_blank.png"));
+				BufferedImage inventory_tab = ImageIO.read(new File(Directory.INVENTORY.getPath()+"inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 				
 				final int startX = guild_settings.getInventoryStartX();
 				final int startY = guild_settings.getInventoryStartY();
