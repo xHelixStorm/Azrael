@@ -3,6 +3,8 @@ package de.azrael.google;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,7 +67,7 @@ public class GoogleYoutube {
 			}
 			name = formattedName.toString();
 		}
-		final BufferedReader bf = STATIC.retrieveWebPageCode("https://www.youtube.com/results?search_query="+name+"&h1=en&persist_h1=1");
+		final BufferedReader bf = STATIC.retrieveWebPageCode("https://www.youtube.com/results?search_query="+URLEncoder.encode(name, StandardCharsets.UTF_8)+"&h1=en&persist_h1=1");
 		StringBuilder out = new StringBuilder(); 
 		String line = "";
 		while((line = bf.readLine()) != null) {
