@@ -96,7 +96,7 @@ public class SubscriptionUtils {
 		MessageHistory history = new MessageHistory(textChannel);
 		history.retrievePast(100).queue(historyList -> {
 			Message historyMessage = historyList.parallelStream().filter(f -> f.getContentRaw().replaceAll("[^a-zA-Z]", "").contains(outMessage.replaceAll("[^a-zA-Z]", ""))).findAny().orElse(null);
-			if(historyMessage == null || Azrael.SQLIsSubscriptionPosted(subscriptionId, guild.getIdLong()))
+			if(historyMessage == null && !Azrael.SQLIsSubscriptionPosted(subscriptionId, guild.getIdLong()))
 				textChannel.sendMessage(outMessage).queue(m -> {
 					Azrael.SQLInsertSubscriptionLog(m.getIdLong(), subscriptionId, guild.getIdLong());
 					if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getCacheLog()) {
