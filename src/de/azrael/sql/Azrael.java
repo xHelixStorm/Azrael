@@ -2093,13 +2093,13 @@ public class Azrael {
 	
 	public static CopyOnWriteArrayList<Subscription> SQLgetSubscriptions() {
 		final var subscriptions = Hashes.getSubscriptions();
-		if(subscriptions.isEmpty()) {
+		if(subscriptions == null || subscriptions.isEmpty()) {
 			logger.trace("SQLgetSubscriptions launched. No params passed");
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				CopyOnWriteArrayList<Subscription> feeds = new CopyOnWriteArrayList<Subscription>();
+				CopyOnWriteArrayList<Subscription> subs = new CopyOnWriteArrayList<Subscription>();
 				myConn = STATIC.getDatabaseURL(1);
 				stmt = myConn.prepareStatement(AzraelStatements.SQLgetSubscriptions);
 				rs = stmt.executeQuery();
@@ -2116,10 +2116,10 @@ public class Azrael {
 							rs.getString(9),
 							SQLgetChildSubscriptions(rs.getLong(2), rs.getString(1))
 					);
-					feeds.add(subscription);
+					subs.add(subscription);
 					Hashes.addSubscription(subscription);
 				}
-				return feeds;
+				return subs;
 			} catch (SQLException e) {
 				logger.error("SQLgetSubscriptions Exception", e);
 				return null;
@@ -3358,8 +3358,8 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLInsertSubscriptionLog(long message_id, String subscription_id) {
-		logger.trace("SQLInsertSubscriptionLog launched. Passed params {}, {}", message_id, subscription_id);
+	public static int SQLInsertSubscriptionLog(long message_id, String subscription_id, long guild_id) {
+		logger.trace("SQLInsertSubscriptionLog launched. Passed params {}, {}, {}", message_id, subscription_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
@@ -3367,6 +3367,7 @@ public class Azrael {
 			stmt = myConn.prepareStatement(AzraelStatements.SQLInsertSubscriptionLog);
 			stmt.setLong(1, message_id);
 			stmt.setString(2, subscription_id);
+			stmt.setLong(3, guild_id);
 			return stmt.executeUpdate();
 		} catch (SQLException e) {
 			logger.error("SQLInsertSubscriptionLog Exception", e);
@@ -3395,8 +3396,8 @@ public class Azrael {
 		}
 	}
 	
-	public static boolean SQLIsSubscriptionDeleted(String subscription_id) {
-		logger.trace("SQLIsSubscriptionDeleted launched. Params passed {}", subscription_id);
+	public static boolean SQLIsSubscriptionDeleted(String subscription_id, long guild_id) {
+		logger.trace("SQLIsSubscriptionDeleted launched. Params passed {}, {}", subscription_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -3404,6 +3405,7 @@ public class Azrael {
 			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(AzraelStatements.SQLIsSubscriptionDeleted);
 			stmt.setString(1, subscription_id);
+			stmt.setLong(2, guild_id);
 			rs = stmt.executeQuery();
 			while(rs.next()) {
 				return true;
@@ -3419,36 +3421,26 @@ public class Azrael {
 		}
 	}
 	
-	public static int SQLUpdateSubscriptionTimestamp(String subscription_id) {
-		logger.trace("SQLUpdateSubscriptionTimestamp launched. Passed params {}", subscription_id);
+	public static boolean SQLIsSubscriptionPosted(String subscription_id, long guild_id) {
+		logger.trace("SQLIsSubscriptionPosted launched. Params passed {}, {}", subscription_id, guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
+		ResultSet rs = null;
 		try {
 			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLUpdateSubscriptionTimestamp);
+			stmt = myConn.prepareStatement(AzraelStatements.SQLIsSubscriptionPosted);
 			stmt.setString(1, subscription_id);
-			return stmt.executeUpdate();
+			stmt.setLong(2, guild_id);
+			rs = stmt.executeQuery();
+			while(rs.next()) {
+				return true;
+			}
+			return false;
 		} catch (SQLException e) {
-			logger.error("SQLUpdateSubscriptionTimestamp Exception", e);
-			return 0;
+			logger.error("SQLIsSubscriptionPosted Exception", e);
+			return false;
 		} finally {
-		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
-		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
-		}
-	}
-	
-	public static int SQLDeleteSubscriptionLog() {
-		logger.trace("SQLDeleteTweetLog launched. No params passed");
-		Connection myConn = null;
-		PreparedStatement stmt = null;
-		try {
-			myConn = STATIC.getDatabaseURL(1);
-			stmt = myConn.prepareStatement(AzraelStatements.SQLDeleteSubscriptionLog);
-			return stmt.executeUpdate();
-		} catch (SQLException e) {
-			logger.error("SQLDeleteSubscriptionLog Exception", e);
-			return 0;
-		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
 		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
 		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}

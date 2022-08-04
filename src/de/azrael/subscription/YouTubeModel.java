@@ -50,7 +50,7 @@ public class YouTubeModel {
 								json = items.getJSONObject(index);
 								if(json.has("videoRenderer")) {
 									json = json.getJSONObject("videoRenderer");
-									if(!Azrael.SQLIsSubscriptionDeleted(json.getString("videoId"))) {
+									if(!Azrael.SQLIsSubscriptionDeleted(json.getString("videoId"), guild.getIdLong())) {
 										String title = json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text");
 										String description = json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
 										String videoId = json.getString("videoId");
@@ -68,9 +68,6 @@ public class YouTubeModel {
 										if(outMessage.length() > 0) {
 											SubscriptionUtils.postSubscriptionToServerChannel(guild, textChannel, outMessage, videoId, channelName);
 										}
-									}
-									else {
-										Azrael.SQLUpdateSubscriptionTimestamp(json.getString("videoId"));
 									}
 								}
 							}

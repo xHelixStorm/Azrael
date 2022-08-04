@@ -58,15 +58,6 @@ public class GoogleYoutube {
 	 */
 	
 	public static JSONArray collectYouTubeVideos(String name) throws SocketTimeoutException, IOException {
-		if(name.contains(" ")) {
-			StringBuilder formattedName = new StringBuilder();
-			for(String subName : name.split(" ")) {
-				if(formattedName.length() > 0)
-					formattedName.append("+");
-				formattedName.append(subName);
-			}
-			name = formattedName.toString();
-		}
 		final BufferedReader bf = STATIC.retrieveWebPageCode("https://www.youtube.com/results?search_query="+URLEncoder.encode(name, StandardCharsets.UTF_8)+"&h1=en&persist_h1=1");
 		StringBuilder out = new StringBuilder(); 
 		String line = "";

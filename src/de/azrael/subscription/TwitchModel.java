@@ -142,7 +142,7 @@ public class TwitchModel {
 						for(Object curData : data) {
 							JSONObject streamer = (JSONObject)curData;
 							final String streamId = streamer.getString("id");
-							if(!Azrael.SQLIsSubscriptionDeleted(streamId)) {
+							if(!Azrael.SQLIsSubscriptionDeleted(streamId, guild.getIdLong())) {
 								final String pubDate = streamer.getString("started_at");
 								final String user = streamer.getString("user_name");
 								final String user_id = streamer.getString("user_id");
@@ -167,9 +167,6 @@ public class TwitchModel {
 								if(outMessage.length() > 0) {
 									SubscriptionUtils.postSubscriptionToServerChannel(guild, textChannel, outMessage, streamId, user);
 								}
-							}
-							else {
-								Azrael.SQLUpdateSubscriptionTimestamp(streamId);
 							}
 							count++;
 							if(count == 5)

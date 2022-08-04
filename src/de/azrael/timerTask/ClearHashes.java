@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.core.Hashes;
-import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 
 /**
@@ -53,13 +52,12 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearStatus();
 		
 		logger.info("Temporary cache has been cleared");
-		
-		//clear any expired subscription log
-		Azrael.SQLDeleteSubscriptionLog();
 	}
 	
 	public static void runTask(){
 		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		

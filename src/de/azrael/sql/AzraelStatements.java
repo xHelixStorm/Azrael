@@ -147,11 +147,10 @@ class AzraelStatements {
 	final static String SQLgetLanguages = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA8xBhD8FcFVa2PIw3TdUK+tkCIqdKD2FuTxLS0pirnI4/YYX5VoKQgPDWZIdCKoCbo=");
 	final static String SQLgetTranslatedLanguages = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA+NtAF2nhQgI4VPti1Ft/W1TsQrLdu/UtcMh5LAFoSewGjDQb1hYhcgBChRnbaRb2E=");
 	final static String SQLisLanguageTranslated = STATIC.decrypt("6krGzUiAMoW8j5f8nt0dgM2cFR6ggkdSa/H8rQyCcA8xBhD8FcFVa2PIw3TdUK+tZQ1xLLs+IuZ5QbiwhlBljXQpByFsaFbI4OJJPgzko+g=");
-	final static String SQLInsertSubscriptionLog = STATIC.decrypt("nvBbp9ZbcBrO/qBBp+YHTC/ihVED9LPwwIAauEAJELVxiaKK8RwLLkf9DSFsx9jgF0VnSwoOGAyplkYbZQTNrkjhfxXmlwDKSDDewvvaYZw=");
+	final static String SQLInsertSubscriptionLog = STATIC.decrypt("nvBbp9ZbcBrO/qBBp+YHTC/ihVED9LPwwIAauEAJELVxiaKK8RwLLkf9DSFsx9jg1/uccBe8wnTcnwQXdmLojRkMen0gFoXAfGSg4vNbggn9r56NkJ3ZBHcmo2cTwztf");
 	final static String SQLUpdateSubscriptionLogDeleted = STATIC.decrypt("y7wHYwyTyt1z8kQwebU/easTrPnuqLkxAusoddR/yrCiDTAXlTJQbZurni2uN1Gxmd9AURgOihQYXeyIOSJMmA==");
-	final static String SQLIsSubscriptionDeleted = STATIC.decrypt("53F7gsk5xFDKpPn4nmtGqC1HExCdqEAbPqqVzBmhkV9ZTqUC969puCTh48mZGVo+dFhl+Gv+s0nqeOnVaS6vVDB6QL/a0g8hr9IkJ9l86Gk=");
-	final static String SQLUpdateSubscriptionTimestamp = STATIC.decrypt("y7wHYwyTyt1z8kQwebU/edwDolBtk3RLq3hyC7K8YEhgMrRj4gS4IVnGQtwKjtfOOPT3gxItfkMVcqBi8xGX4yO1pTAY2Wuyzj6im9ip8d0=");
-	final static String SQLDeleteSubscriptionLog = STATIC.decrypt("0xSdKw+yCETQWMnhRCcQeyn++heYWViABsDcOue8DV+0BEOl9s1tj/LXk8+sldmu0p9ktmVPVCwJNC31J/+TMuvoPuNvNb5ViV+0x5Qg1B81WUOWqsKXcvwN+j5XacFI");
+	final static String SQLIsSubscriptionDeleted = STATIC.decrypt("53F7gsk5xFDKpPn4nmtGqC1HExCdqEAbPqqVzBmhkV9ZTqUC969puCTh48mZGVo+dFhl+Gv+s0nqeOnVaS6vVL4u0+Sgqu8k0q2+mVHLdO0AwDo2WP06bOk9Hc+vpBum");
+	final static String SQLIsSubscriptionPosted = STATIC.decrypt("+QwRqn0SW7aHIZtSIiLimDNkPp7fY3G9rk4VWpbW5fuDnxjFK2pTYWSt4bWHf70o98IVvlBVQ2kKBD2j8HLDIYImDU9PoiAJd9d6yldIQP8=");
 	final static String SQLBulkInsertCategories = STATIC.decrypt("9VPblgqJ2WpVxqo9t0wn/XQ1s6plXjAZ1ai1cC0vMBP12M/0yJKLDM195wlIU0qvQbbCdiXg9tpUK+1yp2Zx0jCmaqYsIhD/hp+yd2PFP5KRFCcFuzToagTbZzou+deznvd29zOYmbTPOIG5iAcTSg==");
 	final static String SQLgetCategories = STATIC.decrypt("5tcVgI18JqClRTfzj05I6NmBv55M/EyR4GizCUJID6Tln/yRYZ2Knl5KpvlsLQzoWyA2+7S0nrkq3wHQCIXSTsYcuFqjiGvFEpGl5tpp2jn2GF+VaCkIDw1mSHQiqAm6");
 	final static String SQLInsertCategory = STATIC.decrypt("9VPblgqJ2WpVxqo9t0wn/XQ1s6plXjAZ1ai1cC0vMBP12M/0yJKLDM195wlIU0qvtHrK0Qxu1GTcmIGLQGDA2Lbr2nnLetl1gbuPviPWWSFgcCI8aoN905hCGCPa013Rb/3+A7crHdjA11h+Cd7w3A==");

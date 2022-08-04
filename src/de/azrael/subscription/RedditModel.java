@@ -129,7 +129,7 @@ public class RedditModel {
 						if(prohibitedSubscriptions.parallelStream().filter(f -> author.equals(f)).findAny().orElse(null) != null)
 		        			continue;
 						
-						if(!Azrael.SQLIsSubscriptionDeleted(permaLink)) {
+						if(!Azrael.SQLIsSubscriptionDeleted(permaLink, guild.getIdLong())) {
 							String message = null;
 							switch(kind) {
 								case "t1" -> message = buildMessageBodyT1(data, format);
@@ -140,9 +140,6 @@ public class RedditModel {
 							if(outMessage.length() > 0) {
 								SubscriptionUtils.postSubscriptionToServerChannel(guild, textChannel, outMessage, permaLink, author);
 							}
-						}
-						else {
-							Azrael.SQLUpdateSubscriptionTimestamp(permaLink);
 						}
 					}
 				}

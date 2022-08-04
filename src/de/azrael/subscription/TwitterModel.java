@@ -69,7 +69,7 @@ public class TwitterModel {
 			        final var prohibitedSubscriptions = Azrael.SQLgetSubscriptionBlacklist(guild.getIdLong());
 			        for (Status tweet : tweets) {
 			        	if(!tweet.isRetweet()) {
-			        		if(!Azrael.SQLIsSubscriptionDeleted(tweet.getId()+"")) {
+			        		if(!Azrael.SQLIsSubscriptionDeleted(tweet.getId()+"", guild.getIdLong())) {
 			        			String message = tweet.getText();
 				        		boolean tweetProhibited = false;
 				        		final String fullName = tweet.getUser().getName();
@@ -210,9 +210,6 @@ public class TwitterModel {
 					                	SubscriptionUtils.postSubscriptionToServerChannel(guild, textChannel, outMessage, (tweet.getId()+""), (fullName + " ("+username+")"));
 				                	}
 				        		}
-			        		}
-			        		else {
-			        			Azrael.SQLUpdateSubscriptionTimestamp(tweet.getId()+"");
 			        		}
 			        	}
 			        }
