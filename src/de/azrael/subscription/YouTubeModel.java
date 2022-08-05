@@ -50,7 +50,8 @@ public class YouTubeModel {
 								json = items.getJSONObject(index);
 								if(json.has("videoRenderer")) {
 									json = json.getJSONObject("videoRenderer");
-									if(!Azrael.SQLIsSubscriptionDeleted(json.getString("videoId"), guild.getIdLong())) {
+									final String browseId = findBrowseId(json);
+									if(browseId != null && browseId.equals(channelId) && !Azrael.SQLIsSubscriptionDeleted(json.getString("videoId"), guild.getIdLong())) {
 										String title = json.getJSONObject("title").getJSONArray("runs").getJSONObject(0).getString("text");
 										String description = json.getJSONArray("detailedMetadataSnippets").getJSONObject(0).getJSONObject("snippetText").getJSONArray("runs").getJSONObject(0).getString("text");
 										String videoId = json.getString("videoId");
@@ -85,6 +86,23 @@ public class YouTubeModel {
 			SubscriptionUtils.deleteRemovedChannel(subscriptionChannel, defaultChannel, subscription.getURL(), guild);
 		}
 		return success;
+	}
+	
+	private static String findBrowseId(JSONObject parentJson) {
+		String browseId = null;
+		if(parentJson.has("longBylineText")) {
+			var json = parentJson.getJSONObject("longBylineText");
+			return json.getJSONArray("runs").getJSONObject(0).getJSONObject("navigationEndpoint").getJSONObject("browseEndpoint").getString("browseId");
+		}
+		if(parentJson.has("ownerText")) {
+			var json = parentJson.getJSONObject("ownerText");
+			return json.getJSONArray("runs").getJSONObject(0).getJSONObject("navigationEndpoint").getJSONObject("browseEndpoint").getString("browseId");
+		}
+		if(parentJson.has("shortBylineText")) {
+			var json = parentJson.getJSONObject("shortBylineText");
+			return json.getJSONArray("runs").getJSONObject(0).getJSONObject("navigationEndpoint").getJSONObject("browseEndpoint").getString("browseId");
+		}
+		return browseId;
 	}
 	
 	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
