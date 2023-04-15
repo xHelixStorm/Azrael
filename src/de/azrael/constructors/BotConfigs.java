@@ -66,6 +66,7 @@ public class BotConfigs {
 	private String customMessageReaction = null;
 	private String customMessageAssign = null;
 	private String customMessageVerification = null;
+	private String customMessageJoin = null;
 	
 	/**
 	 * Default constructor for default values
@@ -135,6 +136,7 @@ public class BotConfigs {
 	 * @param _customMessageReaction
 	 * @param _customMessageAssign
 	 * @param _customMessageVerification
+	 * @param _customMessageJoin
 	 */
 	public BotConfigs(String _commandPrefix, boolean _joinMessage, boolean _leaveMessage, boolean _channelLog
 			, boolean _cacheLog, String _doubleExperience, int _doubleExperienceStart, int _doubleExperienceEnd
@@ -151,7 +153,8 @@ public class BotConfigs {
 			, boolean _reactionsEnabled, String _reactionsEmoji1, String _reactionsEmoji2, String _reactionsEmoji3
 			, String _reactionsEmoji4, String _reactionsEmoji5, String _reactionsEmoji6, String _reactionsEmoji7
 			, String _reactionsEmoji8, String _reactionsEmoji9, String _voteReactionThumbsUp, String _voteReactionThumbsDown
-			, String _voteReactionShrug, String _customMessageReaction, String _customMessageAssign, String _customMessageVerification) {
+			, String _voteReactionShrug, String _customMessageReaction, String _customMessageAssign, String _customMessageVerification
+			, String _customMessageJoin) {
 		
 		this.commandPrefix = _commandPrefix;
 		this.joinMessage = _joinMessage;
@@ -211,6 +214,7 @@ public class BotConfigs {
 		this.customMessageReaction = _customMessageReaction;
 		this.customMessageAssign = _customMessageAssign;
 		this.customMessageVerification = _customMessageVerification;
+		this.customMessageJoin = _customMessageJoin;
 	}
 	
 	public boolean isDefault() {
@@ -413,6 +417,9 @@ public class BotConfigs {
 	}
 	public String getCustomMessageVerification() {
 		return customMessageVerification;
+	}
+	public String getCustomMessageJoin() {
+		return customMessageJoin;
 	}
 	
 }

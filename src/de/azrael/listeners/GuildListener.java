@@ -413,6 +413,13 @@ public class GuildListener extends ListenerAdapter {
 				handleSingleUseInvites(botConfig, e.getGuild(), e.getMember());
 			}
 			
+			//send a message to the user, if available
+			if(botConfig.getCustomMessageJoin() != null && botConfig.getCustomMessageJoin().length() > 0) {
+				e.getMember().getUser().openPrivateChannel().queue(channel -> {
+					channel.sendMessage(botConfig.getCustomMessageJoin()).queue();
+				});
+			}
+			
 			Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
 		}).start();
 	}

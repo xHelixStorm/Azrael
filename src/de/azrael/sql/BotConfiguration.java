@@ -186,7 +186,8 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 							rs.getString("vote_reaction_shrug"),
 							rs.getString("custom_message_reaction"),
 							rs.getString("custom_message_assign"),
-							rs.getString("custom_message_verification")
+							rs.getString("custom_message_verification"),
+							rs.getString("custom_message_join")
 					);
 				}
 				if(config == null)
