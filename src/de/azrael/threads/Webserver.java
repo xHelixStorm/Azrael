@@ -29,8 +29,9 @@ public class Webserver implements Runnable {
 
 	@Override
 	public void run() {
+		ServerSocket connect = null;
 		try {
-			ServerSocket connect = new ServerSocket(WebserviceUtils.getPort(), 100);
+			connect = new ServerSocket(WebserviceUtils.getPort(), 100);
 			connect.setSoTimeout(0);
 			while(true) {
 				//create a socket and lock on to it until a request has been received

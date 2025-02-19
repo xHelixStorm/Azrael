@@ -62,7 +62,6 @@ private static final Logger logger = LoggerFactory.getLogger(AzraelWeb.class);
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static void SQLCodeUsageLog(long user_id, String address) {
 		logger.trace("SQLCodeUsageLog launched. Passed params {}", user_id);
 		Connection myConn = null;

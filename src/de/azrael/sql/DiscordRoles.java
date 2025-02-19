@@ -343,7 +343,6 @@ public class DiscordRoles {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static void SQLInsertReassignRoles(long user_id, long guild_id, ArrayList<Role> roles) {
 		logger.trace("SQLInsertReassignRoles launched. Passed params {}, {}, roles array", user_id, guild_id);
 		Connection myConn = null;
@@ -373,7 +372,6 @@ public class DiscordRoles {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static ArrayList<Long> SQLgetReassignRoles(long user_id, long guild_id) {
 		logger.trace("SQLgetReassignRoles launched. Passed params {}, {}", user_id, guild_id);
 		Connection myConn = null;

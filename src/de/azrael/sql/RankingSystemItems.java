@@ -646,7 +646,6 @@ public class RankingSystemItems {
 	}
 	
 	//Transaction
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertTimedInventory(long user_id, long guild_id, long currency, int item_id, long position, long expires, int number, boolean weapon, long extend) {
 		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}, {}", user_id, guild_id, currency, item_id, position, expires, number, weapon, extend);
 		Connection myConn = null;
@@ -684,7 +683,6 @@ public class RankingSystemItems {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long user_id, long guild_id, long currency, int weapon_id, Timestamp timestamp, int number) {
 		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, currency, weapon_id, timestamp, number);
 		Connection myConn = null;

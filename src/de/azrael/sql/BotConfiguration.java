@@ -76,7 +76,6 @@ private static final Logger logger = LoggerFactory.getLogger(BotConfiguration.cl
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static boolean SQLInsertBotConfigs(long guild_id) {
 		logger.trace("SQLInsertBotConfigs launched. Passed params {}", guild_id);
 		Connection myConn = null;

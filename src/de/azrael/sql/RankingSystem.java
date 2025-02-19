@@ -2245,7 +2245,6 @@ public class RankingSystem {
 	}
 	
 	//Transaction
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertInventory(long user_id, long guild_id, long currency, int item_id, Timestamp position, int number) {
 		logger.trace("SQLUpdateCurrencyAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, currency, item_id, position, number);
 		Connection myConn = null;
@@ -2283,7 +2282,6 @@ public class RankingSystem {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndRemoveInventory(long user_id, long guild_id, long currency, int item_id, Timestamp last_update) {
 		logger.trace("SQLUpdateCurrencyAndRemoveInventory launched. Passed params {}, {}, {}, {}, {}", user_id, guild_id, currency, item_id, last_update);
 		Connection myConn = null;
@@ -2319,7 +2317,6 @@ public class RankingSystem {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateAndInsertInventory(long user_id, long guild_id, int number, int number_limit, int item_id, Timestamp position, Timestamp expiration) {
 		logger.trace("SQLUpdateAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}", user_id, guild_id, number, number_limit, item_id, position, expiration);
 		Connection myConn = null;
@@ -2358,7 +2355,6 @@ public class RankingSystem {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDeleteAndInsertInventory(long user_id, long guild_id, int number, int item_id, Timestamp position, Timestamp expiration) {
 		logger.trace("SQLDeleteAndInsertInventory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, number, item_id, position, expiration);
 		Connection myConn = null;

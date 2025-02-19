@@ -1729,7 +1729,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceStaffNames(String [] words, long guild_id, boolean delete) {
 		logger.trace("SQLBatchInsertStaffNames launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
@@ -1767,7 +1766,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLInsertChannel_Filter(long channel_id, ArrayList<String> filterLanguages) {
 		logger.trace("SQLInsertChannel_Filter launched. Passed params {}, {}", channel_id, filterLanguages);
 		Connection myConn = null;
@@ -4184,7 +4182,6 @@ public class Azrael {
 	}
 	
 	//Transactions
-	@SuppressWarnings("resource")
 	public static int SQLLowerTotalWarning(long guild_id, int warning_id) {
 		logger.trace("SQLLowerTotalWarning launched. Passed params {}, {}", guild_id, warning_id);
 		Connection myConn = null;
@@ -4217,7 +4214,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceWordFilter(String lang, String [] words, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceWordFilter launched. Passed params {}, array, {}, {}", lang, guild_id, delete);
 		Connection myConn = null;
@@ -4269,7 +4265,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceNameFilter(String [] words, boolean kick, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceNameFilter launched. Passed params array, {}, {}, {}", kick, guild_id, delete);
 		Connection myConn = null;
@@ -4321,7 +4316,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceFunnyNames(String [] words, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceFunnyNames launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
@@ -4371,7 +4365,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceProhibitedURLs(String [] urls, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceProhibitedURLs launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
@@ -4421,7 +4414,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceAllowedURLs(String [] urls, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceAllowedURLs launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
@@ -4471,7 +4463,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLReplaceProhibitedSubscriptions(String [] usernames, long guild_id, boolean delete) {
 		logger.trace("SQLReplaceProhibitedSubscriptions launched. Passed params array, {}, {}", guild_id, delete);
 		Connection myConn = null;
@@ -4521,7 +4512,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLRegisterLanguageChannel(long guild_id, long channel_id, String channel_type) {
 		logger.trace("SQLRegisterLanguageChannel launched. Passed params {}, {}, {}", guild_id, channel_id, channel_type);
 		Connection myConn = null;
@@ -4570,7 +4560,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLRegisterSpecialChannel(long guild_id, long channel_id, String channel_type) {
 		logger.trace("SQLRegisterSpecialChannel launched. Passed params {}, {}, {}", guild_id, channel_id, channel_type);
 		Connection myConn = null;
@@ -4603,7 +4592,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLRegisterUniqueChannel(long guild_id, long channel_id, String channel_type) {
 		logger.trace("SQLRegisterUniqueChannel launched. Passed params {}, {}, {}", guild_id, channel_id, channel_type);
 		Connection myConn = null;
@@ -4637,7 +4625,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLOverwriteQuizData(long guild_id) {
 		logger.trace("SQLOverwriteQuizData launched. Passed params {}", guild_id);
 		Connection myConn = null;
@@ -4704,7 +4691,6 @@ public class Azrael {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static synchronized long SQLgetNextNumberDeletedMessages() {
 		logger.trace("SQLgetNextNumberDeletedMessages launched. No params passed");
 		Connection myConn = null;

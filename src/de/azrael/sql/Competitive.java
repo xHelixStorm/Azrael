@@ -553,7 +553,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLInsertClanMember(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLInsertClanMember launched. Passed params {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
@@ -596,7 +595,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLRemoveClanMember(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLRemoveClanMember launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
@@ -638,7 +636,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDelegateOwnership(long guild_id, long user_id_target, long user_id_self, int clan_id) {
 		logger.trace("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", guild_id, user_id_target, user_id_self, clan_id);
 		Connection myConn = null;
@@ -674,7 +671,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDisbandClan(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLDisbandClan launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
@@ -717,7 +713,6 @@ public class Competitive {
 	}
 	
 	//clans
-	@SuppressWarnings("resource")
 	public static int SQLCreateClan(long guild_id, long user_id, String name) {
 		logger.trace("SQLCreateClan launched. Passed params {}, {}, {}", guild_id, user_id, name);
 		Connection myConn = null;
@@ -1256,7 +1251,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLCreateMatchmakingRoom(long guild_id, long user_id, int type, int map, int member_limit, long channel_id) {
 		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}, {}", guild_id, user_id, type, map, member_limit, channel_id);
 		Connection myConn = null;
@@ -1312,7 +1306,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLCreateClanMatchmakingRoom(long guild_id, int type, int map, int clan_id_1, int clan_id_2, int member_limit) {
 		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}, {}", guild_id, type, map, clan_id_1, clan_id_2, member_limit);
 		Connection myConn = null;
@@ -1362,7 +1355,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDeleteMatchmakingRoom(long guild_id, int room_id) {
 		logger.trace("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", guild_id, room_id);
 		Connection myConn = null;
@@ -1397,7 +1389,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long guild_id, long user_id, int room_id) {
 		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
@@ -1433,7 +1424,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long guild_id, long user_id, int room_id, int team) {
 		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id, room_id, team);
 		Connection myConn = null;
@@ -1470,7 +1460,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long guild_id, int room_id, Member [] team1, Member [] team2) {
 		logger.trace("SQLUpdateTeams launched. Passed params {}, {} and arrays", guild_id, room_id);
 		Connection myConn = null;
@@ -1527,7 +1516,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long guild_id, int room_id, long user_id_1, long user_id_2) {
 		logger.trace("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", guild_id, room_id, user_id_1, user_id_2);
 		Connection myConn = null;
@@ -1632,7 +1620,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLsetWinner(long guild_id, int room_id, int team, boolean clans) {
 		logger.trace("SQLsetWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
@@ -1734,7 +1721,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLrevertWinner(long guild_id, int room_id, int team, boolean clans) {
 		logger.trace("SQLrevertWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
@@ -1825,7 +1811,6 @@ public class Competitive {
 	}
 	
 	//matchmaking_members
-	@SuppressWarnings("resource")
 	public static int SQLPickMember(long guild_id, int room_id, long user_id, long leader_id, int team) {
 		logger.trace("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", guild_id, room_id, user_id, leader_id, team);
 		Connection myConn = null;
@@ -1872,7 +1857,6 @@ public class Competitive {
 	}
 	
 	//comp_maps
-	@SuppressWarnings("resource")
 	public static int SQLInsertMap(long guild_id, String mapName, String url) {
 		logger.trace("SQLInsertMap launched. Passed params {}, {}, {}", guild_id, mapName, url);
 		Connection myConn = null;
@@ -2239,7 +2223,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLLeaveRoom(long guild_id, long user_id, int room_id) {
 		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
@@ -2384,7 +2367,6 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateRoomMaster(long guild_id, long user_id1, long user_id2, int room_id) {
 		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id1, user_id2, room_id);
 		Connection myConn = null;
