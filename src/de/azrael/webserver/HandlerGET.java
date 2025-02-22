@@ -9,15 +9,15 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import de.azrael.constructors.BotConfigs;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 public class HandlerGET {
 	public static void handleRequest(ReadyEvent e, PrintWriter out, String endpoint, String [] queryParams) {

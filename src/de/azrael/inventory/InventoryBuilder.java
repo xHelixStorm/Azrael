@@ -24,12 +24,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class InventoryBuilder {
 	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 	
-	public static void DrawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
+	public static void drawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		String lastItem = "";
 		if(new File(Directory.INVENTORY.getPath()+"inventory_blank.png").exists()) {
 			try {
@@ -105,12 +106,12 @@ public class InventoryBuilder {
 				
 				ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
 				File upload = new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
-				channel.sendFile(upload, "inventory.png").queue(m -> {
+				channel.sendFiles(FileUpload.fromData(upload, "inventory.png")).queue(m -> {
 					upload.delete();
 				});
 			} catch(IOException ioe) {
 				if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-					channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).build()).queue();
 				else
 					channel.sendMessage(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).queue();
 				logger.warn("Inventory couldn't be drawn for user {} and item {} in guild {}", member.getUser().getId(), lastItem, guild.getId(), ioe);

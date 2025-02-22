@@ -23,7 +23,8 @@ import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class RandomshopItemDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
@@ -74,12 +75,12 @@ public class RandomshopItemDrawer {
 			g.dispose();
 			
 			File file1 = new File(Directory.TEMP.getPath()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
-			channel.sendFile(file1, "randomshop.png").queue(m -> {
+			channel.sendFiles(FileUpload.fromData(file1, "randomshop.png")).queue(m -> {
 				file1.delete();
 			});
 		} catch (IOException e1) {
 			if(member.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).build()).queue();
+				channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).build()).queue();
 			else
 				channel.sendMessage(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).queue();
 			logger.error("Randomshop Items couldn't be drawn. Error for item {} in guild {}", traceWeapon, member.getGuild().getId(), e1);

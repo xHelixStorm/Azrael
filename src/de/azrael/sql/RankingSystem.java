@@ -26,7 +26,7 @@ import de.azrael.constructors.UserIcon;
 import de.azrael.constructors.UserLevel;
 import de.azrael.constructors.UserProfile;
 import de.azrael.constructors.UserRank;
-import de.azrael.core.Hashes;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Member;
 

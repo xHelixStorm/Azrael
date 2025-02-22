@@ -18,8 +18,8 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RSSModel {
 	private static final Logger logger = LoggerFactory.getLogger(RSSModel.class);
@@ -28,7 +28,7 @@ public class RSSModel {
 		boolean success = false;
 		final TextChannel textChannel = guild.getTextChannelById(subscriptionChannel);
 		if(textChannel != null) {
-			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY))) {
 				String format = subscription.getFormat();
 				String title = "";
 				String description = "";
@@ -92,7 +92,7 @@ public class RSSModel {
 		return success;
 	}
 	
-	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
+	public static void ModelTest(MessageReceivedEvent e, Subscription subscription) {
 		try {
 			String format = subscription.getFormat();
 			BufferedReader in = STATIC.retrieveWebPageCode(subscription.getURL());
@@ -145,7 +145,7 @@ public class RSSModel {
 			}
 			in.close();
 		} catch (IOException e1) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}

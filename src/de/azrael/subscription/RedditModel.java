@@ -31,8 +31,8 @@ import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RedditModel {
 	private static final Logger logger = LoggerFactory.getLogger(RedditModel.class);
@@ -111,7 +111,7 @@ public class RedditModel {
 		boolean success = false;
 		final TextChannel textChannel = guild.getTextChannelById(subscriptionChannel);
 		if(textChannel != null) {
-			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_WRITE, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+			if(guild.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(guild, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_HISTORY))) {
 				JSONObject response = new JSONObject(fetchRedditContent(guild, subscription));
 				JSONObject parentData = response.getJSONObject("data");
 				JSONArray children = parentData.getJSONArray("children");
@@ -155,7 +155,7 @@ public class RedditModel {
 		return success;
 	}
 	
-	public static void ModelTest(GuildMessageReceivedEvent e, Subscription subscription) {
+	public static void ModelTest(MessageReceivedEvent e, Subscription subscription) {
 		try {
 			JSONObject response = new JSONObject(fetchRedditContent(e.getGuild(), subscription));
 			JSONObject parentData = response.getJSONObject("data");
@@ -178,10 +178,10 @@ public class RedditModel {
 						return;
 					}
 				}
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_NO_CONTENT)).build()).queue();
 			}
 		} catch (Exception e1) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Subscription couldn't be retrieved from {} in guild {}", subscription.getURL(), e.getGuild().getId(), e1);
 		}
 	}

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Thumbnails;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 
 public class BotConfiguration {

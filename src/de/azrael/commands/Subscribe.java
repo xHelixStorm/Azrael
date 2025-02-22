@@ -8,16 +8,16 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * Subscribe to an RSS feed or follow hashtags on Twitter
@@ -29,12 +29,12 @@ public class Subscribe implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Subscribe.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.SUBSCRIBE);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		EmbedBuilder message = new EmbedBuilder();
 		
 		if(args.length == 0) {
@@ -93,22 +93,22 @@ public class Subscribe implements CommandPublic {
 				}
 				if(out.length() > 0) {
 					message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HELP).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+out.toString()).build()).queue();
+					e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_HELP).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))+out.toString()).build()).queue();
 				}
 				else {
 					message.setColor(Color.RED);
-					e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISABLED)).build()).queue();
+					e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.SUBSCRIBE_DISABLED)).build()).queue();
 				}
 			}
 			else {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("Subscription types couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 		}
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RSS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_RSS)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_RSS);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.RSS_HELP)
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.RSS_HELP)
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
@@ -123,7 +123,7 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWITTER)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_TWITTER)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_TWITTER);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_HELP)
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITTER_HELP)
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_OPTIONS))
@@ -139,7 +139,7 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_REDDIT)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_REDDIT)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_REDDIT);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_HELP)
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.REDDIT_HELP)
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
@@ -154,7 +154,7 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_YOUTUBE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_YOUTUBE)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_YOUTUBE);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_HELP)
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.YOUTUBE_HELP)
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
@@ -169,7 +169,7 @@ public class Subscribe implements CommandPublic {
 		else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_TWITCH)) && STATIC.getCommandEnabled(e.getGuild(), Command.SUBSCRIBE_TWITCH)) {
 			int permissionLevel = STATIC.getCommandLevel(e.getGuild(), Command.SUBSCRIBE_TWITCH);
 			if(UserPrivs.comparePrivilege(e.getMember(), permissionLevel)) {
-				e.getChannel().sendMessage(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_HELP)
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.TWITCH_HELP)
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_REGISTER))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_FORMAT))
 						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CHANNEL))
@@ -182,13 +182,13 @@ public class Subscribe implements CommandPublic {
 				UserPrivs.throwNotEnoughPrivilegeError(e, permissionLevel);
 		}
 		else {
-			e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Subscribe command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

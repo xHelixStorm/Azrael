@@ -16,18 +16,18 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Leaderboard implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Leaderboard.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.LEADERBOARD);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		if(bot_channels.size() == 0 || bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null) != null) {
 			final var ranking = Competitive.SQLgetRankingTop10(e.getGuild().getIdLong());
@@ -64,10 +64,10 @@ public class Leaderboard implements CommandPublic {
 						+ personalInfo+"\n```").queue();
 			}
 			else if(ranking != null) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEADERBOARD_ERR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEADERBOARD_ERR)).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("Top 10 ELO ranking couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 		}
@@ -78,7 +78,7 @@ public class Leaderboard implements CommandPublic {
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Leaderboard command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

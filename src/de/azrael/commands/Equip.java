@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPrivate;
@@ -18,11 +16,12 @@ import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Equip command will allow a user to equip weapons
@@ -36,19 +35,19 @@ public class Equip implements CommandPublic, CommandPrivate {
 	
 	//PUBLIC COMMAND SECTION START
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.EQUIP);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//print message to write the command in private message
-		e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EQUIP_WRONG_CHANNEL).replace("{}", e.getGuild().getSelfMember().getAsMention())).build()).queue();
+		e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.EQUIP_WRONG_CHANNEL).replace("{}", e.getGuild().getSelfMember().getAsMention())).build()).queue();
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Equip command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();
@@ -60,13 +59,13 @@ public class Equip implements CommandPublic, CommandPrivate {
 
 	//PRIVATE COMMAND SECTION START
 	@Override
-	public boolean called(String[] args, PrivateMessageReceivedEvent e) {
+	public boolean called(String[] args, MessageReceivedEvent e) {
 		//private message is always enabled
 		return true;
 	}
 
 	@Override
-	public boolean action(String[] args, PrivateMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e) {
 		//save mutual guilds into an array where the ranking state is enabled
 		List<Guild> mutualGuilds = e.getAuthor().getMutualGuilds().parallelStream().filter(f -> RankingSystem.SQLgetGuild(f.getIdLong()).getRankingState() && STATIC.getCommandEnabled(f, Command.EQUIP)).collect(Collectors.toList());
 		//If there's at least 1 guild with an enabled ranking state, proceed!
@@ -77,7 +76,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 				long guild_id = mutualGuilds.get(0).getIdLong();
 				if(UserPrivs.comparePrivilege(e.getJDA().getGuildById(guild_id).getMemberById(e.getAuthor().getId()), STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP))) {
 					//directly make the selection screen appear (e.g. show, set, etc)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_HELP)
 							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_EXIT))
 							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_DISPLAY))
 							.replaceFirst("\\{\\}", STATIC.getTranslation3(e.getAuthor(), Translation.PARAM_SET))
@@ -87,7 +86,7 @@ public class Equip implements CommandPublic, CommandPrivate {
 				}
 				else {
 					EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(guild_id).getDenied()).setTitle(STATIC.getTranslation3(e.getAuthor(), Translation.EMBED_TITLE_DENIED));
-					e.getChannel().sendMessage(denied.setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP), mutualGuilds.get(0).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
+					e.getChannel().sendMessageEmbeds(denied.setDescription(e.getAuthor().getAsMention()+STATIC.getTranslation3(e.getAuthor(), Translation.HIGHER_PRIVILEGES_ROLE)+UserPrivs.retrieveRequiredRoles(STATIC.getCommandLevel(mutualGuilds.get(0), Command.EQUIP), mutualGuilds.get(0).getMemberById(e.getAuthor().getIdLong()))).build()).queue();
 				}
 			}
 			//if multiple guilds have been found
@@ -111,24 +110,24 @@ public class Equip implements CommandPublic, CommandPrivate {
 				}
 				final var printMessage = STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT)+out.toString();
 				if(printMessage.length() <= 2048) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(printMessage).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(printMessage).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "wait"));
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT_2)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.EQUIP_SERVER_SELECT_2)).build()).queue();
 					Hashes.addTempCache("equip_us"+e.getAuthor().getId(), new Cache(180000, guilds, "err"));
 				}
 			}
 			return true;
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation3(e.getAuthor(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 		return false;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, PrivateMessageReceivedEvent e) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e) {
 		if(success) {
 			logger.trace("{} has used Equip command", e.getAuthor().getId());
 			StringBuilder out = new StringBuilder();

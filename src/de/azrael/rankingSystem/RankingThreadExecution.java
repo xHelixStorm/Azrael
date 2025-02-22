@@ -19,14 +19,14 @@ import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Level;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Roles;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * This class is meant to gain experience points basing on the 
@@ -43,7 +43,7 @@ import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 public class RankingThreadExecution {
 	private final static Logger logger = LoggerFactory.getLogger(RankingThreadExecution.class);
 	
-	public static void setProgress(GuildMessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, long percentMultiplier, Ranking user_details, Guilds guild_settings, BotConfigs botConfig) {
+	public static void setProgress(MessageReceivedEvent e, long user_id, long guild_id, String message, int roleAssignLevel, long role_id, long percentMultiplier, Ranking user_details, Guilds guild_settings, BotConfigs botConfig) {
 		//delete all expired items from the inventory (e.g experience booster)
 		RankingSystem.SQLDeleteInventory();
 		double multiplier = 1;
@@ -115,7 +115,7 @@ public class RankingThreadExecution {
 						logger.info("User {} has reached the limit of obtainable experience points for today in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						RankingSystem.SQLInsertActionLog("medium", user_id, guild_id, "Experience limit reached", "User reached the limit of experience points");
 						e.getMember().getUser().openPrivateChannel().queue(channel -> {
-							channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.EXP_LIMIT)).queue(success -> channel.close().queue(), error -> channel.close().queue());
+							channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.EXP_LIMIT)).queue();
 						});
 					}
 				}
@@ -127,7 +127,7 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static void ExperienceGain(GuildMessageReceivedEvent e, Ranking user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset, BotConfigs botConfig) {
+	private static void ExperienceGain(MessageReceivedEvent e, Ranking user_details, Guilds guild_settings, int currentExperience, long experience, int daily_experience, int roleAssignLevel, boolean max_experience_enabled, Timestamp reset, BotConfigs botConfig) {
 		//check if the default skin had been updated, if yes update level skin, description and file type
 		var old_guild_settings = Hashes.getOldGuildSettings(e.getGuild().getIdLong());
 		if(old_guild_settings != null && old_guild_settings.getLevelID() == user_details.getRankingLevel()) {
@@ -208,7 +208,7 @@ public class RankingThreadExecution {
 					//reset experience points to the beginning of the current level
 					if(RankingSystem.SQLUpdateExperience(user_details.getUser_ID(), e.getGuild().getIdLong(), user_details.getExperience(), user_details.getLastUpdate()) > 0) {
 						Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_LEVEL_UP)).setDescription(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.LEVEL_PROMOTION_FAILED)+user_details.getLevel()).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_LEVEL_UP)).setDescription(e.getMember().getAsMention()+STATIC.getTranslation(e.getMember(), Translation.LEVEL_PROMOTION_FAILED)+user_details.getLevel()).build()).queue();
 					}
 					else {
 						logger.error("Experience points for the user {} couldn't be updated in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
@@ -254,23 +254,23 @@ public class RankingThreadExecution {
 				RankingSystem.SQLInsertActionLog("low", user_details.getUser_ID(), e.getGuild().getIdLong(), "Level Up", "User reached level "+user_details.getLevel());
 				Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 				if(user_details.getRankingLevel() > 0) {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES))) {
+					if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES))) {
 						//Upload level up image
 						RankingMethods.getRankUp(e, user_details, rankIcon);
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+e.getChannel().getAsMention()).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName()+" and "+Permission.MESSAGE_ATTACH_FILES.getName())+e.getChannel().getAsMention()).build()).queue();
 						logger.error("MESSAGE_WRITE and MESSAGE_ATTACH_FILES permissions required to display the level up image on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				else {
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE))) {
-						e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.LEVEL_TITLE)).setColor(Color.MAGENTA)
+					if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND))) {
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.LEVEL_TITLE)).setColor(Color.MAGENTA)
 							.setAuthor(e.getMember().getEffectiveName(), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getEffectiveAvatarUrl())
 							.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_MESSAGE).replace("{}", ""+user_details.getLevel())).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName())+e.getChannel().getAsMention()).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName())+e.getChannel().getAsMention()).build()).queue();
 						logger.error("MESSAGE_WRITE permission required to display the level up message on channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
@@ -335,7 +335,7 @@ public class RankingThreadExecution {
 		}
 	}
 	
-	private static Roles updateRole(GuildMessageReceivedEvent e, final int level, final int newLevel, int roleAssignLevel, BotConfigs botConfig) {
+	private static Roles updateRole(MessageReceivedEvent e, final int level, final int newLevel, int roleAssignLevel, BotConfigs botConfig) {
 		Roles current_role = null;
 		//check that the bot has the manage roles permission to remove and assign roles
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
@@ -356,7 +356,7 @@ public class RankingThreadExecution {
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_UP_ROLE_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_UP_ROLE_ERR)+Permission.MANAGE_ROLES.getName()).build()).queue();
 			logger.warn("MANAGE ROLES permission required to assign ranking rolea to users in guild {}", e.getGuild().getId());
 		}
 		return current_role;

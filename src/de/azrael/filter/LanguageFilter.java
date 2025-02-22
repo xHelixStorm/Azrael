@@ -14,19 +14,19 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.CharacterReplacer;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class LanguageFilter implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
@@ -71,11 +71,11 @@ public class LanguageFilter implements Runnable {
 							logger.warn("Message {} already removed in guild {}", message.getId(), message.getGuild().getId());
 						});
 						Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
-						STATIC.handleRemovedMessages(message.getMember(), message.getTextChannel(), output);
+						STATIC.handleRemovedMessages(message.getMember(), message.getChannel().asTextChannel(), output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 						if(tra_channel != null) {
 							final TextChannel textChannel = message.getGuild().getTextChannelById(tra_channel.getChannel_ID());
-							if(textChannel != null && (message.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(message.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
+							if(textChannel != null && (message.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(message.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS)))) {
 								Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
 								while(matcher.find()) {
 									var word = matcher.group();
@@ -88,7 +88,7 @@ public class LanguageFilter implements Runnable {
 								embed.setTitle(name);
 								embed.setFooter(channel + "("+message.getChannel().getId()+")").setThumbnail(message.getMember().getUser().getEffectiveAvatarUrl());
 								final String printMessage = STATIC.getTranslation(message.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n\n"+getMessage;
-								textChannel.sendMessage(embed.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+								textChannel.sendMessageEmbeds(embed.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 						}
 						break;

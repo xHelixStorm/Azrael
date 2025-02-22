@@ -13,7 +13,7 @@ import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The About command prints a summary Information of the Bot
@@ -25,12 +25,12 @@ public class About implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(About.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.ABOUT);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		long guild_id = e.getGuild().getIdLong();
 		//retrieve all registered bot channels and check if the current channel is registered
 		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
@@ -51,13 +51,13 @@ public class About implements CommandPublic {
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_3_DESC).replace("{}", botConfig.getCommandPrefix())+"\n\n", false);
 			messageBuilder.addBlankField(false);
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4), "["+STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4_DESC)+"](https://github.com/xHelixStorm/Azrael)", false);
-			e.getChannel().sendMessage(messageBuilder.build()).queue();
+			e.getChannel().sendMessageEmbeds(messageBuilder.build()).queue();
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used About command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

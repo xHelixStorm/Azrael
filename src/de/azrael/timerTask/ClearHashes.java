@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.core.Hashes;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 
 /**

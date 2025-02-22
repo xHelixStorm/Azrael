@@ -6,12 +6,11 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.commandsContainer.RegisterCategory;
-import de.azrael.commandsContainer.RegisterChannel;
-import de.azrael.commandsContainer.RegisterRankingRole;
-import de.azrael.commandsContainer.RegisterRole;
+import de.azrael.commands.util.RegisterCategory;
+import de.azrael.commands.util.RegisterChannel;
+import de.azrael.commands.util.RegisterRankingRole;
+import de.azrael.commands.util.RegisterRole;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -20,26 +19,27 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.threads.CollectUsers;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Register implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Register.class);
 	
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		final var thumbnails = BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong());
 		EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(thumbnails.getSettings());
 		var guild_id = e.getGuild().getIdLong();
 		if(DiscordRoles.SQLgetRoles(guild_id).parallelStream().filter(f -> f.getCategory_ABV().equals("adm")).findAny().orElse(null) == null) {
 			if(BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 				if(args.length == 0) {
-					e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_1)).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_1)).build()).queue();
 				}
 				else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE))) {
 					RegisterRole.RegisterRoleHelper(e, thumbnails, true);
@@ -48,13 +48,13 @@ public class Register implements CommandPublic {
 					RegisterRole.runCommandWithAdminFirst(e, args, thumbnails);
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
 				return true;
 			}
 			else {
 				EmbedBuilder denied = new EmbedBuilder().setColor(Color.RED).setThumbnail(thumbnails.getDenied()).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DENIED));
-				e.getChannel().sendMessage(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
+				e.getChannel().sendMessageEmbeds(denied.setDescription(e.getMember().getAsMention() + STATIC.getTranslation(e.getMember(), Translation.HIGHER_PRIVILEGES_REQUIRED)).build()).queue();
 			}
 		}
 		else if(UserPrivs.comparePrivilege(e.getMember(), STATIC.getCommandLevel(e.getGuild(), Command.REGISTER))) {
@@ -119,9 +119,9 @@ public class Register implements CommandPublic {
 				if(registerUsers)			sb.append(STATIC.getTranslation(e.getMember(), Translation.REGISTER_PARAM_8).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_USERS)));
 				
 				if(sb.length() > 0)
-					e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)+sb.toString()).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_HELP_2)+sb.toString()).build()).queue();
 				else
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_DISABLED)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.REGISTER_DISABLED)).build()).queue();
 				return true;
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ROLE)) && STATIC.getCommandEnabled(e.getGuild(), Command.REGISTER_ROLE)) {
@@ -216,7 +216,7 @@ public class Register implements CommandPublic {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else if(!botConfig.getIgnoreMissingPermissions()) {
@@ -226,7 +226,7 @@ public class Register implements CommandPublic {
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Register command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

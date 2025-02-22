@@ -8,8 +8,6 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.EnumSet;
 import java.util.Properties;
 
-import javax.security.auth.login.LoginException;
-
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +68,7 @@ import de.azrael.commands.User;
 import de.azrael.commands.Warn;
 import de.azrael.commands.Web;
 import de.azrael.commands.Write;
+import de.azrael.commands.util.CommandHandler;
 import de.azrael.enums.Directory;
 import de.azrael.listeners.AvatarUpdateListener;
 import de.azrael.listeners.BanListener;
@@ -87,7 +86,7 @@ import de.azrael.listeners.NicknameListener;
 import de.azrael.listeners.PrivateMessageListener;
 import de.azrael.listeners.PrivateMessageReactionAddListener;
 import de.azrael.listeners.ReadyListener;
-import de.azrael.listeners.ResumedListener;
+import de.azrael.listeners.SessionResumeListener;
 import de.azrael.listeners.RoleCreateListener;
 import de.azrael.listeners.RoleListener;
 import de.azrael.listeners.RoleNameUpdateListener;
@@ -289,8 +288,19 @@ public class Main {
 				return;
 			}
 			
+			EnumSet<GatewayIntent> intents = EnumSet.of(
+					GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+					GatewayIntent.DIRECT_MESSAGES,
+					GatewayIntent.GUILD_INVITES,
+					GatewayIntent.GUILD_MEMBERS,
+					GatewayIntent.GUILD_MESSAGE_REACTIONS,
+					GatewayIntent.GUILD_MESSAGES,
+					GatewayIntent.GUILD_MODERATION,
+					GatewayIntent.MESSAGE_CONTENT
+			);
+			
 			builder = JDABuilder.createDefault(System.getProperty("TOKEN"))
-					.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))
+					.enableIntents(intents)
 					.setMemberCachePolicy(MemberCachePolicy.ALL);
 			builder.setAutoReconnect(true);
 			builder.setStatus(OnlineStatus.ONLINE);	
@@ -302,7 +312,7 @@ public class Main {
 			try {
 				@SuppressWarnings("unused")
 				JDA jda = builder.build();
-			} catch (LoginException | IllegalArgumentException e) {
+			} catch (IllegalArgumentException e) {
 				logger.error("Login or Token error", e);
 			}
 		}
@@ -391,7 +401,7 @@ public class Main {
 			new GuildMessageReactionAddListener(),
 			new GuildMessageReactionRemoveListener(),
 			new StatusListener(),
-			new ResumedListener(),
+			new SessionResumeListener(),
 			new RoleCreateListener(),
 			new TextChannelListener(),
 			new RoleNameUpdateListener(),

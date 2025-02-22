@@ -33,14 +33,14 @@ import de.azrael.constructors.Schedule;
 import de.azrael.constructors.User;
 import de.azrael.constructors.Warning;
 import de.azrael.constructors.Watchlist;
-import de.azrael.core.Hashes;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.util.CharacterReplacer;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class Azrael {
 	private static final Logger logger = LoggerFactory.getLogger(Azrael.class);

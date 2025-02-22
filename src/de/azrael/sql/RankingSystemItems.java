@@ -17,7 +17,7 @@ import de.azrael.constructors.Skills;
 import de.azrael.constructors.WeaponAbbvs;
 import de.azrael.constructors.WeaponStats;
 import de.azrael.constructors.Weapons;
-import de.azrael.core.Hashes;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 
 public class RankingSystemItems {

@@ -21,12 +21,13 @@ import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class DrawDaily {
 	private final static Logger logger = LoggerFactory.getLogger(DrawDaily.class);
 	
-	public static void draw(GuildMessageReceivedEvent e, String obtained, Guilds guild_settings) {
+	public static void draw(MessageReceivedEvent e, String obtained, Guilds guild_settings) {
 		try {
 			BufferedImage daily = ImageIO.read(new File(Directory.DAILIES.getPath()+"daily_blank.png"));
 			BufferedImage reward = ImageIO.read(new File(Directory.DAILIES.getPath()+obtained+".png"));
@@ -59,12 +60,12 @@ public class DrawDaily {
 			g.dispose();
 			
 			final File file1 = new File(Directory.TEMP.getPath()+"daily_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+".png");
-			e.getChannel().sendFile(file1, "daily.png").queue(message -> {
+			e.getChannel().sendFiles(FileUpload.fromData(file1, "daily.png")).queue(message -> {
 				file1.delete();
 			});
 		} catch(IOException ioe) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).build()).queue();
+			if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_1)+obtained).queue();
 			logger.error("Daily reward couldn't be printed for user {} and reward {} in guild {}", e.getMember().getUser().getId(), obtained, e.getGuild().getId(), ioe);

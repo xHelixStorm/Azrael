@@ -11,7 +11,6 @@ import org.json.JSONObject;
 import de.azrael.commands.Invites;
 import de.azrael.commands.ShutDown;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleEvent;
@@ -23,10 +22,11 @@ import de.azrael.sql.AzraelWeb;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 public class HandlerPOST {
 	public static void handleRequest(ReadyEvent e, PrintWriter out, JSONObject json) {
@@ -355,7 +355,7 @@ public class HandlerPOST {
 						final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
 						final var channel = member.getUser().openPrivateChannel().complete();
 						try {
-							channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CODE).replace("{}", displayCode)).build()).queue();
+							channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CODE).replace("{}", displayCode)).build()).queue();
 							if(AzraelWeb.SQLInsertLoginInfo(user_id, 2, key) > 0) {
 								WebserviceUtils.return200(out, "Login key sent!", true, false);
 								AzraelWeb.SQLCodeUsageLog(user_id, address);
@@ -405,7 +405,7 @@ public class HandlerPOST {
 				if(!member.getUser().isBot()) {
 					final var channel = member.getUser().openPrivateChannel().complete();
 					try {
-						channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+System.getProperty("HOMEPAGE")+"/account/confirm.php?key="+confirmToken).build()).queue();
+						channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+System.getProperty("HOMEPAGE")+"/account/confirm.php?key="+confirmToken).build()).queue();
 						AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_SENT", "Confirmation sent.");
 						WebserviceUtils.return200(out, "Success", true, false);
 					} catch(Exception exc) {
@@ -440,7 +440,7 @@ public class HandlerPOST {
 				final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
 				final var channel = member.getUser().openPrivateChannel().complete();
 				try {
-					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
 					if(AzraelWeb.SQLInsertLoginInfo(user_id, 3, key) > 0) {
 						WebserviceUtils.return200(out, "Recovery key sent!", true, false);
 						AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATED", key);
@@ -474,7 +474,7 @@ public class HandlerPOST {
 				final String key = RandomStringUtils.random(6, true, true).toUpperCase();
 				final var channel = member.getUser().openPrivateChannel().complete();
 				try {
-					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_OPTIONS).replace("{}", key)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_OPTIONS).replace("{}", key)).build()).queue();
 					if(AzraelWeb.SQLInsertLoginInfo(user_id, 4, key) > 0) {
 						WebserviceUtils.return200(out, "Options change key sent!", true, false);
 						AzraelWeb.SQLInsertActionLog(user_id, address, "OPTIONS_CODE_GENERATED", key);

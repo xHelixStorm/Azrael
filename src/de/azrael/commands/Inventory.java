@@ -11,7 +11,6 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.InventoryContent;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
@@ -20,10 +19,11 @@ import de.azrael.inventory.InventoryBuilder;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
 import de.azrael.sql.RankingSystemItems;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Inventory command allows the user to inspect all
@@ -36,12 +36,12 @@ public class Inventory implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Inventory.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.INVENTORY);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//verify that the ranking system is enabled for the current server
 		Guilds guild_settings = RankingSystem.SQLgetGuild(e.getGuild().getIdLong());
 		if(guild_settings.getRankingState()) {
@@ -60,10 +60,10 @@ public class Inventory implements CommandPublic {
 						count++;
 					}
 					if(out.length() == 0)
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.INVENTORY_EMPTY)).build()).queue();
 					else {
 						final int maxPage = (items.size()/10)+(items.size()%10 > 0 ? 1 : 0);
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 							STATIC.addPaginationReactions(e, m, maxPage, "1", "10", items);
 						});
 					}
@@ -95,40 +95,40 @@ public class Inventory implements CommandPublic {
 					else
 						itemNumber = RankingSystem.SQLgetTotalItemNumber(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), maxItems);
 					
-					if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+					if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
 						//draw the inventory and assign a fitting tab image
 						//write to cache so that reactions can be added, if there are multiple pages
 						String drawTab = "";
 						if(args.length > 0 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_ITEMS))) {
 							drawTab = "items_total";
 							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
-							InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
+							InventoryBuilder.drawInventory(e.getGuild(), e.getMember(), e.getChannel().asTextChannel(), "items", "total", RankingSystem.SQLgetInventoryAndDescriptionsItems(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
 						}
 						else if(args.length > 0 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_WEAPONS))) {
 							if(args.length > 1 && sub_cat != null) {
 								drawTab = "weapons_"+args[1];
 								Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
-								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), "weapons", args[1], RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, args[1]), limit/maxItems+1, itemNumber+1, guild_settings);
+								InventoryBuilder.drawInventory(e.getGuild(), e.getMember(), e.getChannel().asTextChannel(), "weapons", args[1], RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems, args[1]), limit/maxItems+1, itemNumber+1, guild_settings);
 							}
 							else {
 								drawTab = "weapons_total";
 								Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
-								InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
+								InventoryBuilder.drawInventory(e.getGuild(), e.getMember(), e.getChannel().asTextChannel(), "weapons", "total", RankingSystem.SQLgetInventoryAndDescriptionsWeapons(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
 							}
 						}
 						else if(args.length > 0 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_SKINS))) {
 							drawTab = "skins_total";
 							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
-							InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
+							InventoryBuilder.drawInventory(e.getGuild(), e.getMember(), e.getChannel().asTextChannel(), "skins", "total", RankingSystem.SQLgetInventoryAndDescriptionsSkins(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
 						}
 						else {
 							drawTab = "total_total";
 							Hashes.addTempCache("inventory_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId(), new Cache(60000, e.getMember().getUser().getId()+"_"+(limit/maxItems+1)+"_"+(itemNumber+1)+"_"+drawTab));
-							InventoryBuilder.DrawInventory(e.getGuild(), e.getMember(), e.getChannel(), "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
+							InventoryBuilder.drawInventory(e.getGuild(), e.getMember(), e.getChannel().asTextChannel(), "total", "total", RankingSystem.SQLgetInventoryAndDescriptions(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), limit, maxItems), limit/maxItems+1, itemNumber+1, guild_settings);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
 						logger.error("Permission MESSAGE_ATTACH_FILES required to display the inventory in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
@@ -138,13 +138,13 @@ public class Inventory implements CommandPublic {
 			}
 		}
 		else{
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Inventory command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

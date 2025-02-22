@@ -13,7 +13,6 @@ import de.azrael.constructors.CategoryConf;
 import de.azrael.constructors.Channels;
 import de.azrael.constructors.Dailies;
 import de.azrael.constructors.Roles;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -22,12 +21,13 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.VoiceChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Display command can print details of various things
@@ -44,12 +44,12 @@ public class Display implements CommandPublic{
 	private static final int BREAKER = 10;
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.DISPLAY);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		long guild_id = e.getGuild().getIdLong();
 		StringBuilder out = new StringBuilder();
 		
@@ -153,10 +153,10 @@ public class Display implements CommandPublic{
 			
 			if(sb.length() > 0) {
 				out.append(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_HELP)+sb.toString());
-				e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
+				e.getChannel().sendMessageEmbeds(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(out.toString()).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_DISABLED)).build()).queue();
+				e.getChannel().sendMessageEmbeds(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_DISABLED)).build()).queue();
 			}
 		}
 		//display all roles
@@ -173,7 +173,7 @@ public class Display implements CommandPublic{
 					count++;
 				}
 				final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
-				e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+				e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 					STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, roles);
 				});
 			}
@@ -199,12 +199,12 @@ public class Display implements CommandPublic{
 				}
 				if(out.length() > 0) {
 					final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, roles);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else {
@@ -228,16 +228,16 @@ public class Display implements CommandPublic{
 					}
 					if(out.length() > 0) {
 						final int maxPage = (roles.size()/BREAKER)+(roles.size()%BREAKER > 0 ? 1 : 0);
-						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+						e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 							STATIC.addPaginationReactions(e, m, maxPage, "2", ""+BREAKER, roles);
 						});
 					}
 					else {
-						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 					}
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 				}
 			}
 			else {
@@ -259,12 +259,12 @@ public class Display implements CommandPublic{
 				}
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/BREAKER)+(categories.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, categories);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else {
@@ -294,12 +294,12 @@ public class Display implements CommandPublic{
 				}
 				if(out.length() > 0) {
 					final int maxPage = (categories.size()/BREAKER)+(categories.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, categories);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else{
@@ -321,12 +321,12 @@ public class Display implements CommandPublic{
 				}
 				if(out.length() > 0) {
 					final int maxPage = (textChannels.size()/BREAKER)+(textChannels.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, textChannels);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else {
@@ -348,12 +348,12 @@ public class Display implements CommandPublic{
 				}
 				if(out.length() > 0) {
 					final int maxPage = (voiceChannels.size()/BREAKER)+(voiceChannels.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, voiceChannels);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else {
@@ -402,12 +402,12 @@ public class Display implements CommandPublic{
 				
 				if(out.length() > 0) {
 					final int maxPage = (totChannels.size()/BREAKER)+(totChannels.size()%BREAKER > 0 ? 1 : 0);
-					e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "3", ""+BREAKER, totChannels);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else{
@@ -430,16 +430,16 @@ public class Display implements CommandPublic{
 					}
 					if(out.length() > 0) {
 						final int maxPage = (dailies.size()/BREAKER)+(dailies.size()%BREAKER > 0 ? 1 : 0);
-						e.getChannel().sendMessage(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
+						e.getChannel().sendMessageEmbeds(messageBuild.setFooter("1/"+maxPage).setDescription(out.toString()).build()).queue(m -> {
 							STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, dailies);
 						});
 					}
 					else {
-						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 					}
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				}
 			}
 			else{
@@ -469,12 +469,12 @@ public class Display implements CommandPublic{
 				if(out.length() > 0) {
 					final int maxPage = (watchedUsers.size()/BREAKER)+(watchedUsers.size()%BREAKER > 0 ? 1 : 0);
 					final var users = watchedUsers;
-					e.getChannel().sendMessage(messageBuild.setDescription(out.toString()).build()).queue(m -> {
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(out.toString()).build()).queue(m -> {
 						STATIC.addPaginationReactions(e, m, maxPage, "1", ""+BREAKER, users);
 					});
 				}
 				else {
-					e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.DISPLAY_INPUT_NOT_FOUND)).build()).queue();
 				}
 			}
 			else {
@@ -482,13 +482,13 @@ public class Display implements CommandPublic{
 			}
 		}
 		else {
-			e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Display command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

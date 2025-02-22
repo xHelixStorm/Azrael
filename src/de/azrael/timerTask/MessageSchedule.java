@@ -9,14 +9,14 @@ import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import de.azrael.constructors.Schedule;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class MessageSchedule extends TimerTask {
 	private Guild guild;
@@ -63,7 +63,7 @@ public class MessageSchedule extends TimerTask {
 		
 		final TextChannel textChannel = guild.getTextChannelById(schedule.getChannel_id());
 		if(textChannel != null) {
-			if(guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_WRITE) || STATIC.setPermissions(null, textChannel, EnumSet.of(Permission.MESSAGE_WRITE))) {
+			if(guild.getSelfMember().hasPermission(textChannel, Permission.MESSAGE_SEND) || STATIC.setPermissions(null, textChannel, EnumSet.of(Permission.MESSAGE_SEND))) {
 				textChannel.sendMessage(schedule.getMessage()).queue();
 			}
 			else {

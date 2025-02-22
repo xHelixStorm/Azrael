@@ -4,14 +4,14 @@ import java.util.ArrayList;
 
 import de.azrael.enums.Translation;
 import de.azrael.util.STATIC;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class MeowUsage {
 
 	private static StringBuilder readMessage = new StringBuilder();
 	private static ArrayList <String> textCollector = new ArrayList<>();
 
-	public static String getMeowInfos(GuildMessageReceivedEvent e) {
+	public static String getMeowInfos(MessageReceivedEvent e) {
 		if(readMessage.length() == 0) {
 			textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP));
 			textCollector.add(STATIC.getTranslation(e.getMember(), Translation.MEOW_HELP_1));

@@ -19,7 +19,6 @@ import de.azrael.constructors.Cache;
 import de.azrael.constructors.Dailies;
 import de.azrael.constructors.InventoryContent;
 import de.azrael.constructors.Ranking;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
@@ -27,10 +26,11 @@ import de.azrael.interfaces.CommandPublic;
 import de.azrael.inventory.DrawDaily;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Daily command sends the user a random defined reward
@@ -44,12 +44,12 @@ public class Daily implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Daily.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.DAILY);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//check if the user is spamming the command before it's completed (attempt to retrieve multiple rewards)
 		var cache = Hashes.getTempCache("dailyDelay_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId());
 		if(cache == null || cache.getExpiration() - System.currentTimeMillis() <= 0) {
@@ -114,15 +114,15 @@ public class Daily implements CommandPublic {
 								
 								if(guild_settings.getDailyId() > 0) {
 									//get the index of an array depending on the random number and draw the reward into the screen
-									if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
+									if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES)))
 										DrawDaily.draw(e, list.get(random).getDescription(), guild_settings);
 									else {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
 										logger.error("Permission MESSAGE_ATTACH_FILES required to display the dailies for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 									}
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERR)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERR)).build()).queue();
 									return true;
 								}
 								
@@ -148,7 +148,7 @@ public class Daily implements CommandPublic {
 											Hashes.addRanking(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), user_details);
 									}
 									else {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 										logger.error("Currency couldn't be updated for user {} with the daily reward {} in guild {}", e.getMember().getUser().getId(), reward.getDescription(), e.getGuild().getId());
 										RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Currency from daily not updated", reward.getDescription());
 									}
@@ -181,10 +181,8 @@ public class Daily implements CommandPublic {
 										channel.sendMessage(STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD)+cod_reward).queue(success -> {
 											EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
 											STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward, Channel.LOG.getType());
-											channel.close().queue();
 										}, error -> {
 											STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED), STATIC.getTranslation(e.getMember(), Translation.DAILY_REWARD_NOT_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+cod_reward, Channel.LOG.getType());
-											channel.close().queue();
 										});
 									});
 									
@@ -194,7 +192,7 @@ public class Daily implements CommandPublic {
 								//If the player was unlucky, send a message that nothing was won
 								else if(list.get(random).getType().equals("riv")) {
 									EmbedBuilder message = new EmbedBuilder().setColor(Color.getHSBColor(268, 81, 88)).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DAILY));
-									e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_RIVET)).build()).queue();
+									e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_RIVET)).build()).queue();
 									//mark as successful
 									editedRows = 1;
 								}
@@ -211,22 +209,22 @@ public class Daily implements CommandPublic {
 									}
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_3)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_ERROR_3)).build()).queue();
 									logger.error("{} couldn't be inserted into inventory in guild {}", list.get(random).getDescription(), e.getGuild().getId());
 									RankingSystem.SQLInsertActionLog("high", e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), "Daily item couldn't be inserted to inventory", "An insert error occurred for the following item "+list.get(random).getDescription());
 								}
 								list.clear();
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_EMPTY)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_EMPTY)).build()).queue();
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_EMPTY)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.DAILY_EMPTY)).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					}
 				}
 				//notify the user that he can't use the daily command yet
@@ -244,7 +242,7 @@ public class Daily implements CommandPublic {
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Daily command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

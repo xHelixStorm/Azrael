@@ -10,25 +10,25 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Quizes;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class RunQuiz implements Runnable{
 	private final static Logger logger = LoggerFactory.getLogger(RunQuiz.class);
 	public final static ConcurrentMap<Long, String> quizState = new ConcurrentHashMap<Long, String>();
 	
-	private GuildMessageReceivedEvent e;
+	private MessageReceivedEvent e;
 	private long quizChannel;
 	private long logChannel;
 	private int mode;
 	
-	public RunQuiz(GuildMessageReceivedEvent _e, long _quizChannel, long _logChannel, int _mode) {
+	public RunQuiz(MessageReceivedEvent _e, long _quizChannel, long _logChannel, int _mode) {
 		this.e = _e;
 		this.quizChannel = _quizChannel;
 		this.logChannel = _logChannel;
@@ -100,15 +100,13 @@ public class RunQuiz implements Runnable{
 									+ "**"+quiz.getReward()+"**").queue(success -> {
 										Azrael.SQLUpdateUsedQuizReward(e.getGuild().getIdLong(), quiz.getReward());
 										if(logChannel != null)
-											logChannel.sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
-										pchannel.close().queue();
+											logChannel.sendMessageEmbeds(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
 									}, error -> {
 										//When the reward couldn't be sent, throw this error.
 										Azrael.SQLUpdateUsedQuizReward(e.getGuild().getIdLong(), quiz.getReward());
 										EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REWARD_SEND_ERR));
 										if(logChannel != null)
-											logChannel.sendMessage(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION_2).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
-										pchannel.close().queue();
+											logChannel.sendMessageEmbeds(err.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_WINNER_NOTIFICATION_2).replaceFirst("\\{\\}", member.getUser().getName()+"#"+member.getUser().getDiscriminator())+quiz.getReward()).build()).queue();
 									});
 						});
 						
@@ -157,7 +155,7 @@ public class RunQuiz implements Runnable{
 		}
 	}
 	
-	private String replyList(GuildMessageReceivedEvent e, int digit) {
+	private String replyList(MessageReceivedEvent e, int digit) {
 		return switch(digit) {
 			case 1  -> STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REPLY_1);
 			case 2  -> STATIC.getTranslation2(e.getGuild(), Translation.QUIZ_REPLY_2);

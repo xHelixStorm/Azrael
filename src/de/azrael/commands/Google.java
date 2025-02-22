@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
+import de.azrael.commands.util.GoogleSpreadsheetsExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Directory;
@@ -16,7 +16,7 @@ import de.azrael.sql.Azrael;
 import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * Google APIs set up for specific events
@@ -28,12 +28,12 @@ public class Google implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Google.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.GOOGLE);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//print help message and all currently available APIs
 		if(args.length == 0) {
 			String email;
@@ -43,7 +43,7 @@ public class Google implements CommandPublic {
 			else 
 				email = STATIC.getTranslation(e.getMember(), Translation.NOT_AVAILABLE);
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS));
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replaceFirst("\\{\\}", email)
+			e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGlE_HELP).replaceFirst("\\{\\}", email)
 					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_SPREADSHEETS))).build()).queue();
 		}
 		else if(args.length == 1) {
@@ -53,18 +53,18 @@ public class Google implements CommandPublic {
 			}
 			else {
 				EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
-				e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_API_NOT_AVAILABLE)).build()).queue();
+				e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_API_NOT_AVAILABLE)).build()).queue();
 			}
 		}
 		else {
 			EmbedBuilder message = new EmbedBuilder().setColor(Color.RED);
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+			e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String [] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String [] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Google command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

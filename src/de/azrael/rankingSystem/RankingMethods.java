@@ -41,22 +41,23 @@ import de.azrael.gif.GifOptimizer;
 import de.azrael.gif.GifSequenceWriter;
 import de.azrael.gif.GifDecoder.GifImage;
 import de.azrael.sql.RankingSystem;
-import de.azrael.util.Imgur;
+import de.azrael.subscription.ImgurModel;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class RankingMethods extends ListenerAdapter {
 	//Class for drawing level ups, ranks and profiles basing on the user settings
 	private final static Logger logger = LoggerFactory.getLogger(RankingMethods.class);
 	
-	public static void getRankUp(GuildMessageReceivedEvent e, Ranking user_details, int rankIcon) {
+	public static void getRankUp(MessageReceivedEvent e, Ranking user_details, int rankIcon) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingLevel(user_details.getRankingLevel(), e.getGuild().getIdLong());
 		if(skin == null) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			logger.error("RankUp couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
@@ -157,7 +158,7 @@ public class RankingMethods extends ListenerAdapter {
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
-					final String uploadedFile = Imgur.uploadFile(file1);
+					final String uploadedFile = ImgurModel.uploadFile(file1);
 					if(uploadedFile != null) {
 						e.getChannel().sendMessage(uploadedFile).queue();
 					}
@@ -171,11 +172,11 @@ public class RankingMethods extends ListenerAdapter {
 									message.delete().queue();
 									final File file2 = new File(Directory.TEMP.getPath()+"level_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
-										e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+										e.getChannel().sendFiles(FileUpload.fromData(file2, "level_up."+skin.getFileType())).queue(complete -> {
 											file2.delete();
 										});
 									} catch(IllegalArgumentException e1) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
 										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 										file2.delete();
 									}
@@ -184,7 +185,7 @@ public class RankingMethods extends ListenerAdapter {
 								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
-								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 							}
 						});
 					}
@@ -208,35 +209,35 @@ public class RankingMethods extends ListenerAdapter {
 					
 					file1.delete();
 					try {
-						e.getChannel().sendFile(file2, "level_up."+skin.getFileType()).queue(complete -> {
+						e.getChannel().sendFiles(FileUpload.fromData(file2, "level_up."+skin.getFileType())).queue(complete -> {
 							file2.delete();
 						});
 					} catch(IllegalArgumentException e1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
 						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 						file2.delete();
 					}
 				}
 			}
 			else {
-				e.getChannel().sendFile(file1, "level_up."+skin.getFileType()).queue(complete -> {
+				e.getChannel().sendFiles(FileUpload.fromData(file1, "level_up."+skin.getFileType())).queue(complete -> {
 					file1.delete();
 				});
 			}
 		} catch (IOException e1) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
+			if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.LEVEL_ERR)).queue();
 			logger.error("RankUp couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getRank(GuildMessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, Ranking user_details) {
+	public static void getRank(MessageReceivedEvent e, String _name, String _avatar, int _experience, int _rank, Ranking user_details) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingRank(user_details.getRankingRank(), e.getGuild().getIdLong());
 		if(skin == null) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			logger.error("Rank couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
@@ -345,7 +346,7 @@ public class RankingMethods extends ListenerAdapter {
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
-					final String uploadedFile = Imgur.uploadFile(file1);
+					final String uploadedFile = ImgurModel.uploadFile(file1);
 					if(uploadedFile != null) {
 						e.getChannel().sendMessage(uploadedFile).queue();
 					}
@@ -359,17 +360,17 @@ public class RankingMethods extends ListenerAdapter {
 									message.delete().queue();
 									final File file2 = new File(Directory.TEMP.getPath()+"rank_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
-										e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+										e.getChannel().sendFiles(FileUpload.fromData(file2, "rank."+skin.getFileType())).queue(complete -> {
 											file2.delete();
 										});
 									} catch(IllegalArgumentException e1) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
 										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 										file2.delete();
 									}
 								}
 							} catch(IOException | DataFormatException e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
@@ -396,35 +397,35 @@ public class RankingMethods extends ListenerAdapter {
 					
 					file1.delete();
 					try {
-						e.getChannel().sendFile(file2, "rank."+skin.getFileType()).queue(complete -> {
+						e.getChannel().sendFiles(FileUpload.fromData(file2, "rank."+skin.getFileType())).queue(complete -> {
 							file2.delete();
 						});
 					} catch(IllegalArgumentException e1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
 						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 						file2.delete();
 					}
 				}
 			}
 			else {
-				e.getChannel().sendFile(file1, "rank."+skin.getFileType()).queue(complete -> {
+				e.getChannel().sendFiles(FileUpload.fromData(file1, "rank."+skin.getFileType())).queue(complete -> {
 					file1.delete();
 				});
 			}
 		} catch (IOException e1) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
+			if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.RANK_ERR)).queue();
 			logger.error("Rank couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);
 		}
 	}
 	
-	public static void getProfile(GuildMessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, Ranking user_details) {
+	public static void getProfile(MessageReceivedEvent e, String _name, String _avatar, int _experiencePercentage, int _rank, int currentExperience, int rankUpExperience, Ranking user_details) {
 		final var skinIcon = RankingSystem.SQLgetRankingIcons(user_details.getRankingIcon(), e.getGuild().getIdLong());
 		final var skin = RankingSystem.SQLgetRankingProfile(user_details.getRankingProfile(), e.getGuild().getIdLong());
 		if(skin == null) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			logger.error("Profile couldn't be drawn. Skin not found in guild {}", e.getGuild().getIdLong());
 			return;
 		}
@@ -628,7 +629,7 @@ public class RankingMethods extends ListenerAdapter {
 			if(file1.length() > (FileUtils.ONE_MB*8) || skin.getFileType().equals("gif")) {
 				if(skin.getFileType().equals("gif")) {
 					//before attempting file compression, check if it can be uploaded to Imgur
-					final String uploadedFile = Imgur.uploadFile(file1);
+					final String uploadedFile = ImgurModel.uploadFile(file1);
 					if(uploadedFile != null) {
 						e.getChannel().sendMessage(uploadedFile).queue();
 					}
@@ -642,17 +643,17 @@ public class RankingMethods extends ListenerAdapter {
 									message.delete().queue();
 									final File file2 = new File(Directory.TEMP.getPath()+"profile_compressed_gu"+e.getGuild().getId()+"us"+e.getMember().getUser().getId()+"."+skin.getFileType());
 									try {
-										e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+										e.getChannel().sendFiles(FileUpload.fromData(file2, "profile."+skin.getFileType())).queue(complete -> {
 											file2.delete();
 										});
 									} catch(IllegalArgumentException e1) {
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_SEND_ERR)).build()).queue();
 										logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 										file2.delete();
 									}
 								}
 							} catch(IOException | DataFormatException e1) {
-								e.getChannel().sendMessage(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GIF_COMPRESS_ERR)).build()).queue();
 								logger.error("Compression error for file {} in guild {}", skin.getSkinDescription()+"."+skin.getFileType(), e.getGuild().getId(), e1);
 								file1.delete();
 								message.delete().queue();
@@ -679,23 +680,23 @@ public class RankingMethods extends ListenerAdapter {
 					
 					file1.delete();
 					try {
-						e.getChannel().sendFile(file2, "profile."+skin.getFileType()).queue(complete -> {
+						e.getChannel().sendFiles(FileUpload.fromData(file2, "profile."+skin.getFileType())).queue(complete -> {
 							file2.delete();
 						});
 					} catch(IllegalArgumentException e1) {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.IMAGE_SEND_ERR)).build()).queue();
 						logger.error("File size exceeded the allowed amount in guild {}", e.getGuild().getId(), e1.getMessage());
 						file2.delete();
 					}
 				}
 			}
 			else {
-				e.getChannel().sendFile(file1, "profile."+skin.getFileType()).complete();
+				e.getChannel().sendFiles(FileUpload.fromData(file1, "profile."+skin.getFileType())).complete();
 				file1.delete();
 			}
 		} catch (IOException e1) {
-			if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
+			if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).build()).queue();
 			else
 				e.getChannel().sendMessage(STATIC.getTranslation(e.getMember(), Translation.PROFILE_ERR)).queue();
 			logger.error("Profile couldn't be drawn in guild {}", e.getGuild().getIdLong(), e1);

@@ -6,24 +6,23 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.commandsContainer.SetChannelFilter;
-import de.azrael.commandsContainer.SetCompServer;
-import de.azrael.commandsContainer.SetDailyItem;
-import de.azrael.commandsContainer.SetGiveawayItems;
-import de.azrael.commandsContainer.SetIconDefaultSkin;
-import de.azrael.commandsContainer.SetLanguage;
-import de.azrael.commandsContainer.SetLevelDefaultSkin;
-import de.azrael.commandsContainer.SetMap;
-import de.azrael.commandsContainer.SetMatchmakingMembers;
-import de.azrael.commandsContainer.SetMaxClanMembers;
-import de.azrael.commandsContainer.SetMaxExperience;
-import de.azrael.commandsContainer.SetPrivilegeLevel;
-import de.azrael.commandsContainer.SetProfileDefaultSkin;
-import de.azrael.commandsContainer.SetRankDefaultSkin;
-import de.azrael.commandsContainer.SetRankingSystem;
-import de.azrael.commandsContainer.SetWarning;
+import de.azrael.commands.util.SetChannelFilter;
+import de.azrael.commands.util.SetCompServer;
+import de.azrael.commands.util.SetDailyItem;
+import de.azrael.commands.util.SetGiveawayItems;
+import de.azrael.commands.util.SetIconDefaultSkin;
+import de.azrael.commands.util.SetLanguage;
+import de.azrael.commands.util.SetLevelDefaultSkin;
+import de.azrael.commands.util.SetMap;
+import de.azrael.commands.util.SetMatchmakingMembers;
+import de.azrael.commands.util.SetMaxClanMembers;
+import de.azrael.commands.util.SetMaxExperience;
+import de.azrael.commands.util.SetPrivilegeLevel;
+import de.azrael.commands.util.SetProfileDefaultSkin;
+import de.azrael.commands.util.SetRankDefaultSkin;
+import de.azrael.commands.util.SetRankingSystem;
+import de.azrael.commands.util.SetWarning;
 import de.azrael.constructors.BotConfigs;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
@@ -31,8 +30,9 @@ import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * Set up the Bot with various functionalities
@@ -42,7 +42,7 @@ public class Set implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(RoleReaction.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(STATIC.getCommandEnabled(e.getGuild(), Command.SET)) {
 			return true;
 		}
@@ -50,7 +50,7 @@ public class Set implements CommandPublic {
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		var commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET);
 		if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
 			EmbedBuilder messageBuild = new EmbedBuilder().setColor(Color.BLUE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getSettings());
@@ -141,15 +141,15 @@ public class Set implements CommandPublic {
 				if(setLanguage)				sf.append(STATIC.getTranslation(e.getMember(), Translation.SET_PARAM_16).replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_LANGUAGE)));
 				
 				if(sf.length() > 0)
-					e.getChannel().sendMessage(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_HELP)+sf.toString()).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_HELP)+sf.toString()).build()).queue();
 				else
-					e.getChannel().sendMessage(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DISABLED)).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DISABLED)).build()).queue();
 				return true;
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PERMISSIONS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_PERMISSIONS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_PERMISSIONS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION)).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PERMISSION)).build()).queue();
 					return true;
 				}
 				else {
@@ -177,10 +177,10 @@ public class Set implements CommandPublic {
 							out.append("**"+k+"**\n");
 							out2.append("*"+v+"*\n");
 						});
-						e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+						e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_CENSOR)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Languages couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -222,7 +222,7 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_RANKING)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_RANKING)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_RANKING);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANKING)
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANKING)
 							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 					return true;
@@ -244,7 +244,7 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_MAX_EXPERIENCE)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_MAX_EXPERIENCE)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_MAX_EXPERIENCE);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_EXPERIENCE)
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_MAX_EXPERIENCE)
 							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ENABLE))
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_DISABLE))).build()).queue();
 					return true;
@@ -276,12 +276,12 @@ public class Set implements CommandPublic {
 							count++;
 						}
 						if(skins.size() > 0)
-							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+							e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -299,14 +299,14 @@ public class Set implements CommandPublic {
 							if(args[1].matches("[0-9]*"))
 								SetLevelDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_LEVEL_SKIN_ERR)).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Level skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -331,12 +331,12 @@ public class Set implements CommandPublic {
 							count++;
 						}
 						if(skins.size() > 0)
-							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+							e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -354,14 +354,14 @@ public class Set implements CommandPublic {
 							if(args[1].matches("[0-9]*"))
 								SetRankDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_RANK_SKIN_ERR)).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Rank skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -386,12 +386,12 @@ public class Set implements CommandPublic {
 							count++;
 						}
 						if(skins.size() > 0)
-							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+							e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -409,14 +409,14 @@ public class Set implements CommandPublic {
 							if(args[1].matches("[0-9]*"))
 								SetProfileDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_PROFILE_SKIN_ERR)).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Profile skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -441,12 +441,12 @@ public class Set implements CommandPublic {
 							count++;
 						}
 						if(skins.size() > 0)
-							e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
+							e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_HELP)).addField("", out.toString(), true).addField("", out2.toString(), true).build()).queue();
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -464,13 +464,13 @@ public class Set implements CommandPublic {
 							if(args[1].matches("[0-9]*"))
 								SetIconDefaultSkin.runTask(e, Integer.parseInt(args[1]), skins.size(), skins);
 							else
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_INVALID_NUMBER)).build()).queue();
 						}
 						else
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_ICON_SKIN_ERR)).build()).queue();
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Icon skins couldn't be retrieved in guild {}", e.getGuild().getId());
 					}
 					return true;
@@ -482,7 +482,7 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_DAILY_ITEM)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_DAILY_ITEM)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_DAILY_ITEM);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ITEM_HELP)).build()).queue();
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_DAILY_ITEM_HELP)).build()).queue();
 					return true;
 				}
 				else {
@@ -502,7 +502,7 @@ public class Set implements CommandPublic {
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GIVEAWAY_ITEMS)) && STATIC.getCommandEnabled(e.getGuild(), Command.SET_GIVEAWAY_ITEMS)) {
 				commandLevel = STATIC.getCommandLevel(e.getGuild(), Command.SET_GIVEAWAY_ITEMS);
 				if(UserPrivs.comparePrivilege(e.getMember(), commandLevel)) {
-					e.getChannel().sendMessage(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY)
+					e.getChannel().sendMessageEmbeds(messageBuild.setDescription(STATIC.getTranslation(e.getMember(), Translation.SET_GIVEAWAY)
 							.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXTEND))
 							.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_CLEAR))).build()).queue();
 					return true;
@@ -619,7 +619,7 @@ public class Set implements CommandPublic {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else if(!botConfig.getIgnoreMissingPermissions()) {
@@ -629,7 +629,7 @@ public class Set implements CommandPublic {
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Set command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

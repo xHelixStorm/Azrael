@@ -15,29 +15,27 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 import com.vdurmont.emoji.EmojiManager;
 
 import de.azrael.commands.Quiz;
-import de.azrael.commandsContainer.ClanExecution;
-import de.azrael.commandsContainer.FilterExecution;
-import de.azrael.commandsContainer.GoogleSpreadsheetsExecution;
-import de.azrael.commandsContainer.JoinExecution;
-import de.azrael.commandsContainer.PruneExecution;
-import de.azrael.commandsContainer.PurchaseExecution;
-import de.azrael.commandsContainer.QuizExecution;
-import de.azrael.commandsContainer.RoomExecution;
-import de.azrael.commandsContainer.ScheduleExecution;
-import de.azrael.commandsContainer.SetWarning;
-import de.azrael.commandsContainer.ShopExecution;
-import de.azrael.commandsContainer.UserExecution;
-import de.azrael.commandsContainer.WriteEditExecution;
+import de.azrael.commands.util.ClanExecution;
+import de.azrael.commands.util.CommandHandler;
+import de.azrael.commands.util.CommandParser;
+import de.azrael.commands.util.FilterExecution;
+import de.azrael.commands.util.GoogleSpreadsheetsExecution;
+import de.azrael.commands.util.JoinExecution;
+import de.azrael.commands.util.PruneExecution;
+import de.azrael.commands.util.PurchaseExecution;
+import de.azrael.commands.util.QuizExecution;
+import de.azrael.commands.util.RoomExecution;
+import de.azrael.commands.util.ScheduleExecution;
+import de.azrael.commands.util.SetWarning;
+import de.azrael.commands.util.ShopExecution;
+import de.azrael.commands.util.UserExecution;
+import de.azrael.commands.util.WriteEditExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Subscription;
-import de.azrael.core.CommandHandler;
-import de.azrael.core.CommandParser;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Command;
 import de.azrael.enums.Directory;
@@ -55,15 +53,20 @@ import de.azrael.subscription.SubscriptionUtils;
 import de.azrael.threads.DelayedGoogleUpdate;
 import de.azrael.threads.RunQuiz;
 import de.azrael.util.FileHandler;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.Emoji.Type;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.entities.MessageType;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -83,8 +86,8 @@ public class GuildMessageListener extends ListenerAdapter {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void onGuildMessageReceived(GuildMessageReceivedEvent e) {
-		if(e.getMember() != null) {
+	public void onMessageReceived(MessageReceivedEvent e) {
+		if(e.isFromGuild() && e.getChannel().getType().equals(ChannelType.TEXT)) {
 			new Thread(() -> {
 				long user_id = e.getMember().getUser().getIdLong();
 				long guild_id = e.getGuild().getIdLong();
@@ -106,7 +109,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						//check if the language filter is enabled for this channel and retrieve all languages
 						var filter_lang = Azrael.SQLgetChannel_Filter(channel_id);
 						if(filter_lang != null && filter_lang.size() > 0) {
-							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE))) {
 								threadLanguage = new Thread(new LanguageFilter(e.getMessage(), filter_lang, allChannels));
 								threadLanguage.start();
 								//if url censoring is enabled, also run the url censoring thread
@@ -116,18 +119,18 @@ public class GuildMessageListener extends ListenerAdapter {
 								}
 							}
 							else {
-								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
 								logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 						}
 						//if url censoring is enabled but no language has been applied, use english as default and run the url censoring thread
 						else if(currentChannel != null && currentChannel.getURLCensoring()) {
-							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_MANAGE))) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_MANAGE))) {
 								threadUrl = new Thread(new URLFilter(e.getMessage(), e.getMember(), allChannels));
 								threadUrl.start();
 							}
 							else {
-								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
+								STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName()+" and "+Permission.MESSAGE_MANAGE.getName())+e.getChannel().getName(), Channel.LOG.getType());
 								logger.error("MESSAGE_WRITE and MESSAGE_MANAGE permissions required to censor messages on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 						}
@@ -152,7 +155,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//execute commands
 					if(e.getMessage().getContentRaw().startsWith(botConfig.getCommandPrefix())) {
 						var prefixLength = botConfig.getCommandPrefix().length();
-						if(!CommandHandler.handleCommand(CommandParser.parser(botConfig.getCommandPrefix(), e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e, null), botConfig)) {
+						if(!CommandHandler.handleCommand(CommandParser.parser(botConfig.getCommandPrefix(), e.getMessage().getContentRaw().substring(0, prefixLength)+e.getMessage().getContentRaw().substring(prefixLength), e), botConfig)) {
 							logger.debug("Command {} doesn't exist in guild {}", e.getMessage().getContentRaw(), e.getGuild().getId());
 						}
 						else
@@ -186,7 +189,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					if(shop != null && !e.getMember().getUser().isBot() && shop.getExpiration() - System.currentTimeMillis() > 0) {
 						//verify if the user whishes to close the shop
 						if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_EXIT))) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE_EXIT)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SHOP_TITLE_EXIT)).build()).queue();
 							Hashes.clearTempCache("shop_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 						}
 						//check if the user has decided for a specific category
@@ -307,11 +310,11 @@ public class GuildMessageListener extends ListenerAdapter {
 						boolean createTemp = false;
 						//add reactions
 						if(current_page > 1) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
+							e.getMessage().addReaction(Emoji.fromUnicode(EmojiManager.getForAlias(":arrow_left:").getUnicode())).queue();
 							createTemp = true;
 						}
 						if(current_page < last_page) {
-							e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
+							e.getMessage().addReaction(Emoji.fromUnicode(EmojiManager.getForAlias(":arrow_right:").getUnicode())).queue();
 							createTemp = true;
 						}
 						//enable reaction events for the current user and drawn inventory
@@ -323,27 +326,27 @@ public class GuildMessageListener extends ListenerAdapter {
 					
 					//include vote up and vote down reactions, if it's a vote channel
 					if(currentChannel != null && currentChannel.getChannel_Type() != null && (currentChannel.getChannel_Type().equals(Channel.VOT.getType()) || currentChannel.getChannel_Type().equals(Channel.VO2.getType())) && e.getGuild().getSelfMember().getIdLong() != e.getMember().getUser().getIdLong()) {
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION))) {
 							if(e.getMessage().getType() != MessageType.CHANNEL_PINNED_ADD) {
 								try {
 									final boolean voteTwoChannel = currentChannel.getChannel_Type().equals(Channel.VO2.getType());
 									final String [] reactions = botConfig.getVoteReactions();
 									final Object thumbsup = STATIC.retrieveEmoji(e.getGuild(), reactions[0], ":thumbsup:");;
 									final Object thumbsdown = STATIC.retrieveEmoji(e.getGuild(), reactions[1], ":thumbsdown:");
-									if(thumbsup instanceof Emote)
-										e.getMessage().addReaction((Emote)thumbsup).complete();
+									if(thumbsup instanceof Emoji)
+										e.getMessage().addReaction((RichCustomEmoji)thumbsup).complete();
 									else if(thumbsup instanceof String)
-										e.getMessage().addReaction((String)thumbsup).complete();
-									if(thumbsdown instanceof Emote)
-										e.getMessage().addReaction((Emote)thumbsdown).complete();
+										e.getMessage().addReaction(Emoji.fromUnicode((String)thumbsup)).complete();
+									if(thumbsdown instanceof Emoji)
+										e.getMessage().addReaction((RichCustomEmoji)thumbsdown).complete();
 									else if(thumbsdown instanceof String)
-										e.getMessage().addReaction((String)thumbsdown).complete();
+										e.getMessage().addReaction(Emoji.fromUnicode((String)thumbsdown)).complete();
 									if(voteTwoChannel) {
 										final Object shrug = STATIC.retrieveEmoji(e.getGuild(), reactions[2], ":shrug:");
-										if(shrug instanceof Emote)
-											e.getMessage().addReaction((Emote)shrug).complete();
+										if(shrug instanceof RichCustomEmoji)
+											e.getMessage().addReaction((RichCustomEmoji)shrug).complete();
 										else if(shrug instanceof String)
-											e.getMessage().addReaction((String)shrug).complete();
+											e.getMessage().addReaction(Emoji.fromUnicode((String)shrug)).complete();
 									}
 									
 									//Run google service, if enabled
@@ -378,7 +381,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					//check if the randomshop command has been used
 					final var randomshop_bot = Hashes.getTempCache("randomshop_bot_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId());
 					if(randomshop_bot != null && e.getGuild().getSelfMember().getIdLong() == e.getMember().getUser().getIdLong() && randomshop_bot.getExpiration() - System.currentTimeMillis() > 0) {
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_ADD_REACTION))) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION))) {
 							//get details of the inventory
 							String cache_content = randomshop_bot.getAdditionalInfo();
 							String [] array = cache_content.split("_");
@@ -390,11 +393,11 @@ public class GuildMessageListener extends ListenerAdapter {
 							boolean createCache = false;
 							//add reactions
 							if(current_page > 1) {
-								e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_left:").getUnicode()).queue();
+								e.getMessage().addReaction(Emoji.fromUnicode(EmojiManager.getForAlias(":arrow_left:").getUnicode())).queue();
 								createCache = true;
 							}
 							if(current_page < last_page) {
-								e.getMessage().addReaction(EmojiManager.getForAlias(":arrow_right:").getUnicode()).queue();
+								e.getMessage().addReaction(Emoji.fromUnicode(EmojiManager.getForAlias(":arrow_right:").getUnicode())).queue();
 								createCache = true;
 							}
 							//enable reaction events for the current user and drawn inventory
@@ -615,7 +618,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EXIT)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.GOOGLE_EXIT)).build()).queue();
 							//remove the google command from cache
 							Hashes.clearTempCache(key);
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.GOOGLE.getColumn(), e.getMessage().getContentRaw());
@@ -801,7 +804,7 @@ public class GuildMessageListener extends ListenerAdapter {
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_EXITED)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.SCHEDULE_EXITED)).build()).queue();
 							Hashes.clearTempCache("schedule_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId());
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.SCHEDULE.getColumn(), e.getMessage().getContentRaw());
 						}
@@ -817,7 +820,7 @@ public class GuildMessageListener extends ListenerAdapter {
 						}
 						else if(message.equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NO))) {
 							//Abort prune
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ABORT)).build()).queue();
 							Hashes.clearTempCache("prune_gu"+guild_id+"ch"+channel_id+"us"+user_id);
 							Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PRUNE.getColumn(), e.getMessage().getContentRaw());
 						}
@@ -906,29 +909,29 @@ public class GuildMessageListener extends ListenerAdapter {
 				//if the watched member level equals 2, then print all written messages from that user in a separate channel
 				if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage != null) {
 					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
-					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS))) {
 						var cachedMessage = sentMessage.get(0);
 						var printMessage = cachedMessage.getMessage();
-						textChannel.sendMessage(new EmbedBuilder()
+						textChannel.sendMessageEmbeds(new EmbedBuilder()
 							.setAuthor(cachedMessage.getUserName()+" ("+cachedMessage.getUserID()+")")
 							.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_WATCH)).setColor(Color.WHITE)
 							.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 					}
 					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
 						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
 				//print an error if the cache log is not enabled
 				else if(watchedMember != null && watchedMember.getLevel() == 2 && sentMessage == null) {
 					TextChannel textChannel = e.getGuild().getTextChannelById(watchedMember.getWatchChannel());
-					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS))) {
-						textChannel.sendMessage(new EmbedBuilder()
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS))) {
+						textChannel.sendMessageEmbeds(new EmbedBuilder()
 								.setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR)).setColor(Color.RED)
 								.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.MESSAGE_WATCH_ERR).replace("{}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator())).build()).queue();
 					}
 					else {
-						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_WRITE.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_SEND.getName()+" and "+Permission.MESSAGE_EMBED_LINKS.getName())+e.getChannel().getAsMention(), Channel.LOG.getType());
 						logger.error("MESSAGE_WRITE and MESSAGE_EMBED_LINKS permissions required to log messages of watched users on text channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 					}
 				}
@@ -938,7 +941,7 @@ public class GuildMessageListener extends ListenerAdapter {
 					final String [] array = Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.COMMENT.id, e.getChannel().getId());
 					if(array != null && !array[0].equals("empty")) {
 						//log low priority messages to google spreadsheets
-						if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY))) {
+						if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY))) {
 							StringBuilder urls = new StringBuilder();
 							for(final var attachment : e.getMessage().getAttachments()) {
 								urls.append(attachment.getProxyUrl()+"\n");
@@ -962,7 +965,7 @@ public class GuildMessageListener extends ListenerAdapter {
 	
 	private void validateVoteReactions(final Message message, boolean shrugRequired, int recursiveCount, BotConfigs botConfig) {
 		final int count = recursiveCount+1;
-		if(message.getGuild().getSelfMember().hasPermission(message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY)) || STATIC.setPermissions(message.getGuild(), message.getTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
+		if(message.getGuild().getSelfMember().hasPermission(message.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY)) || STATIC.setPermissions(message.getGuild(), message.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) {
 			new Thread(() -> {
 				try {
 					Thread.sleep(TimeUnit.SECONDS.toMillis(20));
@@ -978,43 +981,43 @@ public class GuildMessageListener extends ListenerAdapter {
 					boolean thumbsDownFound = false;
 					boolean shrugFound = false;
 					for(final var reaction : m.getReactions()) {
-						if(!thumbsUpFound && reaction.getReactionEmote().isEmoji() && thumbsup instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsup)) {
+						if(!thumbsUpFound && reaction.getEmoji().getType().equals(Type.UNICODE) && thumbsup instanceof String && reaction.getEmoji().getName().equals((String)thumbsup)) {
 							thumbsUpFound = true;
 						}
-						else if(!thumbsUpFound && reaction.getReactionEmote().isEmote() && thumbsup instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsup).getIdLong()) {
+						else if(!thumbsUpFound && reaction.getEmoji().getType().equals(Type.CUSTOM) && thumbsup instanceof RichCustomEmoji && reaction.getEmoji().asCustom().getIdLong() == ((RichCustomEmoji)thumbsup).getIdLong()) {
 							thumbsUpFound = true;
 						}
-						else if(!thumbsDownFound && reaction.getReactionEmote().isEmoji() && thumbsdown instanceof String && reaction.getReactionEmote().getName().equals((String)thumbsdown)) {
+						else if(!thumbsDownFound && reaction.getEmoji().getType().equals(Type.UNICODE) && thumbsdown instanceof String && reaction.getEmoji().getName().equals((String)thumbsdown)) {
 							thumbsDownFound = true;
 						}
-						else if(!thumbsDownFound && reaction.getReactionEmote().isEmote() && thumbsdown instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)thumbsdown).getIdLong()) {
+						else if(!thumbsDownFound && reaction.getEmoji().getType().equals(Type.CUSTOM) && thumbsdown instanceof RichCustomEmoji && reaction.getEmoji().asCustom().getIdLong() == ((RichCustomEmoji)thumbsdown).getIdLong()) {
 							thumbsDownFound = true;
 						}
-						else if(shrugRequired || (!shrugFound && reaction.getReactionEmote().isEmoji() && shrug instanceof String && reaction.getReactionEmote().getName().equals((String)shrug))) {
+						else if(shrugRequired || (!shrugFound && reaction.getEmoji().getType().equals(Type.UNICODE) && shrug instanceof String && reaction.getEmoji().getName().equals((String)shrug))) {
 							shrugFound = true;
 						}
-						else if(shrugRequired || (!shrugFound && reaction.getReactionEmote().isEmote() && shrug instanceof Emote && reaction.getReactionEmote().getEmote().getIdLong() == ((Emote)shrug).getIdLong())) {
+						else if(shrugRequired || (!shrugFound && reaction.getEmoji().getType().equals(Type.CUSTOM) && shrug instanceof RichCustomEmoji && reaction.getEmoji().asCustom().getIdLong() == ((RichCustomEmoji)shrug).getIdLong())) {
 							shrugFound = true;
 						}
 					}
 					
 					if(!thumbsUpFound) {
 						if(thumbsup instanceof String)
-							m.addReaction((String)thumbsup).queue();
+							m.addReaction(Emoji.fromUnicode((String)thumbsup)).queue();
 						else 
-							m.addReaction((Emote)thumbsup).queue();
+							m.addReaction((Emoji)thumbsup).queue();
 					}
 					if(!thumbsDownFound) {
 						if(thumbsdown instanceof String)
-							m.addReaction((String)thumbsdown).queue();
+							m.addReaction(Emoji.fromUnicode((String)thumbsdown)).queue();
 						else 
-							m.addReaction((Emote)thumbsdown).queue();
+							m.addReaction((Emoji)thumbsdown).queue();
 					}
 					if(shrugRequired && !shrugFound) {
 						if(shrug instanceof String)
-							m.addReaction((String)shrug).queue();
+							m.addReaction(Emoji.fromUnicode((String)shrug)).queue();
 						else 
-							m.addReaction((Emote)shrug).queue();
+							m.addReaction((Emoji)shrug).queue();
 					}
 					
 					//check again if this time all reactions are visible, else repeat the above logic after 20 seconds again
@@ -1027,7 +1030,7 @@ public class GuildMessageListener extends ListenerAdapter {
 			}).start();
 		}
 		else {
-			logger.warn("Reactions on the vote message couldn't be validated because the MESSAGE_HISTORY permission is missing on channel {} in guild {}", message.getTextChannel().getId(), message.getGuild().getId());
+			logger.warn("Reactions on the vote message couldn't be validated because the MESSAGE_HISTORY permission is missing on channel {} in guild {}", message.getChannel().asTextChannel().getId(), message.getGuild().getId());
 		}
 	}
 }

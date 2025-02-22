@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Subscription;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
@@ -22,11 +21,12 @@ import de.azrael.subscription.RedditModel;
 import de.azrael.subscription.TwitchModel;
 import de.azrael.subscription.TwitterModel;
 import de.azrael.subscription.YouTubeModel;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class ParseSubscription extends TimerTask {
 	private static final Logger logger = LoggerFactory.getLogger(ParseSubscription.class);

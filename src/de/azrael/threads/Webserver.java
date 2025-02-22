@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import de.azrael.webserver.HandlerGET;
 import de.azrael.webserver.HandlerPOST;
 import de.azrael.webserver.WebserviceUtils;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 public class Webserver implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(Webserver.class);

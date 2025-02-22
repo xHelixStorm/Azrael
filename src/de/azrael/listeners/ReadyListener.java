@@ -15,14 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.commands.CustomCmd;
-import de.azrael.commandsContainer.ScheduleExecution;
+import de.azrael.commands.util.CommandHandler;
+import de.azrael.commands.util.ScheduleExecution;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Messages;
 import de.azrael.constructors.Patchnote;
-import de.azrael.core.CommandHandler;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
@@ -39,10 +38,11 @@ import de.azrael.timerTask.ClearHashes;
 import de.azrael.timerTask.ParseSubscription;
 import de.azrael.timerTask.VerifyMutedMembers;
 import de.azrael.util.FileHandler;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 /**

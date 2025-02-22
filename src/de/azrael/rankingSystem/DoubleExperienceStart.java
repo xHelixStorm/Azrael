@@ -12,17 +12,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class DoubleExperienceStart extends TimerTask {
 	private final static Logger logger = LoggerFactory.getLogger(DoubleExperienceStart.class);
@@ -46,10 +47,10 @@ public class DoubleExperienceStart extends TimerTask {
 						var bot_channel = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).findAny().orElse(null);
 						if(bot_channel != null) {
 							final TextChannel textChannel = g.getTextChannelById(bot_channel.getChannel_ID());
-							if(textChannel != null && (g.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(g, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES)))) {
+							if(textChannel != null && (g.getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(g, textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES)))) {
 								File doubleEvent = new File(Directory.BANNERS.getPath()+"doubleweekend.jpg");
 								if(doubleEvent.exists())
-									textChannel.sendFile(doubleEvent, "doubleweekend.jpg").queue();
+									textChannel.sendFiles(FileUpload.fromData(doubleEvent, "doubleweekend.jpg")).queue();
 								textChannel.sendMessage("```css\n"+STATIC.getTranslation2(g, Translation.DOUBLE_EXPERIENCE_AUTO)+"```").queue();
 							}
 							else

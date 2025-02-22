@@ -12,15 +12,15 @@ import de.azrael.sql.RankingSystem;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CollectUsers implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(CollectUsers.class);
 	private static EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN);
-	private GuildMessageReceivedEvent e;
+	private MessageReceivedEvent e;
 	private boolean suppressMessage;
 	
-	public CollectUsers(GuildMessageReceivedEvent _e, boolean _suppressMessage) {
+	public CollectUsers(MessageReceivedEvent _e, boolean _suppressMessage) {
 		e = _e;
 		suppressMessage = _suppressMessage;
 	}
@@ -37,7 +37,7 @@ public class CollectUsers implements Runnable {
 			RankingSystem.SQLBulkInsertUserDetails(members, 0, 0, guild_settings.getStartCurrency(), 0);
 		}
 		if(!suppressMessage)
-			e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
+			e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.USER_REGISTER_COMPLETE)).build()).queue();
 		logger.info("User {} has registered all available users in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 	}
 }

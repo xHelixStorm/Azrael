@@ -13,31 +13,31 @@ import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.GuildPrune;
 import de.azrael.constructors.PruneManagement;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Prune implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Prune.class);
 	public final static ConcurrentHashMap<Long, PruneManagement> pruneStatus = new ConcurrentHashMap<Long, PruneManagement>();
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return STATIC.commandValidation(e, botConfig, Command.PRUNE);
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(args.length == 0) {
 			//command explanation
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_HELP)
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_HELP)
 					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_EXCLUDE))
 					.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_ALL))
 					.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_STATUS))).build()).queue();
@@ -46,10 +46,10 @@ public class Prune implements CommandPublic {
 			if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_STATUS))) {
 				if(STATIC.threadExists("prune_gu"+e.getGuild().getId())) {
 					final var prune = pruneStatus.get(e.getGuild().getIdLong());
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_STATUS).replaceFirst("\\{\\}", prune.getKickCount()+"").replace("{}", prune.getTotalMembers()+"")).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_STATUS).replaceFirst("\\{\\}", prune.getKickCount()+"").replace("{}", prune.getTotalMembers()+"")).build()).queue();
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_STATUS_ERR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_STATUS_ERR)).build()).queue();
 				}
 				return true;
 			}
@@ -94,19 +94,19 @@ public class Prune implements CommandPublic {
 											tExcludedMembers ++;
 										}
 										else {
-											e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
+											e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
 											return true;
 										}
 									}
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
 									return true;
 								}
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", args[1])).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", args[1])).build()).queue();
 						}
 					}
 				}
@@ -119,7 +119,7 @@ public class Prune implements CommandPublic {
 							continue;
 						}
 						else if(arg.equalsIgnoreCase(exclude)) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 							return true;
 						}
 						
@@ -164,20 +164,20 @@ public class Prune implements CommandPublic {
 									}
 								}
 								else {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
 									return true;
 								}
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND_2).replace("{}", arg)).build()).queue();
 							return true;
 						}
 					}
 				}
 				
 				if(excludeMode && excludeMembers.size() == 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 				}
 				else {
 					//notify user of how many members have been found and excluded. Write to cache to allow a final confirmation
@@ -233,20 +233,20 @@ public class Prune implements CommandPublic {
 						embed.addField(STATIC.getTranslation(e.getMember(), Translation.PRUNE_EXC_ROLES), out.toString(), false);
 					}
 					
-					e.getChannel().sendMessage(embed.build()).queue();
+					e.getChannel().sendMessageEmbeds(embed.build()).queue();
 					Hashes.addTempCache("prune_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000).setObject(new GuildPrune(kickMembers, excludeMembers)));
 				}
 			}
 			else {
 				final var prune = pruneStatus.get(e.getGuild().getIdLong());
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ALREADY_RUNNING).replaceFirst("\\{\\}", prune.getKickCount()+"").replace("{}", prune.getTotalMembers()+"")).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PRUNE_ALREADY_RUNNING).replaceFirst("\\{\\}", prune.getKickCount()+"").replace("{}", prune.getTotalMembers()+"")).build()).queue();
 			}
 		}
 		return true;
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Prune command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

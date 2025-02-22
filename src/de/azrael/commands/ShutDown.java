@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.BotConfigs;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Command;
 import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
@@ -17,9 +16,10 @@ import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.BotConfiguration;
 import de.azrael.util.FileHandler;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * Shutdown the Bot with this command
@@ -31,12 +31,12 @@ public class ShutDown implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(ShutDown.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		return true;
 	}
 
 	@Override
-	public boolean action(String[] args, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 			FileHandler.createFile(Directory.TEMP, System.getProperty("SESSION_NAME")+"running.azr", "0");
 			e.getChannel().sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.SHUTDOWN_PREP)).queue();
@@ -62,7 +62,7 @@ public class ShutDown implements CommandPublic {
 				});
 			}
 			else {
-				ShutdownListener.setShutdownChannel(e.getChannel());
+				ShutdownListener.setShutdownChannel(e.getChannel().asTextChannel());
 				STATIC.killGoogleThreads();
 			}
 			return true;
@@ -71,7 +71,7 @@ public class ShutDown implements CommandPublic {
 	}
 
 	@Override
-	public void executed(String[] args, boolean success, GuildMessageReceivedEvent e, BotConfigs botConfig) {
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(success) {
 			logger.trace("{} has used Shutdown command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			StringBuilder out = new StringBuilder();

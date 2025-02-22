@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +14,6 @@ import de.azrael.constructors.Bancollect;
 import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Ranking;
 import de.azrael.constructors.Warning;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
@@ -24,7 +23,9 @@ import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.RoleTimer;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
@@ -191,10 +192,8 @@ public class RoleListener extends ListenerAdapter {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", hour_add+and_add+minute_add)
 									+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 										//success callback not required
-										channel.close().queue();
 									}, error -> {
 										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
-										channel.close().queue();
 									});
 						});
 						//unmute after a specific amount of time
@@ -240,10 +239,8 @@ public class RoleListener extends ListenerAdapter {
 								channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_2).replaceFirst("\\{\\}", e.getGuild().getName()).replaceFirst("\\{\\}", hour_add+and_add+minute_add).replace("{}", "**"+(warning_id+1)+"**/**"+max_warning+"**")
 										+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 											//success callback not required
-											channel.close().queue();
 										}, error -> {
 											STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
-											channel.close().queue();
 										});
 							});
 							//run RoleTimer for automatic unmute
@@ -265,15 +262,13 @@ public class RoleListener extends ListenerAdapter {
 										channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM).replace("{}", e.getGuild().getName())
 												+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 													//ban the user
-													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
+													e.getGuild().ban(e.getMember(), 0, TimeUnit.SECONDS).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
-													channel.close().queue();
 												}, error -> {
 													STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_DM_LOCKED), Channel.LOG.getType());
 													//ban the user
-													e.getGuild().ban(e.getMember(), 0).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
+													e.getGuild().ban(e.getMember(), 0, TimeUnit.SECONDS).reason(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_BAN_REASON)).queue();
 													Azrael.SQLInsertHistory(user_id, guild_id, "ban", reason, 0, e.getJDA().getSelfUser().getName()+"#"+e.getJDA().getSelfUser().getDiscriminator());
-													channel.close().queue();
 												});
 									});
 								}
@@ -293,10 +288,8 @@ public class RoleListener extends ListenerAdapter {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.ROLE_MUTE_DM_3).replace("{}", e.getGuild().getName())
 											+ (botConfig.getMuteSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+reason : "")).queue(success -> {
 												//no callback required
-												channel.close().queue();
 											}, error -> {
 												STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_DM_LOCKED), Channel.LOG.getType());
-												channel.close().queue();
 											});
 								});
 								//execute RoleTimer
@@ -349,7 +342,7 @@ public class RoleListener extends ListenerAdapter {
 								else {
 									submit = STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_MESSAGE_3)+"\n**"+reward+"**";
 								}
-								channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(submit).build()).queue(success -> {
+								channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(submit).build()).queue(success -> {
 									STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.BLUE), STATIC.getTranslation2(e.getGuild(), Translation.ROLE_KEY_SENT).replaceFirst("\\{\\}", e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator()).replace("{}", e.getMember().getUser().getId())+"\n**"+reward+"**", Channel.LOG.getType());
 									logger.info("User {} has received the reward {} in guild {}", e.getMember().getUser().getId(), reward, e.getGuild().getId());
 								}, error -> {
