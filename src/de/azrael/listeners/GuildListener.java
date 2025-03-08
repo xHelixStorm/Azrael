@@ -18,31 +18,30 @@ import org.slf4j.LoggerFactory;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
 import de.azrael.constructors.Bancollect;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Ranking;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleDD;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.google.GoogleUtils;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.DelayedGoogleUpdate;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -69,20 +68,20 @@ public class GuildListener extends ListenerAdapter {
 	public void onGuildMemberJoin(GuildMemberJoinEvent e) {
 		new Thread(() -> {
 			final EmbedBuilder message = new EmbedBuilder().setColor(Color.GREEN).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_TITLE));
-			final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 			final EmbedBuilder err = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_ERROR));
 			logger.trace("User {} has joined in guild {}", e.getUser().getId(), e.getGuild().getId());
 			boolean excludeChannelCreation = false;
 			long user_id = e.getMember().getUser().getIdLong();
 			String user_name = e.getMember().getUser().getName()+"#"+e.getMember().getUser().getDiscriminator();
 			long guild_id = e.getGuild().getIdLong();
-			long currentTime = System.currentTimeMillis();;
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild_id);
+			long currentTime = System.currentTimeMillis();
 			boolean badName = false;
 			long unmute = 0;
 			boolean muted;
 			
 			//insert or update the name of the user into Azrael.users
-			if(Azrael.SQLInsertUser(user_id, user_name, STATIC.getLanguage2(e.getGuild()), e.getMember().getUser().getEffectiveAvatarUrl()) == 0) {
+			if(Azrael.SQLInsertUser(user_id, user_name, STATIC.getLanguage2(e.getGuild()), e.getMember().getUser().getEffectiveAvatarUrl(), e.getMember().getUser().getTimeCreated().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))) == 0) {
 				STATIC.writeToRemoteChannel(e.getGuild(), err, STATIC.getTranslation2(e.getGuild(), Translation.JOIN_ERR).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 				logger.error("Information of user {} couldn't saved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
@@ -117,21 +116,19 @@ public class GuildListener extends ListenerAdapter {
 			Bancollect warnedUser = Azrael.SQLgetData(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong());
 			muted = warnedUser.getMuted();
 			//print join message, if the user is not muted and if the printing of join messages is allowed
-			final boolean joinMessage = GuildIni.getJoinMessage(guild_id);
-			final boolean newAccountOnJoin = GuildIni.getNewAccountOnJoin(guild_id);
-			if(joinMessage || newAccountOnJoin) {
-				if(!newAccountOnJoin)
+			if(botConfig.getJoinMessage() || botConfig.getNewAccountOnJoin()) {
+				if(!botConfig.getNewAccountOnJoin())
 					STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 				else {
 					//TODO: check logic again during daylight saving 
-					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
+					final long createdAgo = System.currentTimeMillis() - ((e.getMember().getUser().getTimeCreated().toEpochSecond()*1000) + (TimeZone.getDefault().useDaylightTime() ? Calendar.ZONE_OFFSET : 0));
 					final long hours = TimeUnit.MILLISECONDS.toHours(createdAgo);
 					final long minutes = (TimeUnit.MILLISECONDS.toMinutes(createdAgo)%60);
 					//display accounts which are not older than a day only
 					if(hours < 24) {
 						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()).setFooter(STATIC.getTranslation2(e.getGuild(), Translation.JOIN_NEW).replaceFirst("\\{\\}", ""+hours).replace("{}", ""+minutes)), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 					}
-					else if(joinMessage) {
+					else if(botConfig.getJoinMessage()) {
 						STATIC.writeToRemoteChannel(e.getGuild(), message.setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl()), STATIC.getTranslation2(e.getGuild(), Translation.JOIN_MESSAGE).replace("{}", user_name), Channel.LOG.getType());
 					}
 				}
@@ -266,17 +263,15 @@ public class GuildListener extends ListenerAdapter {
 						//send a private message before banning
 						e.getUser().openPrivateChannel().queue(channel -> {
 							channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_DM_2).replace("{}", e.getGuild().getName())
-									+ (GuildIni.getBanSendReason(e.getGuild().getIdLong()) ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
+									+ (botConfig.getBanSendReason() ? STATIC.getTranslation2(e.getGuild(), Translation.USER_BAN_REASON)+rejoinAction.getReason() : "")).queue(success -> {
 										Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
-										e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+										e.getGuild().ban(e.getMember(), 0, TimeUnit.SECONDS).reason(rejoinAction.getReason()).queue();
 										Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
-										channel.close().queue();
 									}, error -> {
 										STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.ORANGE), STATIC.getTranslation2(e.getGuild(), Translation.BAN_DM_LOCKED).replaceFirst("\\{\\}", user_name).replace("{}", ""+user_id), Channel.LOG.getType());
 										Hashes.addTempCache("ban_gu"+e.getGuild().getId()+"us"+user_id, new Cache(rejoinAction.getReporter(), rejoinAction.getReason()));
-										e.getGuild().ban(e.getMember(), 0).reason(rejoinAction.getReason()).queue();
+										e.getGuild().ban(e.getMember(), 0, TimeUnit.SECONDS).reason(rejoinAction.getReason()).queue();
 										Azrael.SQLInsertHistory(user_id, guild_id, "ban", rejoinAction.getReason(), 0, "");
-										channel.close().queue();
 									});
 						});
 						excludeChannelCreation = true;
@@ -299,7 +294,7 @@ public class GuildListener extends ListenerAdapter {
 				
 				//verify if additional verification actions are required
 				if(!excludeChannelCreation) {
-					putUserIntoWaitingRoom(e.getGuild(), e.getMember());
+					putUserIntoWaitingRoom(e.getGuild(), e.getMember(), botConfig);
 				}
 				
 				String nickname = null;
@@ -307,6 +302,7 @@ public class GuildListener extends ListenerAdapter {
 				//lookup if the user is using the same name as a registered staff member name
 				final var name = Azrael.SQLgetStaffNames(guild_id).parallelStream().filter(f -> lc_user_name.matches(f+"#[0-9]{4}")).findAny().orElse(null);
 				if(name != null) {
+					final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getCaught()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 					nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_TITLE)).setThumbnail(e.getMember().getUser().getEffectiveAvatarUrl());
 					//verify if the bot has the permission to manage nicknames
 					if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
@@ -318,7 +314,7 @@ public class GuildListener extends ListenerAdapter {
 						logger.info("Impersonation attempt found from user {} in guild {}", user_id, guild_id);
 						Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(botConfig.getGoogleFunctionalities()) {
 							GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_STAFF_IMPERSONATION), e.getMember().getEffectiveName(), nickname);
 						}
 					}
@@ -334,6 +330,7 @@ public class GuildListener extends ListenerAdapter {
 					//look up the name filter for not allowed words
 					final var word = Azrael.SQLgetNameFilter(guild_id).parallelStream().filter(f -> lc_user_name.contains(f.getName())).findAny().orElse(null);
 					if(word != null) {
+						final EmbedBuilder nick_assign = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getCaught()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_TITLE));
 						if(!word.getKick()) {
 							//verify if the bot has the permission to manage nicknames
 							if(e.getGuild().getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
@@ -345,7 +342,7 @@ public class GuildListener extends ListenerAdapter {
 								logger.info("Improper name found from user {} in guild {}", user_id, guild_id);
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild_id, nickname);
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								if(botConfig.getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.RENAME.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_REASON), e.getMember().getEffectiveName(), nickname);
 								}
 							}
@@ -363,17 +360,17 @@ public class GuildListener extends ListenerAdapter {
 								e.getMember().getUser().openPrivateChannel().queue(channel -> {
 									channel.sendMessage(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_DM).replaceFirst("\\{\\}", e.getGuild().getName()).replace("{}", word.getName().toUpperCase())).queue(success -> {
 										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
 										STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_1).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 									}, error -> {
 										e.getGuild().kick(e.getMember()).reason(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-										nick_assign.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
+										nick_assign.setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_TITLE));
 										STATIC.writeToRemoteChannel(e.getGuild(), nick_assign, STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_MESSAGE_2).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 									});
 								});
 								Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild_id, "kick", STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+								if(botConfig.getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getMember().getEffectiveName(), e.getGuild().getSelfMember().getUser().getName()+"#"+e.getGuild().getSelfMember().getUser().getDiscriminator(), e.getGuild().getSelfMember().getEffectiveName(), STATIC.getTranslation2(e.getGuild(), Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()));
 								}
 							}
@@ -411,52 +408,56 @@ public class GuildListener extends ListenerAdapter {
 				}
 				
 				//single use invite logic
-				handleSingleUseInvites(e.getGuild(), e.getMember());
+				handleSingleUseInvites(botConfig, e.getGuild(), e.getMember());
+			}
+			
+			//send a message to the user, if available
+			if(botConfig.getCustomMessageJoin() != null && botConfig.getCustomMessageJoin().length() > 0) {
+				e.getMember().getUser().openPrivateChannel().queue(channel -> {
+					channel.sendMessage(botConfig.getCustomMessageJoin()).queue();
+				});
 			}
 			
 			Azrael.SQLInsertActionLog("GUILD_MEMBER_JOIN", user_id, guild_id, user_name);
 		}).start();
 	}
 	
-	public static void putUserIntoWaitingRoom(Guild guild, Member member) {
-		final var categories = Azrael.SQLgetCategories(guild.getIdLong());
-		if(categories != null && categories.size() > 0) {
-			final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
-			if(verification != null) {
-				Category category = guild.getCategoryById(verification.getCategoryID());
-				if(category != null) {
-					if(guild.getSelfMember().hasPermission(category, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS) || STATIC.setPermissions(guild, category, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))) {
-						//create a new text channel under the category and add the required permissions
-						category.createTextChannel(""+member.getUser().getId())
-							.addPermissionOverride(guild.getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS), null)
-							.addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE))
-							.addPermissionOverride(member, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))
-							.queue(channel -> {
-								final var roles = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("adm") || f.getCategory_ABV().equals("mod")).collect(Collectors.toList());
-								for(final var role : roles) {
-									Role serverRole = guild.getRoleById(role.getRole_ID());
-									if(serverRole != null) {
-										channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_HISTORY, Permission.MESSAGE_WRITE, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
-									}
+	public static void putUserIntoWaitingRoom(Guild guild, Member member, BotConfigs botConfig) {
+		final var verification = Azrael.SQLgetCategories(guild.getIdLong()).parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+		if(verification != null) {
+			Category category = guild.getCategoryById(verification.getCategoryID());
+			if(category != null) {
+				if(guild.getSelfMember().hasPermission(category, Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS) || STATIC.setPermissions(guild, category, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))) {
+					//create a new text channel under the category and add the required permissions
+					category.createTextChannel(""+member.getUser().getId())
+						.addPermissionOverride(guild.getSelfMember(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY, Permission.MESSAGE_SEND, Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS), null)
+						.addPermissionOverride(guild.getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY, Permission.MESSAGE_SEND))
+						.addPermissionOverride(member, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS))
+						.queue(channel -> {
+							final var roles = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("adm") || f.getCategory_ABV().equals("mod")).collect(Collectors.toList());
+							for(final var role : roles) {
+								Role serverRole = guild.getRoleById(role.getRole_ID());
+								if(serverRole != null) {
+									channel.getManager().putPermissionOverride(serverRole, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_HISTORY, Permission.MESSAGE_SEND, Permission.MESSAGE_ATTACH_FILES, Permission.MESSAGE_EMBED_LINKS), EnumSet.of(Permission.MANAGE_CHANNEL, Permission.MANAGE_PERMISSIONS)).queue();
 								}
-								final String verificationMessage = FileSetting.readFile("files/Guilds/"+guild.getId()+"/verificationmessage.txt");
-								channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
 							}
-						);
-					}
-					else {
-						STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN_2).replace("{}", Permission.MANAGE_CHANNEL.getName()+" and "+Permission.MANAGE_PERMISSIONS.getName())+category.getName(), Channel.LOG.getType());
-						logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels in guild {}", verification.getCategoryID(), guild.getId());
-					}
+							final String verificationMessage = botConfig.getCustomMessageVerification();
+							channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setThumbnail(guild.getIconUrl()).setDescription((verificationMessage != null && verificationMessage.length() > 0 ? verificationMessage : STATIC.getTranslation2(guild, Translation.JOIN_VERIFY).replaceFirst("\\{\\}", guild.getName()).replace("{}", member.getAsMention()))).build()).queue();
+						}
+					);
 				}
 				else {
-					logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
+					STATIC.writeToRemoteChannel(guild, new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(guild, Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(guild, Translation.MISSING_PERMISSION_IN_2).replace("{}", Permission.MANAGE_CHANNEL.getName()+" and "+Permission.MANAGE_PERMISSIONS.getName())+category.getName(), Channel.LOG.getType());
+					logger.warn("MANAGE_CHANNEL and MANAGE_PERMISSIONS for category {} required to create verification channels in guild {}", verification.getCategoryID(), guild.getId());
 				}
+			}
+			else {
+				logger.warn("Category {} doesn't exist anymore in guild {}", verification.getCategoryID(), guild.getId());
 			}
 		}
 	}
 	
-	private static void handleSingleUseInvites(Guild guild, Member member) {
+	private static void handleSingleUseInvites(BotConfigs botConfig, Guild guild, Member member) {
 		final var invites = Azrael.SQLgetUnusedInvites(guild.getIdLong());
 		if(invites != null && invites.size() > 0) {
 			if(guild.getSelfMember().hasPermission(Permission.MANAGE_SERVER)) {
@@ -489,7 +490,7 @@ public class GuildListener extends ListenerAdapter {
 								logger.warn("Used invite {} from {} couldn't be labeled as used in guild {}", invite, member.getUser().getId(), guild.getId());
 							
 							//Google spreadsheet execution
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+							if(botConfig.getGoogleFunctionalities()) {
 								handleGoogleInviteRequest(guild, member, invite);
 							}
 							break;

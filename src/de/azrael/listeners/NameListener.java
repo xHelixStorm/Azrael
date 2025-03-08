@@ -7,14 +7,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -75,7 +74,7 @@ public class NameListener extends ListenerAdapter {
 								STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_STAFF_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
 								Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 								//Run google service, if enabled
-								if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+								if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 									GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_STAFF_IMPERSONATION), oldname, newname);
 								}
 							}
@@ -94,6 +93,7 @@ public class NameListener extends ListenerAdapter {
 						if(word != null) {
 							//verify that the user has lower permissions than the bot
 							if(guild.getSelfMember().canInteract(member)) {
+								final var thumbnails = BotConfiguration.SQLgetThumbnails(guild.getIdLong());
 								if(!word.getKick()) {
 									//verify if the bot has the permission to manage nicknames
 									if(guild.getSelfMember().hasPermission(Permission.NICKNAME_MANAGE)) {
@@ -102,11 +102,11 @@ public class NameListener extends ListenerAdapter {
 										guild.modifyNickname(member, nickname).queue();
 										Hashes.addTempCache("nickname_add_gu"+guild.getId()+"us"+user_id, new Cache(60000));
 										updateNickname(member, nickname);
-										message.setColor(Color.ORANGE).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_TITLE));
+										message.setColor(Color.ORANGE).setThumbnail(thumbnails.getCaught()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_TITLE));
 										STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_ASSIGN_2).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", nickname), Channel.LOG.getType());
 										Azrael.SQLInsertActionLog("MEMBER_NICKNAME_UPDATE", e.getUser().getIdLong(), guild.getIdLong(), nickname);
 										//Run google service, if enabled
-										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+										if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 											GoogleSheets.spreadsheetRenameRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.RENAME.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_REASON), oldname, newname);
 										}
 									}
@@ -123,17 +123,17 @@ public class NameListener extends ListenerAdapter {
 										member.getUser().openPrivateChannel().queue(channel -> {
 											channel.sendMessage(STATIC.getTranslation2(guild, Translation.NAME_KICK_DM).replaceFirst("\\{\\}", guild.getName()).replace("{}", word.getName().toUpperCase())).queue(success -> {
 												guild.kick(member).reason(STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
+												message.setColor(Color.RED).setThumbnail(thumbnails.getCaught()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
 												STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_3).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 											}, error -> {
 												guild.kick(member).reason(STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase())).queue();
-												message.setColor(Color.RED).setThumbnail(IniFileReader.getCaughtThumbnail()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
+												message.setColor(Color.RED).setThumbnail(thumbnails.getCaught()).setTitle(STATIC.getTranslation2(guild, Translation.NAME_KICK_TITLE));
 												STATIC.writeToRemoteChannel(guild, message, STATIC.getTranslation2(guild, Translation.NAME_KICK_MESSAGE_4).replaceFirst("\\{\\}", oldname).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", newname).replace("{}", word.getName().toUpperCase()), Channel.LOG.getType());
 											});
 										});
 										Azrael.SQLInsertHistory(e.getUser().getIdLong(), guild.getIdLong(), "kick", STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()), 0, "");
 										//Run google service, if enabled
-										if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+										if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 											GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.KICK.id, ""), guild, "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), member.getEffectiveName(), guild.getSelfMember().getUser().getName()+"#"+guild.getSelfMember().getUser().getDiscriminator(), guild.getSelfMember().getEffectiveName(), STATIC.getTranslation2(guild, Translation.NAME_KICK_REASON).replace("{}", word.getName().toUpperCase()));
 										}
 									}

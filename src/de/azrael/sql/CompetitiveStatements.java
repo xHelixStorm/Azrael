@@ -100,6 +100,8 @@ class CompetitiveStatements {
 	final static String SQLInsertMap = STATIC.decrypt("gN706prw5CNqJLvZOR5rCj1MttfMsPdGaZI0XHBn7OAnlGLAmKhxZPaNtnIwnwqnxvTvKPvgJIsShn0hF8x1/A==");
 	final static String SQLInsertMap2 = STATIC.decrypt("EZ1zWtUcaxdkX7Y8eeG5s9jUh1fQQX4bZ1LOWntFr3sJQ31FxkDqSDxOx9ZaDDCP79CRtv+/Dr66C5RvgrO3RzGG+wuD2a5XtgWawf8Wwng=");
 	final static String SQLInsertMap3 = STATIC.decrypt("+GF9vYY+2FO+t3chuQrxWSM9xyGbFcoY4MsyLSMSnwbuSlfGZqqRSwIOhoJ8MqrnBLYRvSmpST2A8xLXEEvfGw==");
+	final static String SQLDeleteMap = STATIC.decrypt("NyV1hu2DRXa4O16g2PIQzqgetEVW8C6uoCBD0CBHLDX6AqGyxAeIP5iLF7L/5ipBjPc2VbOsfxoAPzcMgCSHTw==");
+	final static String SQLClearMaps = STATIC.decrypt("NyV1hu2DRXa4O16g2PIQzqgetEVW8C6uoCBD0CBHLDVoPf29vruTdkT4uapYIPz0");
 	final static String SQLgetRandomMap = STATIC.decrypt("AQaWQ08Fnxve1exhLDiuFxIavqq+Orj1gCBjgQB2Ur09TLbXzLD3RmmSNFxwZ+zgrCvId/B3rNd0clrS50dXeTWpGv1V4Xr5U6GXz54CKFdoH10GL489UO0y+riXb+fF");
 	final static String SQLgetMap = STATIC.decrypt("AQaWQ08Fnxve1exhLDiuFxIavqq+Orj1gCBjgQB2Ur3vt4vPa6NteFPf6o26x5XIn1IUIiwWG+zWR8BQ7ecMdw==");
 	final static String SQLgetMap2 = STATIC.decrypt("AQaWQ08Fnxve1exhLDiuFxIavqq+Orj1gCBjgQB2Ur09TLbXzLD3RmmSNFxwZ+zgJ5RiwJiocWT2jbZyMJ8Kp8b07yj74CSLEoZ9IRfMdfw=");

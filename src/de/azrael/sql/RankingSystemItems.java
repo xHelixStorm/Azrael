@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,16 +17,11 @@ import de.azrael.constructors.Skills;
 import de.azrael.constructors.WeaponAbbvs;
 import de.azrael.constructors.WeaponStats;
 import de.azrael.constructors.Weapons;
-import de.azrael.core.Hashes;
-import de.azrael.fileManagement.IniFileReader;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 
 public class RankingSystemItems {
 	private static final Logger logger = LoggerFactory.getLogger(RankingSystemItems.class);
-	
-	private static String ip = IniFileReader.getSQLIP2();
-	private static String username = IniFileReader.getSQLUsername2();
-	private static String password = IniFileReader.getSQLPassword2();
 	
 	public static void SQLconnection(){
 		try {
@@ -43,7 +37,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLRemoveEquippedWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLRemoveEquippedWeapon2 : RankingSystemItemsStatements.SQLRemoveEquippedWeapon3));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -62,7 +56,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLRemoveEquippedSkill);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -81,7 +75,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLEquipWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLEquipWeapon2 : RankingSystemItemsStatements.SQLEquipWeapon3));
 			stmt.setInt(1, item_id);
 			stmt.setLong(2, user_id);
@@ -101,7 +95,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(slot == 1 ? RankingSystemItemsStatements.SQLUnequipWeapon : (slot == 2 ? RankingSystemItemsStatements.SQLUnequipWeapon2 : RankingSystemItemsStatements.SQLUnequipWeapon3));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -120,7 +114,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUnequipWholeEquipment);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -139,7 +133,7 @@ public class RankingSystemItems {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLEquipSkill);
 			stmt.setInt(1, item_id);
 			stmt.setLong(2, user_id);
@@ -161,7 +155,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetNumberOfWeaponID);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -188,7 +182,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetRandomWeaponIDByAbbv);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, abbv);
@@ -214,7 +208,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetRandomWeaponIDByCategory);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, category);
@@ -239,14 +233,14 @@ public class RankingSystemItems {
 	//weapon_category
 	public static ArrayList<String> SQLgetWeaponCategories(long guild_id, boolean overrideSkill) {
 		final var weaponCategories = Hashes.getWeaponCategories(guild_id);
-		if(weaponCategories == null) {
+		if(weaponCategories == null || weaponCategories.size() == 0) {
 			logger.trace("SQLgetWeaponCategories launched. Params passed {}, {}", guild_id, overrideSkill);
 			ArrayList<String> categories = new ArrayList<String>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement((!overrideSkill ? RankingSystemItemsStatements.SQLgetWeaponCategories : RankingSystemItemsStatements.SQLgetWeaponCategories2));
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -270,14 +264,14 @@ public class RankingSystemItems {
 	//weapon_abbreviation
 	public static ArrayList<WeaponAbbvs> SQLgetWeaponAbbvs(long guild_id) {
 		final var weapons = Hashes.getWeaponAbbreviations(guild_id);
-		if(weapons == null) {
+		if(weapons == null || weapons.size() == 0) {
 			logger.trace("SQLgetWeaponAbbvs launched. Params passed {}", guild_id);
 			ArrayList<WeaponAbbvs> abbreviations = new ArrayList<WeaponAbbvs>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWeaponAbbvs);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -300,48 +294,42 @@ public class RankingSystemItems {
 	}
 	
 	//weapon_stats
-	public static ArrayList<WeaponStats> SQLgetWeaponStats(long guild_id) {
-		final var weaponStats = Hashes.getWeaponStats(guild_id);
-		if(weaponStats == null) {
-			logger.trace("SQLgetWeaponStats launched. Params passed {}", guild_id);
-			ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
-			Connection myConn = null;
-			PreparedStatement stmt = null;
-			ResultSet rs = null;
-			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
-				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWeaponStats);
-				stmt.setLong(1, guild_id);
-				rs = stmt.executeQuery();
-				while(rs.next()){
-					WeaponStats stat = new WeaponStats(rs.getInt(1), rs.getString(2));
-					stats.add(stat);
-				}
-				Hashes.addWeaponStat(guild_id, stats);
-				return stats;
-			} catch (SQLException e) {
-				logger.error("SQLgetWeponStats Exception", e);
-				return stats;
-			} finally {
-				try { rs.close(); } catch (Exception e) { /* ignored */ }
-			  try { stmt.close(); } catch (Exception e) { /* ignored */ }
-			  try { myConn.close(); } catch (Exception e) { /* ignored */ }
+	public static ArrayList<WeaponStats> SQLgetWeaponStats() {
+		logger.trace("SQLgetWeaponStats launched. No params passed");
+		ArrayList<WeaponStats> stats = new ArrayList<WeaponStats>();
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			myConn = STATIC.getDatabaseURL(2);
+			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWeaponStats);
+			rs = stmt.executeQuery();
+			while(rs.next()){
+				WeaponStats stat = new WeaponStats(rs.getInt(1), rs.getString(2));
+				stats.add(stat);
 			}
+			return stats;
+		} catch (SQLException e) {
+			logger.error("SQLgetWeponStats Exception", e);
+			return stats;
+		} finally {
+			try { rs.close(); } catch (Exception e) { /* ignored */ }
+		  try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		  try { myConn.close(); } catch (Exception e) { /* ignored */ }
 		}
-		return weaponStats;
 	}
 	
 	//JOINS
 	public static ArrayList<Weapons> SQLgetWholeWeaponShop(long guild_id) {
 		final var shop = Hashes.getWeaponShopContent(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetWholeWeaponShop launched. Params passed {}", guild_id);
 			ArrayList<Weapons> weapons = new ArrayList<Weapons>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetWholeWeaponShop);
 				stmt.setLong(1, guild_id);
 				rs = stmt.executeQuery();
@@ -469,14 +457,14 @@ public class RankingSystemItems {
 	
 	public static ArrayList<Skills> SQLgetSkills(long guild_id) {
 		final var shop = Hashes.getSkillShop(guild_id);
-		if(shop == null) {
+		if(shop == null || shop.size() == 0) {
 			logger.trace("SQLgetSkills launched. Params passed {}", guild_id);
 			ArrayList<Skills> skills = new ArrayList<Skills>();
 			Connection myConn = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
 			try {
-				myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+				myConn = STATIC.getDatabaseURL(2);
 				//TODO: add missing ability field
 				stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetSkills);
 				stmt.setLong(1, guild_id);
@@ -511,7 +499,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement((weapon ? RankingSystemItemsStatements.SQLgetNumberAndExpirationFromInventory : RankingSystemItemsStatements.SQLgetNumberAndExpirationFromInventory2));
 			stmt.setLong(1, user_id);
 			stmt.setInt(2, item_id);
@@ -541,7 +529,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement((slot == 1 ? RankingSystemItemsStatements.SQLgetEquippedWeaponDescription : (slot == 2 ? RankingSystemItemsStatements.SQLgetEquippedWeaponDescription2 : RankingSystemItemsStatements.SQLgetEquippedWeaponDescription3)));
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -571,7 +559,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLgetEquippedSkillDescription);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -602,7 +590,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLfilterInventoryWeapons);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -634,7 +622,7 @@ public class RankingSystemItems {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLfilterInventorySkills);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -658,13 +646,12 @@ public class RankingSystemItems {
 	}
 	
 	//Transaction
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertTimedInventory(long user_id, long guild_id, long currency, int item_id, long position, long expires, int number, boolean weapon, long extend) {
 		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}, {}, {}, {}", user_id, guild_id, currency, item_id, position, expires, number, weapon, extend);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertTimedInventory);
 			stmt.setLong(1, currency);
@@ -696,13 +683,12 @@ public class RankingSystemItems {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateCurrencyAndInsertWeaponRandomshop(long user_id, long guild_id, long currency, int weapon_id, Timestamp timestamp, int number) {
 		logger.trace("SQLUpdateCurrencyAndInsertTimedInventory launched. Passed params {}, {}, {}, {}, {}, {}", user_id, guild_id, currency, weapon_id, timestamp, number);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("RankingSystem", ip), username, password);
+			myConn = STATIC.getDatabaseURL(2);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(RankingSystemItemsStatements.SQLUpdateCurrencyAndInsertWeaponRandomshop);
 			stmt.setLong(1, currency);

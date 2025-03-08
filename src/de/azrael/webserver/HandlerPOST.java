@@ -10,24 +10,23 @@ import org.json.JSONObject;
 
 import de.azrael.commands.Invites;
 import de.azrael.commands.ShutDown;
-import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Directory;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.listeners.ShutdownListener;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.AzraelWeb;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.FileHandler;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 public class HandlerPOST {
 	public static void handleRequest(ReadyEvent e, PrintWriter out, JSONObject json) {
@@ -65,7 +64,7 @@ public class HandlerPOST {
 			return false;
 		}
 		final String token = (String)json.get("token"); 
-		if(!token.equals(STATIC.getToken())) {
+		if(!token.equals(System.getProperty("TOKEN"))) {
 			WebserviceUtils.return502(out, "Invalid Token", false);
 			return false;
 		}
@@ -282,7 +281,7 @@ public class HandlerPOST {
 			if(json.has("guild_id")) {
 				Guild guild = e.getJDA().getGuildById(json.getLong("guild_id"));
 				if(guild != null) {
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+					if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 						if(GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), e.getJDA().getGuilds().size())) {
 							WebserviceUtils.return201(out, "Data exported to google spreadsheet.", false);
 						}
@@ -301,7 +300,7 @@ public class HandlerPOST {
 			else {
 				long guilds_count = e.getJDA().getGuilds().size();
 				for(final var guild : e.getJDA().getGuilds()) {
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild.getIdLong()) && GuildIni.getGoogleSpreadsheetsEnabled(guild.getIdLong())) {
+					if(BotConfiguration.SQLgetBotConfigs(guild.getIdLong()).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetExportRequest(Azrael.SQLgetGoogleFilesAndEvent(guild.getIdLong(), 2, GoogleEvent.EXPORT.id, ""), guild, "", e.getJDA().getSelfUser().getId(), new Timestamp(System.currentTimeMillis()), e.getJDA().getGatewayPing(), guild.getMemberCount(), guilds_count);
 					}
 				}
@@ -311,10 +310,11 @@ public class HandlerPOST {
 	}
 	
 	private static void shutdown(ReadyEvent e, PrintWriter out, JSONObject json) {
-		FileSetting.createFile(IniFileReader.getTempDirectory()+STATIC.getSessionName()+"running.azr", "0");
+		FileHandler.createFile(Directory.TEMP, System.getProperty("SESSION_NAME")+"running.azr", "0");
 		WebserviceUtils.return200(out, "Bot shutdown", false, false);
 		e.getJDA().getGuilds().parallelStream().forEach(guild -> {
-			if(GuildIni.getNotifications(guild.getIdLong())) {
+			BotConfigs botConfig = BotConfiguration.SQLgetBotConfigs(guild.getIdLong());
+			if(botConfig.getNotifications()) {
 				if(json.has("message")) {
 					STATIC.writeToRemoteChannel(guild, null, json.getString("message"), Channel.LOG.getType());
 				}
@@ -322,7 +322,7 @@ public class HandlerPOST {
 					STATIC.writeToRemoteChannel(guild, null, STATIC.getTranslation2(guild, Translation.SHUTDOWN_SOON), Channel.LOG.getType());
 				}
 			}
-			ShutDown.saveCache(guild);
+			ShutDown.saveCache(guild, botConfig);
 		});
 		Invites.enableShutdownMode();
 		while(true) {
@@ -355,7 +355,7 @@ public class HandlerPOST {
 						final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
 						final var channel = member.getUser().openPrivateChannel().complete();
 						try {
-							channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CODE).replace("{}", displayCode)).build()).queue();
+							channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CODE).replace("{}", displayCode)).build()).queue();
 							if(AzraelWeb.SQLInsertLoginInfo(user_id, 2, key) > 0) {
 								WebserviceUtils.return200(out, "Login key sent!", true, false);
 								AzraelWeb.SQLCodeUsageLog(user_id, address);
@@ -405,7 +405,7 @@ public class HandlerPOST {
 				if(!member.getUser().isBot()) {
 					final var channel = member.getUser().openPrivateChannel().complete();
 					try {
-						channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+IniFileReader.getWebURL()+"/account/confirm.php?key="+confirmToken).build()).queue();
+						channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_CONFIRM)+System.getProperty("HOMEPAGE")+"/account/confirm.php?key="+confirmToken).build()).queue();
 						AzraelWeb.SQLInsertActionLog(user_id, address, "ACCOUNT_CONFIRMATION_SENT", "Confirmation sent.");
 						WebserviceUtils.return200(out, "Success", true, false);
 					} catch(Exception exc) {
@@ -440,7 +440,7 @@ public class HandlerPOST {
 				final String displayCode = key.substring(0, 2)+"-"+key.substring(2, 4)+"-"+key.substring(4);
 				final var channel = member.getUser().openPrivateChannel().complete();
 				try {
-					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_RECOVERY).replace("{}", displayCode)).build()).queue();
 					if(AzraelWeb.SQLInsertLoginInfo(user_id, 3, key) > 0) {
 						WebserviceUtils.return200(out, "Recovery key sent!", true, false);
 						AzraelWeb.SQLInsertActionLog(user_id, address, "RECOVERY_CODE_GENERATED", key);
@@ -474,7 +474,7 @@ public class HandlerPOST {
 				final String key = RandomStringUtils.random(6, true, true).toUpperCase();
 				final var channel = member.getUser().openPrivateChannel().complete();
 				try {
-					channel.sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_OPTIONS).replace("{}", key)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(member, Translation.WEB_OPTIONS).replace("{}", key)).build()).queue();
 					if(AzraelWeb.SQLInsertLoginInfo(user_id, 4, key) > 0) {
 						WebserviceUtils.return200(out, "Options change key sent!", true, false);
 						AzraelWeb.SQLInsertActionLog(user_id, address, "OPTIONS_CODE_GENERATED", key);
@@ -510,7 +510,7 @@ public class HandlerPOST {
 		if(guild != null) {
 			Member serverMember = guild.getMemberById(user_id);
 			if(serverMember != null) {
-				if(UserPrivs.isUserAdmin(serverMember) || serverMember.getUser().getIdLong() == GuildIni.getAdmin(guild.getIdLong())) {
+				if(UserPrivs.isUserAdmin(serverMember) || BotConfiguration.SQLisAdministrator(serverMember.getUser().getIdLong(), guild.getIdLong())) {
 					boolean valid = false;
 					boolean textFileEdit = false;
 					switch(field) {
@@ -559,15 +559,15 @@ public class HandlerPOST {
 							}
 						}
 						case "General_Administrator" -> {
-							if(value.matches("[0-9]*") && guild.getMemberById(value) != null && user_id == GuildIni.getAdmin(guild.getIdLong()))
+							if(value.matches("[0-9]*") && guild.getMemberById(value) != null && BotConfiguration.SQLisAdministrator(user_id, guild.getIdLong()))
 								valid = true;
 						}
 						case "General_CommandPrefix" -> {
 							if(value.length() > 0 && value.length() <= 5)
 								valid = true;
 						}
-						case "Competitive_Team1", "Competitive_Team2", "Reactions_Emoji1", "Reactions_Emoji2", "Reactions_Emoji3", "Reactions_Emoji4", "Reactions_Emoji5",
-						"Reactions_Emoji6", "Reactions_Emoji7", "Reactions_Emoji8", "Reactions_Emoji9", "Reactions_VoteThumbsUp", "Reactions_VoteThumbsDown", "Reactions_VoteShrug" -> {
+						case "Competitive_Team1Name", "Competitive_Team2Name", "Reactions_Emoji1", "Reactions_Emoji2", "Reactions_Emoji3", "Reactions_Emoji4", "Reactions_Emoji5",
+						"Reactions_Emoji6", "Reactions_Emoji7", "Reactions_Emoji8", "Reactions_Emoji9", "VoteReactionThumbsUp", "VoteReactionThumbsDown", "VoteReactionShrug" -> {
 							if(value.length() >= 0 && value.length() <= 30)
 								valid = true;
 						}
@@ -619,12 +619,14 @@ public class HandlerPOST {
 					
 					if(valid) {
 						if(!textFileEdit) {
-							if(GuildIni.saveIniOption(guild.getIdLong(), field, value)) {
+							//TODO: rework options saving logic
+							/*if(GuildIni.saveIniOption(guild, field, value)) {
 								WebserviceUtils.return200(out, "Option updated!", true, false);
 								AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 								
 								if(field.equals("General_DoubleExperience")) {
-									GuildIni.setDoubleExperienceMode(guild.getIdLong(), value);
+									BotConfiguration.SQLUpdateBotConfigsDoubleExperience(guild.getIdLong(), value);
+									Hashes.removeBotConfiguration(guild.getIdLong());
 									if(!value.equals("auto"))
 										Hashes.addTempCache("doubleExp_gu"+guild.getId(), new Cache(value));
 									else 
@@ -633,11 +635,11 @@ public class HandlerPOST {
 							}
 							else {
 								WebserviceUtils.return500(out, "An internal error occurred! Value couldn't be saved!", true);
-							}
+							}*/
 						}
 						else {
-							FileSetting.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
-							WebserviceUtils.return200(out, "Option updated!", true, false);
+							/*FileHandler.createFile("./files/Guilds/"+guild.getId()+"/"+field.split("_")[1]+".txt", value);
+							WebserviceUtils.return200(out, "Option updated!", true, false);*/
 							AzraelWeb.SQLInsertActionLog(user_id, address, "BOT_OPTION_UPDATED", field+" for guild "+guild.getIdLong());
 						}
 					}

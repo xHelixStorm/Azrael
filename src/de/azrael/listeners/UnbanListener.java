@@ -1,29 +1,18 @@
 package de.azrael.listeners;
 
-/**
- * This class gets executed when a unban occurs.
- * 
- * The main task of this class is to retrieve the 
- * user who unbanned a different user and to display
- * it into a log channel. The unbanned user will be 
- * removed from the table where they're marked as 
- * banned.
- */
-
 import java.awt.Color;
 import java.sql.Timestamp;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -33,6 +22,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.guild.GuildUnbanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
+
+/**
+ * This class gets executed when a unban occurs.
+ * 
+ * The main task of this class is to retrieve the 
+ * user who unbanned a different user and to display
+ * it into a log channel. The unbanned user will be 
+ * removed from the table where they're marked as 
+ * banned.
+ */
 
 public class UnbanListener extends ListenerAdapter {
 	private final static Logger logger = LoggerFactory.getLogger(UnbanListener.class);
@@ -80,7 +79,7 @@ public class UnbanListener extends ListenerAdapter {
 			
 			//print unban message if a log channel has been registered
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getUnbanThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
+			EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getUnban()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_TITLE));
 			STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.UNBAN_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", ""+user_id).replace("{}", trigger_user_name)+reason+append_message, Channel.LOG.getType());
 			//remove the affected user from the bancollect table to symbolize that all current warnings have been removed
 			if(Azrael.SQLDeleteData(user_id, guild_id) == -1) {
@@ -92,7 +91,7 @@ public class UnbanListener extends ListenerAdapter {
 			Azrael.SQLInsertActionLog("MEMBER_BAN_REMOVE", user_id, guild_id, "User Unbanned");
 			
 			//Run google service, if enabled
-			if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+			if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 				String reporterName = "";
 				String reporterEffectiveName = "";
 				if(member != null) {

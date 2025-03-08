@@ -1,18 +1,20 @@
 package de.azrael.core;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.EnumSet;
+import java.util.Properties;
 
-import javax.security.auth.login.LoginException;
-
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.util.ContextInitializer;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.core.joran.spi.JoranException;
 import de.azrael.commands.About;
 import de.azrael.commands.Accept;
 import de.azrael.commands.Changemap;
@@ -48,7 +50,6 @@ import de.azrael.commands.Quiz;
 import de.azrael.commands.Randomshop;
 import de.azrael.commands.Rank;
 import de.azrael.commands.Reboot;
-import de.azrael.commands.Reddit;
 import de.azrael.commands.Register;
 import de.azrael.commands.Remove;
 import de.azrael.commands.Restrict;
@@ -62,13 +63,13 @@ import de.azrael.commands.Start;
 import de.azrael.commands.Stats;
 import de.azrael.commands.Subscribe;
 import de.azrael.commands.Top;
-import de.azrael.commands.Twitch;
 import de.azrael.commands.Use;
 import de.azrael.commands.User;
 import de.azrael.commands.Warn;
 import de.azrael.commands.Web;
 import de.azrael.commands.Write;
-import de.azrael.fileManagement.IniFileReader;
+import de.azrael.commands.util.CommandHandler;
+import de.azrael.enums.Directory;
 import de.azrael.listeners.AvatarUpdateListener;
 import de.azrael.listeners.BanListener;
 import de.azrael.listeners.CategoryListener;
@@ -85,8 +86,7 @@ import de.azrael.listeners.NicknameListener;
 import de.azrael.listeners.PrivateMessageListener;
 import de.azrael.listeners.PrivateMessageReactionAddListener;
 import de.azrael.listeners.ReadyListener;
-import de.azrael.listeners.ReconnectedListener;
-import de.azrael.listeners.ResumedListener;
+import de.azrael.listeners.SessionResumeListener;
 import de.azrael.listeners.RoleCreateListener;
 import de.azrael.listeners.RoleListener;
 import de.azrael.listeners.RoleNameUpdateListener;
@@ -104,8 +104,8 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 public class Main {
-	static {System.setProperty(ContextInitializer.CONFIG_FILE_PROPERTY, "./logback.xml");}
 	private final static Logger logger = LoggerFactory.getLogger(Main.class);
+	private final static String SECRET = "./.secret_data";
 	private static JDABuilder builder;
 	
 	public static void main(String [] args) {
@@ -117,101 +117,204 @@ public class Main {
 			}
 		});
 		
-		Logger logger = LoggerFactory.getLogger(Main.class);
-		boolean [] dir = new boolean[3];
-		dir[0] = (new File("./log")).mkdirs();
-		dir[1] = (new File("./message_log")).mkdirs();
-		dir[2] = (new File("./ini")).mkdirs();
-		
-		//collect parameters, if provided. Token and SessionName have to be the first 2 parameters
-		if(args.length > 0) {
-			//display all available parmeters if program receives 'list' as parameter and terminate with exit 0
-			if(args[0].equals("list")) {
-				System.out.println("These are all available parameters. If nothing has been provided, the values from config.ini will be taken:\n\n"
-						+ "admin:<NUMERIC> (17/18 digit long user id that defines the admin for shutdown and reboot)\n"
-						+ "timezone:<String> (timezone location like 'Europe/Berlin' for mysql databases)\n"
-						+ "sessionname: <String> (if the bot should be started multiple times, assign a name)"
-						+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
-						+ "doubleexperience:<BOOLEAN> (true/false parameter to either enable or disable double experience events)\n"
-						+ "doubleexperiencestart:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the start day of double experience events)\n"
-						+ "doubleexperienceend:<WEEKDAY> (Regular days from Monday to Sunday as parameter to define the end day of double experience events)\n"
-						+ "countmembers:<BOOLEAN> (true/false parameter to either enable or disable the count of all active members as playing status)\n"
-						+ "filelogger:<BOOLEAN> (true/false parameter to print all messages to the console if off or to file if on)\n"
-						+ "gamemessage:<STRING> (Message to display as playing status. Separate blank spaces with '-')\n"
-						+ "temp:<STRING> (Path for the temp directory)\n"
-						+ "port:<NUMERIC> (port number for the webservice)");
-				System.exit(0);
-			}
-			else {
-				//initialize all static variables
-				STATIC.setToken(args[0].trim());
-				if(args.length > 1) {
-					for(final var argument : args) {
-						final var currentArgument = argument.toLowerCase();
-						if(currentArgument.startsWith("admin:"))
-							STATIC.setAdmin(Long.parseLong(argument.split(":")[1].trim()));
-						if(currentArgument.startsWith("timezone:"))
-							STATIC.setTimezone(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("sessionname:"))
-							STATIC.setSessionName(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("actionlog:"))
-							STATIC.setActionLog(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("doubleexperience:"))
-							STATIC.setDoubleExperience(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("doubleexperiencestart:"))
-							STATIC.setDoubleExperienceStart(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("doubleexperienceend:"))
-							STATIC.setDoubleExperienceEnd(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("countmembers:"))
-							STATIC.setCountMembers(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("filelogger:"))
-							STATIC.setFileLogger(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("gamemessage:")) {
-							var splitMessage = argument.split(":")[1].split("-");
-							StringBuilder message = new StringBuilder();
-							for(final var split : splitMessage)
-								message.append(split+" ");
-							STATIC.setGameMessage(message.toString().trim());
-						}
-						if(currentArgument.startsWith("temp:"))
-							STATIC.setTemp(argument.split(":")[1].trim());
-						if(currentArgument.startsWith("port:"))
-							STATIC.setPort(Integer.parseInt(argument.split(":")[1].trim()));
-					}
+		//Create required directories
+		new File(Directory.LOG.getPath()).mkdirs();
+		new File(Directory.MESSAGE_LOG.getPath()).mkdirs();
+		new File(Directory.USER_LOG.getPath()).mkdirs();
+		new File(Directory.CACHE.getPath()).mkdirs();
+				
+		//Verify the passed parameters
+		if(args.length == 0) {
+			//display all available parameters when no parameter has been passed
+			System.out.println("These are all available parameters. A valid token and an encryption key is mandatory to start the application:\n\n"
+					+ "encryption:<String> (AES key to decrypt sql requests and confidential information)"
+					+ "sessionname:<String> (if the bot should be started more than once, assign a name)\n"
+					+ "actionlog:<BOOLEAN> (true/false parameter to log actions related to the ranking system and other updates)\n"
+					+ "countguilds:<BOOLEAN> (true/false parameter to either enable or disable the count of all guilds as status message)\n"
+					+ "statusmessage:<STRING> (Message to display as status message. Separate blank spaces with '-')\n"
+					+ "temp:<STRING> (Path for the temp directory)\n"
+					+ "homepage:<String> (url for the Bot homepage)\n"
+					+ "port:<NUMERIC> (port number for the webservice)\n"
+					+ "spreadsheetdelay:<NUMERIC> (numeric delay time to execute batch updates on spreadsheets)\n");
+			
+		} 
+		else {
+			//initialize all static variables
+			System.setProperty("TOKEN", args[0].trim());
+			for(final var argument : args) {
+				final var currentArgument = argument.toLowerCase();
+				if(currentArgument.startsWith("encryption:"))
+					System.setProperty("AES_SECRET", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("sessionname:"))
+					System.setProperty("SESSION_NAME", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("actionlog:"))
+					System.setProperty("ACTION_LOG", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("countguilds:"))
+					System.setProperty("COUNT_GUILDS", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("statusmessage:")) {
+					var splitMessage = argument.split(":")[1].split("-");
+					StringBuilder message = new StringBuilder();
+					for(final var split : splitMessage)
+						message.append(split+" ");
+					System.setProperty("STATUS_MESSAGE", message.toString());
 				}
+				if(currentArgument.startsWith("temp:")) {
+					var temp = argument.split(":")[1].trim();
+					if(!temp.endsWith("/"))
+						temp += "/";
+					System.setProperty("TEMP_DIRECTORY", temp);
+				}
+				if(currentArgument.startsWith("homepage:"))
+					System.setProperty("HOMEPAGE", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("port:"))
+					System.setProperty("WEBSERVER_PORT", argument.split(":")[1].trim());
+				if(currentArgument.startsWith("spreadsheetdelay:"))
+					System.setProperty("SPREADSHEET_UPDATE_DELAY", argument.split(":")[1].trim());
 			}
-		}
-		if(STATIC.getToken().length() == 0)
-			STATIC.setToken(IniFileReader.getToken());
-		
-		if(IniFileReader.getFileLogger()) {
-			PrintStream out;
+			
+			//set default values, if not set
+			if(System.getProperty("SESSION_NAME") == null)
+				System.setProperty("SESSION_NAME", "Azrael");
+			if(System.getProperty("COUNT_GUILDS") == null || (!System.getProperty("COUNT_GUILDS").equals("true") && !System.getProperty("COUNT_GUILDS").equals("false")))
+				System.setProperty("COUNT_GUILDS", "false");
+			if(System.getProperty("ACTION_LOG") == null || (!System.getProperty("ACTION_LOG").equals("true") && !System.getProperty("ACTION_LOG").equals("false")))
+				System.setProperty("ACTION_LOG", System.getProperty("ACTION_LOG", "false"));
+			if(System.getProperty("WEBSERVER_PORT") == null || !System.getProperty("WEBSERVER_PORT").matches("[0-9]{1,}"))
+				System.setProperty("WEBSERVER_PORT", System.getProperty("WEBSERVER_PORT", "0"));
+			if(System.getProperty("TEMP_DIRECTORY") == null)
+				System.setProperty("TEMP_DIRECTORY", "./temp/");
+			if(System.getProperty("SPREADSHEET_UPDATE_DELAY") == null || (!System.getProperty("SPREADSHEET_UPDATE_DELAY").matches("[0-9]*") && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) > 60  && Long.parseLong(System.getProperty("SPREADSHEET_UPDATE_DELAY")) < 0))
+				System.setProperty("SPREADSHEET_UPDATE_DELAY", "0");
+			
 			try {
-				final String fileName = (STATIC.getSessionName().length() > 0 ? STATIC.getSessionName() : "Azrael");
-				out = new PrintStream(new FileOutputStream("log/"+fileName+".log", true));
-				System.setOut(out);
-				System.setErr(out);
-			} catch (FileNotFoundException e1) {
+				final String fileName = Directory.LOG.getPath()+System.getProperty("SESSION_NAME");
+				System.setProperty("LOG_FILE", fileName);
+				
+				LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+				loggerContext.reset();
+				JoranConfigurator configurator = new JoranConfigurator();
+				InputStream configStream;
+				configStream = FileUtils.openInputStream(new File("./logback.xml"));
+				configurator.setContext(loggerContext);
+				configurator.doConfigure(configStream);
+				configStream.close();
+				
+			} catch (IOException | JoranException e1) {
 				logger.warn("Log file couldn't be found on start up", e1);
 			}
-		}
+			
+			if(System.getProperty("TOKEN") == null) {
+				logger.error("No token has been provided!");
+				return;
+			}
+			if(System.getProperty("AES_SECRET") == null) {
+				logger.error("No encryption key received!");
+				return;
+			}
+			
+			//Load DB configuration from file
+			try {
+				FileInputStream secret = new FileInputStream(SECRET);
+				Properties prop = new Properties();
+				prop.load(secret);
+				
+				//Database options
+				final String dbNumber = prop.getProperty("DATABASE_NUMBER");
+				if(dbNumber != null && dbNumber.trim().matches("^[0-9]*$")) {
+					for(int i = 1; i <= Integer.parseInt(dbNumber.trim()); i++) {
+						final String dbName = prop.getProperty("DB_"+i+"_DB_NAME");
+						final String ip = prop.getProperty("DB_"+i+"_IP");
+						final String port = prop.getProperty("DB_"+i+"_PORT");
+						final String host = prop.getProperty("DB_"+i+"_HOST");
+						final String timezone = prop.getProperty("DB_"+i+"_TIMEZONE", "UTC");
+						final String user = prop.getProperty("DB_"+i+"_USER");
+						final String pass = prop.getProperty("DB_"+i+"_PASS");
+						
+						if(dbName == null || ip == null || port == null || host == null || user == null || pass == null) {
+							if(dbName == null)
+								logger.error("Parameter DB_{}_DB_NAME not found!", i);
+							if(ip == null)
+								logger.error("Parameter DB_{}_IP not found!", i);
+							if(port == null)
+								logger.error("Parameter DB_{}_PORT not found!", i);
+							if(host == null)
+								logger.error("Parameter DB_{}_HOST not found!", i);
+							if(user == null)
+								logger.error("Parameter DB_{}_USER not found!", i);
+							logger.error("Database configuration couldn't be loaded. Application shutdown!");
+							return;
+						}
+						
+						System.setProperty("DB_"+i+"_DB_NAME", dbName.trim());
+						System.setProperty("DB_"+i+"_IP", ip.trim());
+						System.setProperty("DB_"+i+"_PORT", port.trim());
+						System.setProperty("DB_"+i+"_HOST", host.trim());
+						System.setProperty("DB_"+i+"_TIMEZONE", timezone);
+						System.setProperty("DB_"+i+"_USER", STATIC.decrypt(user.trim()));
+						System.setProperty("DB_"+i+"_PASS", (pass != null ? STATIC.decrypt(pass.trim()) : null));
+					}
+				}
+				else if(dbNumber == null) {
+					logger.error("DATABASE_NUMBER parameter not found!");
+					return;
+				}
+				else {
+					logger.error("Invalid number of database connections!");
+					return;
+				}
+				
+				//Imgur options
+				System.setProperty("IMGUR_API_KEY", prop.getProperty("IMGUR_API_KEY", "").trim());
+				
+				//Twitter options
+				System.setProperty("TWITTER_CONSUMER_KEY", prop.getProperty("TWITTER_CONSUMER_KEY", "").trim());
+				System.setProperty("TWITTER_CONSUMER_KEY_SECRET", prop.getProperty("TWITTER_CONSUMER_KEY_SECRET", "").trim());
+				System.setProperty("TWITTER_ACCESS_TOKEN", prop.getProperty("TWITTER_ACCESS_TOKEN", "").trim());
+				System.setProperty("TWITTER_ACCESS_TOKEN_SECRET", prop.getProperty("TWITTER_ACCESS_TOKEN_SECRET", "").trim());
+				
+				//Reddit options
+				System.setProperty("REDDIT_CLIENT_ID", prop.getProperty("REDDIT_CLIENT_ID", "").trim());
+				System.setProperty("REDDIT_CLIENT_SECRET", prop.getProperty("REDDIT_CLIENT_SECRET", "").trim());
+				final String redditUser = prop.getProperty("REDDIT_USER", "");
+				final String redditPass = prop.getProperty("REDDIT_PASS", "");
+				System.setProperty("REDDIT_USER", (redditUser.isBlank() ? redditUser.trim() : STATIC.decrypt(redditUser.trim())));
+				System.setProperty("REDDIT_PASS", (redditPass.isBlank() ? redditPass.trim() : STATIC.decrypt(redditPass.trim())));
+				
+				//Twitch options
+				System.setProperty("TWITCH_CLIENT_ID", prop.getProperty("TWITCH_CLIENT_ID", "").trim());
+				System.setProperty("TWITCH_CLIENT_SECRET", prop.getProperty("TWITCH_CLIENT_SECRET", "").trim());
+			} catch (Exception e1) {
+				logger.error("Database configurations couldn't be loaded. Application shutdown!", e1);
+				return;
+			}
+			
+			EnumSet<GatewayIntent> intents = EnumSet.of(
+					GatewayIntent.DIRECT_MESSAGE_REACTIONS,
+					GatewayIntent.DIRECT_MESSAGES,
+					GatewayIntent.GUILD_INVITES,
+					GatewayIntent.GUILD_MEMBERS,
+					GatewayIntent.GUILD_MESSAGE_REACTIONS,
+					GatewayIntent.GUILD_MESSAGES,
+					GatewayIntent.GUILD_MODERATION,
+					GatewayIntent.MESSAGE_CONTENT
+			);
+			
+			builder = JDABuilder.createDefault(System.getProperty("TOKEN"))
+					.enableIntents(intents)
+					.setMemberCachePolicy(MemberCachePolicy.ALL);
+			builder.setAutoReconnect(true);
+			builder.setStatus(OnlineStatus.ONLINE);	
 		
-		String token = STATIC.getToken();
-		builder = JDABuilder.createDefault(token)
-				.enableIntents(EnumSet.of(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_PRESENCES))
-				.setMemberCachePolicy(MemberCachePolicy.ALL);
-		builder.setAutoReconnect(true);
-		builder.setStatus(OnlineStatus.ONLINE);	
-	
-		addPublicCommands();
-		addPrivateCommands();
-		addListeners();
-		
-		try {
-			@SuppressWarnings("unused")
-			JDA jda = builder.build();
-		} catch (LoginException | IllegalArgumentException e) {
-			logger.error("Login or Token error", e);
+			addPublicCommands();
+			addPrivateCommands();
+			addListeners();
+			
+			try {
+				@SuppressWarnings("unused")
+				JDA jda = builder.build();
+			} catch (IllegalArgumentException e) {
+				logger.error("Login or Token error", e);
+			}
 		}
 	}
 	
@@ -269,9 +372,7 @@ public class Main {
 		CommandHandler.commandsPublic.put("start", new Start());
 		CommandHandler.commandsPublic.put("prune", new Prune());
 		CommandHandler.commandsPublic.put("warn", new Warn());
-		CommandHandler.commandsPublic.put("reddit", new Reddit());
 		CommandHandler.commandsPublic.put("invites", new Invites());
-		CommandHandler.commandsPublic.put("twitch", new Twitch());
 	}
 	
 	public static void addPrivateCommands() {
@@ -300,8 +401,7 @@ public class Main {
 			new GuildMessageReactionAddListener(),
 			new GuildMessageReactionRemoveListener(),
 			new StatusListener(),
-			new ReconnectedListener(),
-			new ResumedListener(),
+			new SessionResumeListener(),
 			new RoleCreateListener(),
 			new TextChannelListener(),
 			new RoleNameUpdateListener(),

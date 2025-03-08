@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,16 +17,10 @@ import de.azrael.constructors.CompMap;
 import de.azrael.constructors.Member;
 import de.azrael.constructors.Room;
 import de.azrael.constructors.UserStats;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 
 public class Competitive {
 	private static final Logger logger = LoggerFactory.getLogger(Competitive.class);
-	
-	private static String ip = IniFileReader.getSQLIP();
-	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword();
-	
 	
 	public static void SQLconnection() {
 		try {
@@ -43,7 +36,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertCompServer);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, server);
@@ -62,7 +55,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveCompServer);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, server);
@@ -83,7 +76,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<String> servers = new ArrayList<String>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetCompServers);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -108,7 +101,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUserStatExists);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -133,7 +126,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetServerFromUserStat);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -158,7 +151,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetUserStats);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -193,7 +186,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<String> rankList = new ArrayList<String>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRanking);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -218,7 +211,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<String> rankList = new ArrayList<String>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRankingTop10);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -242,7 +235,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisNameTaken);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, name);
@@ -266,7 +259,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertUserStat);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -286,7 +279,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateServerFromUserStats);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, server);
@@ -304,7 +297,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateSelectedServerInUserStats);
 			stmt.setString(1, server);
 			stmt.setLong(2, guild_id);
@@ -324,7 +317,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateNameInUserStats);
 			stmt.setString(1, newName);
 			stmt.setLong(2, guild_id);
@@ -345,7 +338,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetUsernameFromUserStats);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -371,7 +364,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMaxClanMembers);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -394,7 +387,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMaxClanMembers);
 			stmt.setInt(1, members);
 			stmt.setLong(2, guild_id);
@@ -414,7 +407,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -439,7 +432,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<Member> members = new ArrayList<Member>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingMembers2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
@@ -473,7 +466,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingMembers);
 			stmt.setInt(1, members);
 			stmt.setLong(2, guild_id);
@@ -494,7 +487,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMemberLevel);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -518,7 +511,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanMemberLevel);
 			stmt.setInt(1, level);
 			stmt.setLong(2, guild_id);
@@ -541,7 +534,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<Long> management = new ArrayList<Long>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanManagement);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -560,13 +553,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLInsertClanMember(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLInsertClanMember launched. Passed params {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanMember);
 			stmt.setLong(1, guild_id);
@@ -603,13 +595,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLRemoveClanMember(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLRemoveClanMember launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRemoveClanMember);
 			stmt.setLong(1, guild_id);
@@ -645,13 +636,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDelegateOwnership(long guild_id, long user_id_target, long user_id_self, int clan_id) {
 		logger.trace("SQLDelegateOwnership launched. Passed params {}, {}, {}, {}", guild_id, user_id_target, user_id_self, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDelegateOwnership);
 			stmt.setLong(1, guild_id);
@@ -681,13 +671,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDisbandClan(long guild_id, long user_id, int clan_id) {
 		logger.trace("SQLDisbandClan launched. Passed params {}, {}, {}", guild_id, user_id, clan_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDisbandClan);
 			stmt.setLong(1, guild_id);
@@ -724,13 +713,12 @@ public class Competitive {
 	}
 	
 	//clans
-	@SuppressWarnings("resource")
 	public static int SQLCreateClan(long guild_id, long user_id, String name) {
 		logger.trace("SQLCreateClan launched. Passed params {}, {}, {}", guild_id, user_id, name);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClan);
 			stmt.setLong(1, guild_id);
@@ -783,7 +771,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<Clan> clans = new ArrayList<Clan>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClans);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -816,7 +804,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanID);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, name);
@@ -841,7 +829,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMemberNumber);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -866,7 +854,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanName);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -890,7 +878,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanMark);
 			stmt.setString(1, url);
 			stmt.setLong(2, guild_id);
@@ -911,7 +899,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertClanReservation);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -934,7 +922,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservationType);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -961,7 +949,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservationAction);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -988,7 +976,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservation);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -1024,7 +1012,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanReservation);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -1058,7 +1046,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateClanReservationAction);
 			stmt.setInt(1, action);
 			stmt.setLong(2, guild_id);
@@ -1082,7 +1070,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, type);
@@ -1122,7 +1110,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
@@ -1161,7 +1149,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMatchmakingRoom3);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -1204,7 +1192,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<Room> rooms = new ArrayList<Room>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetOngoingMatchmakingRooms);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -1242,7 +1230,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisClanMatchmakingRoomOngoing);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, type);
@@ -1263,14 +1251,13 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLCreateMatchmakingRoom(long guild_id, long user_id, int type, int map, int member_limit, long channel_id) {
 		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}, {}", guild_id, user_id, type, map, member_limit, channel_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateMatchmakingRoom);
@@ -1319,14 +1306,13 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLCreateClanMatchmakingRoom(long guild_id, int type, int map, int clan_id_1, int clan_id_2, int member_limit) {
 		logger.trace("SQLCreateMatchmakingRoom launched. Passed params {}, {}, {}, {}, {}, {}", guild_id, type, map, clan_id_1, clan_id_2, member_limit);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLCreateClanMatchmakingRoom);
@@ -1369,13 +1355,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLDeleteMatchmakingRoom(long guild_id, int room_id) {
 		logger.trace("SQLDeleteMatchmakingRoom launched. Passed params {}, {}", guild_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDeleteMatchmakingRoom);
@@ -1404,13 +1389,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long guild_id, long user_id, int room_id) {
 		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom);
@@ -1440,13 +1424,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLJoinRoom(long guild_id, long user_id, int room_id, int team) {
 		logger.trace("SQLJoinRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id, room_id, team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLJoinRoom);
@@ -1477,13 +1460,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long guild_id, int room_id, Member [] team1, Member [] team2) {
 		logger.trace("SQLUpdateTeams launched. Passed params {}, {} and arrays", guild_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams);
@@ -1534,13 +1516,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateTeams(long guild_id, int room_id, long user_id_1, long user_id_2) {
 		logger.trace("SQLUpdateTeams launched. Passed params {}, {}, {}, {}", guild_id, room_id, user_id_1, user_id_2);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateTeams4);
@@ -1583,7 +1564,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateRoomMessageID);
 			stmt.setLong(1, channel_id);
 			stmt.setLong(2, message_id);
@@ -1604,7 +1585,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingRoomMap);
 			stmt.setLong(1, map_id);
 			stmt.setLong(2, guild_id);
@@ -1624,7 +1605,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateMatchmakingRoomStatus);
 			stmt.setInt(1, status);
 			stmt.setLong(2, guild_id);
@@ -1639,13 +1620,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLsetWinner(long guild_id, int room_id, int team, boolean clans) {
 		logger.trace("SQLsetWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLsetWinner);
@@ -1741,13 +1721,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLrevertWinner(long guild_id, int room_id, int team, boolean clans) {
 		logger.trace("SQLrevertWinner launched. Passed params {}, {}, {}, {}", guild_id, room_id, team, clans);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLrevertWinner);
@@ -1832,13 +1811,12 @@ public class Competitive {
 	}
 	
 	//matchmaking_members
-	@SuppressWarnings("resource")
 	public static int SQLPickMember(long guild_id, int room_id, long user_id, long leader_id, int team) {
 		logger.trace("SQLPickMember launched. Passed params {}, {}, {}, {}, {}", guild_id, room_id, user_id, leader_id, team);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLPickMember);
@@ -1879,14 +1857,13 @@ public class Competitive {
 	}
 	
 	//comp_maps
-	@SuppressWarnings("resource")
 	public static int SQLInsertMap(long guild_id, String mapName, String url) {
 		logger.trace("SQLInsertMap launched. Passed params {}, {}, {}", guild_id, mapName, url);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLInsertMap);
@@ -1936,13 +1913,50 @@ public class Competitive {
 		}
 	}
 	
+	public static int SQLDeleteMap(long guild_id, String mapName) {
+		logger.trace("SQLDeleteMap launched. Passed params {}, {}", guild_id, mapName);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLDeleteMap);
+			stmt.setLong(1, guild_id);
+			stmt.setString(2, mapName);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLDeleteMap Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
+	public static int SQLClearMaps(long guild_id) {
+		logger.trace("SQLClearMaps launched. Passed params {}", guild_id);
+		Connection myConn = null;
+		PreparedStatement stmt = null;
+		try {
+			myConn = STATIC.getDatabaseURL(1);
+			stmt = myConn.prepareStatement(CompetitiveStatements.SQLClearMaps);
+			stmt.setLong(1, guild_id);
+			return stmt.executeUpdate();
+		} catch (SQLException e) {
+			logger.error("SQLClearMaps Exception", e);
+			return -1;
+		} finally {
+		    try { stmt.close(); } catch (Exception e) { /* ignored */ }
+		    try { myConn.close(); } catch (Exception e) { /* ignored */ }
+		}
+	}
+	
 	public static CompMap SQLgetRandomMap(long guild_id) {
 		logger.trace("SQLgetRandomMap launched. Passed params {}, {}", guild_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetRandomMap);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -1970,7 +1984,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMap);
 			stmt.setInt(1, map_id);
 			rs = stmt.executeQuery();
@@ -1998,7 +2012,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetMap2);
 			stmt.setLong(1, guild_id);
 			stmt.setString(2, map);
@@ -2028,7 +2042,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanDetails);
 			stmt.setLong(1, user_id);
 			stmt.setLong(2, guild_id);
@@ -2068,7 +2082,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanDetailsByName);
 			stmt.setString(1, name);
 			stmt.setLong(2, guild_id);
@@ -2109,7 +2123,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<ClanMember> clanMembers = new ArrayList<ClanMember>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMembers);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -2150,7 +2164,7 @@ public class Competitive {
 		ResultSet rs = null;
 		try {
 			ArrayList<ClanMember> clanMembers = new ArrayList<ClanMember>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLgetClanMembersStaff);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, clan_id);
@@ -2190,7 +2204,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLisUserInRoom);
 			stmt.setLong(1, guild_id);
 			stmt.setLong(2, user_id);
@@ -2209,13 +2223,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLLeaveRoom(long guild_id, long user_id, int room_id) {
 		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}", guild_id, user_id, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLLeaveRoom);
@@ -2250,7 +2263,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrievePicker);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
@@ -2286,7 +2299,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrieveMember);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
@@ -2323,7 +2336,7 @@ public class Competitive {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), Competitive.username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLRetrieveMember2);
 			stmt.setLong(1, guild_id);
 			stmt.setInt(2, room_id);
@@ -2354,13 +2367,12 @@ public class Competitive {
 		}
 	}
 	
-	@SuppressWarnings("resource")
 	public static int SQLUpdateRoomMaster(long guild_id, long user_id1, long user_id2, int room_id) {
 		logger.trace("SQLLeaveRoom launched. Passed params {}, {}, {}, {}", guild_id, user_id1, user_id2, room_id);
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateRoomMaster);
@@ -2395,7 +2407,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			myConn.setAutoCommit(false);
 			
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateRoomMaster3);
@@ -2417,7 +2429,7 @@ public class Competitive {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(CompetitiveStatements.SQLUpdateRoomMemberLimit);
 			stmt.setInt(1, memberLimit);
 			stmt.setLong(2, guild_id);

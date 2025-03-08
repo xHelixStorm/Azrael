@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,19 +14,19 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.util.CharacterReplacer;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 
 public class LanguageFilter implements Runnable {
 	private final static Logger logger = LoggerFactory.getLogger(LanguageFilter.class);
@@ -57,15 +58,11 @@ public class LanguageFilter implements Runnable {
 			
 			final var parseMessage = thisMessage.toLowerCase();
 			
-			for(String exception : CharacterReplacer.getExceptions()) {
-				if(parseMessage.matches("(.|\\s){0,}\\b"+exception+"\\b(.|\\s){0,}")) {
-					exceptionFound = true;
-				}
-			}
-			
 			if(exceptionFound == false) {
 				var blockHeavyCensor = false;
 				for(String filter : filter_lang) {
+					if(filter.equals("all"))
+						continue;
 					Optional<String> option = Azrael.SQLgetFilter(filter, message.getGuild().getIdLong()).parallelStream()
 						.filter(word -> parseMessage.matches("(.|\\s){0,}\\b"+word+"\\b(.|\\s){0,}")).findAny();
 					if(option.isPresent()) {
@@ -73,11 +70,12 @@ public class LanguageFilter implements Runnable {
 						message.delete().reason("Message removed due to bad manner!").queue(success -> {}, error -> {
 							logger.warn("Message {} already removed in guild {}", message.getId(), message.getGuild().getId());
 						});
-						STATIC.handleRemovedMessages(message.getMember(), message.getTextChannel(), output);
+						Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
+						STATIC.handleRemovedMessages(message.getMember(), message.getChannel().asTextChannel(), output);
 						var tra_channel = allChannels.parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.TRA.getType())).findAny().orElse(null);
 						if(tra_channel != null) {
 							final TextChannel textChannel = message.getGuild().getTextChannelById(tra_channel.getChannel_ID());
-							if(textChannel != null && (message.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(message.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
+							if(textChannel != null && (message.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(message.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS)))) {
 								Matcher matcher = Pattern.compile("[\\w\\d]*").matcher(getMessage);
 								while(matcher.find()) {
 									var word = matcher.group();
@@ -90,7 +88,7 @@ public class LanguageFilter implements Runnable {
 								embed.setTitle(name);
 								embed.setFooter(channel + "("+message.getChannel().getId()+")").setThumbnail(message.getMember().getUser().getEffectiveAvatarUrl());
 								final String printMessage = STATIC.getTranslation(message.getMember(), Translation.CENSOR_TITLE_DETECTED).replaceFirst("\\{\\}", option.get()).replace("{}", filter)+"\n\n"+getMessage;
-								textChannel.sendMessage(embed.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
+								textChannel.sendMessageEmbeds(embed.setDescription((printMessage.length() <= 2048 ? printMessage : printMessage.substring(0, 2040)+"...")).build()).queue();
 							}
 						}
 						break;
@@ -101,7 +99,7 @@ public class LanguageFilter implements Runnable {
 						if(heavyCensoring != null && heavyCensoring) {
 							var messageDeleted = false;
 							var censorMessage = Hashes.getCensorMessage(message.getGuild().getIdLong());
-							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage)) || parseMessage.matches("^[^a-zA-Z0-9]*$")) {
+							if(parseMessage.length() == 1 || (censorMessage != null && censorMessage.contains(parseMessage.toLowerCase())) || parseMessage.matches("^[^a-zA-Z0-9]*$")) {
 								deleteHeavyCensoringMessage(message, allChannels, name, channel, getMessage);
 								messageDeleted = true;
 							}
@@ -148,6 +146,17 @@ public class LanguageFilter implements Runnable {
 								}
 								break;
 							}
+							if(censorMessage == null) {
+								ArrayList<String> messages = new ArrayList<String>();
+								messages.add(getMessage.toLowerCase());
+								Hashes.addCensorMessage(message.getGuild().getIdLong(), messages);
+							}
+							else {
+								censorMessage.add(0, getMessage.toLowerCase());
+								if(censorMessage.size() > 30)
+									censorMessage.remove(30);
+								Hashes.addCensorMessage(message.getGuild().getIdLong(), censorMessage);
+							}
 						}
 					}
 				}
@@ -158,6 +167,7 @@ public class LanguageFilter implements Runnable {
 	private static void deleteHeavyCensoringMessage(Message message, List<Channels> allChannels, String name, String channel, String getMessage) {
 		Hashes.addTempCache("message-removed-filter_gu"+message.getGuild().getId()+"ch"+message.getChannel().getId()+"us"+message.getMember().getUser().getId(), new Cache(10000));
 		message.delete().reason("Message removed due to heavy censoring!").queue();
+		Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 		StringBuilder out = new StringBuilder();
 		for(final Attachment attachment : message.getAttachments()) {
 			out.append(attachment.getProxyUrl()+"\n");

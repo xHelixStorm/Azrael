@@ -18,7 +18,7 @@ public enum Channel {
 	WAT	("wat"),
 	VOT	("vot"),
 	VO2	("vo2"),
-	RSS	("rss"),
+	SUB	("sub"),
 	UPD	("upd");
 	
 	private String type;

@@ -1,7 +1,6 @@
 package de.azrael.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,15 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Patchnote;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 
 public class Patchnotes {
 	private static final Logger logger = LoggerFactory.getLogger(Patchnotes.class);
-	
-	private static String ip = IniFileReader.getSQLIP();
-	private static String username = IniFileReader.getSQLUsername();
-	private static String password = IniFileReader.getSQLPassword();
 		
 	public static void SQLconnection() {
 		try {
@@ -35,7 +29,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -63,7 +57,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			rs = stmt.executeQuery();
@@ -90,7 +84,7 @@ public class Patchnotes {
 		Connection myConn = null;
 		PreparedStatement stmt = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLInsertPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
@@ -109,7 +103,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedPatchnotes);
 			stmt.setString(1, STATIC.getVersion());
 			stmt.setLong(2, guild_id);
@@ -134,7 +128,7 @@ public class Patchnotes {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		try {
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLcheckPublishedBotPatchnotes);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();
@@ -159,7 +153,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPrivatePatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -193,7 +187,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetPublicPatchnotesArray);
 			rs = stmt.executeQuery();
 			while(rs.next()){
@@ -227,7 +221,7 @@ public class Patchnotes {
 		ResultSet rs = null;
 		try {
 			ArrayList<Patchnote> patchnotes = new ArrayList<Patchnote>();
-			myConn = DriverManager.getConnection(STATIC.getDatabaseURL("Azrael", ip), username, password);
+			myConn = STATIC.getDatabaseURL(1);
 			stmt = myConn.prepareStatement(PatchnotesStatements.SQLgetGamePatchnotesArray);
 			stmt.setLong(1, guild_id);
 			rs = stmt.executeQuery();

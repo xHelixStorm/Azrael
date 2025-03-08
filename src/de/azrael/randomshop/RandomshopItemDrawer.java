@@ -17,13 +17,14 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Weapons;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class RandomshopItemDrawer {
 	private final static Logger logger = LoggerFactory.getLogger(RandomshopItemDrawer.class);
@@ -31,7 +32,7 @@ public class RandomshopItemDrawer {
 	public static void drawItems(Member member, TextChannel channel, List<Weapons> weapons, int current_page, int last_page, Guilds guild_settings) {
 		String traceWeapon = null;
 		try {
-			BufferedImage randomshop = ImageIO.read(new File("./files/RankingSystem/Randomshop/randomshop_blank.png"));
+			BufferedImage randomshop = ImageIO.read(new File(Directory.RANDOMSHOP.getPath()+"randomshop_blank.png"));
 			
 			final var startX = guild_settings.getRandomshopStartX();
 			final var startY = guild_settings.getRandomshopStartY();
@@ -58,7 +59,7 @@ public class RandomshopItemDrawer {
 			for(var weapon : weapons) {
 				traceWeapon = weapon.getDescription();
 				counter++;
-				BufferedImage currentWeapon = ImageIO.read(new File("./files/RankingSystem/Weapons/"+weapon.getDescription()+".png"));
+				BufferedImage currentWeapon = ImageIO.read(new File(Directory.WEAPONS.getPath()+weapon.getDescription()+".png"));
 				g.drawImage(currentWeapon, currentX+(sizeX/2)-(itemSizeX/2), currentY+(sizeY/2)-(itemSizeY/2), (itemSizeX != 0 ? itemSizeX : currentWeapon.getWidth()), (itemSizeY != 0 ? itemSizeY : currentWeapon.getHeight()), null);
 				if(counter % rowLimit != 0) {
 					currentX += moveX;
@@ -70,16 +71,16 @@ public class RandomshopItemDrawer {
 			}
 			g.setFont(new Font("Nexa Bold", Font.BOLD, generalFontSize));
 			g.drawString(current_page+" / "+ last_page, pageX+getCenteredString(current_page+" / "+ last_page, 0, g), pageY);
-			ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
+			ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png"));
 			g.dispose();
 			
-			File file1 = new File(IniFileReader.getTempDirectory()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
-			channel.sendFile(file1, "randomshop.png").queue(m -> {
+			File file1 = new File(Directory.TEMP.getPath()+"randomshop_items_gu"+member.getGuild().getId()+"us"+member.getUser().getId()+".png");
+			channel.sendFiles(FileUpload.fromData(file1, "randomshop.png")).queue(m -> {
 				file1.delete();
 			});
 		} catch (IOException e1) {
 			if(member.getGuild().getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(member.getGuild(), channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-				channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).build()).queue();
+				channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).build()).queue();
 			else
 				channel.sendMessage(STATIC.getTranslation(member, Translation.RANDOMSHOP_ERR)).queue();
 			logger.error("Randomshop Items couldn't be drawn. Error for item {} in guild {}", traceWeapon, member.getGuild().getId(), e1);

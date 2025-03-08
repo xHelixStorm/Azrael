@@ -7,17 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Bancollect;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.DiscordRoles;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
@@ -109,7 +109,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 				logger.info("User {} got the mute role removed before the timer expired in guild {}", e.getUser().getId(), e.getGuild().getId());
 				Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE_HALFWAY", user_id, guild_id, "Mute role removed manually");
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+				if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 					String role_id = NA;
 					String role_name = NA;
 					if(role != null) {
@@ -131,7 +131,7 @@ public class RoleRemovedListener extends ListenerAdapter {
 					Azrael.SQLInsertActionLog("MEMBER_MUTE_REMOVE", user_id, guild_id, "Mute role removed");
 				}
 				//Run google service, if enabled
-				if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+				if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 					final String NA = STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE);
 					String role_id = NA;
 					String role_name = NA;

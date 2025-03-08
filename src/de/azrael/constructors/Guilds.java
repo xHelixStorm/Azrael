@@ -22,6 +22,7 @@ public class Guilds {
 	private long randomshop_price;
 	private long start_currency;
 	
+	private int inventory_id;
 	private int inventory_startx;
 	private int inventory_starty;
 	private int inventory_tabx;
@@ -57,6 +58,7 @@ public class Guilds {
 	private int randomshop_reward_item_sizex;
 	private int randomshop_reward_item_sizey;
 	
+	private int daily_id;
 	private int daily_rewardx;
 	private int daily_rewardy;
 	private int daily_text_font_size;
@@ -65,8 +67,6 @@ public class Guilds {
 	private int daily_descriptiony;
 	private int daily_description_startx;
 	private int daily_field_sizex;
-	
-	private long messageTimeout;
 	
 	public void setName(String _name) {
 		this.name = _name;
@@ -128,8 +128,8 @@ public class Guilds {
 	public void setStartCurrency(long _start_currency) {
 		this.start_currency = _start_currency;
 	}
-	public void setMessageTimeout(long _messageTimeout) {
-		this.messageTimeout = _messageTimeout;
+	public void setInventoryId(int _inventory_id) {
+		this.inventory_id = _inventory_id;
 	}
 	public void setInventoryStartX(int _inventory_startx) {
 		this.inventory_startx = _inventory_startx;
@@ -230,6 +230,9 @@ public class Guilds {
 	public void setRandomshopRewardItemSizeY(int _randomshop_reward_item_sizey) {
 		this.randomshop_reward_item_sizey = _randomshop_reward_item_sizey;
 	}
+	public void setDailyId(int daily_id) {
+		this.daily_id = daily_id;
+	}
 	public void setDailyRewardX(int _daily_rewardx) {
 		this.daily_rewardx = _daily_rewardx;
 	}
@@ -315,8 +318,8 @@ public class Guilds {
 	public long getStartCurrency() {
 		return this.start_currency;
 	}
-	public long getMessageTimeout() {
-		return this.messageTimeout;
+	public int getInventoryId() {
+		return this.inventory_id;
 	}
 	public int getInventoryStartX() {
 		return this.inventory_startx;
@@ -416,6 +419,9 @@ public class Guilds {
 	}
 	public int getRandomshopRewardItemSizeY() {
 		return this.randomshop_reward_item_sizey;
+	}
+	public int getDailyId() {
+		return daily_id;
 	}
 	public int getDailyRewardX() {
 		return this.daily_rewardx;

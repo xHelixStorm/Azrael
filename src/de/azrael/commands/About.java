@@ -5,15 +5,15 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.core.UserPrivs;
+import de.azrael.constructors.BotConfigs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The About command prints a summary Information of the Bot
@@ -25,20 +25,12 @@ public class About implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(About.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getAboutCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getAboutLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.ABOUT);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		long guild_id = e.getGuild().getIdLong();
 		//retrieve all registered bot channels and check if the current channel is registered
 		var bot_channels = Azrael.SQLgetChannels(guild_id).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
@@ -56,18 +48,22 @@ public class About implements CommandPublic {
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_1), STATIC.getVersion(), true);
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), "Heiliger#7143", true);
 			messageBuilder.addBlankField(false);
-			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_3_DESC).replace("{}", GuildIni.getCommandPrefix(guild_id))+"\n\n", false);
+			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_2), STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_3_DESC).replace("{}", botConfig.getCommandPrefix())+"\n\n", false);
 			messageBuilder.addBlankField(false);
 			messageBuilder.addField(STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4), "["+STATIC.getTranslation(e.getMember(), Translation.ABOUT_FIELD_4_DESC)+"](https://github.com/xHelixStorm/Azrael)", false);
-			e.getChannel().sendMessage(messageBuilder.build()).queue();
+			e.getChannel().sendMessageEmbeds(messageBuilder.build()).queue();
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used About command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used About command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.ABOUT.getColumn(), out.toString().trim());
+		}
 	}
-	
-	
-
 }

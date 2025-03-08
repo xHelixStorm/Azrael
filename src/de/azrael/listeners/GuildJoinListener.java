@@ -1,17 +1,14 @@
 package de.azrael.listeners;
 
-import java.io.File;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.core.Hashes;
-import de.azrael.fileManagement.FileSetting;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.sql.RankingSystem;
 import de.azrael.threads.CollectUsersGuilds;
 import de.azrael.timerTask.ParseSubscription;
+import de.azrael.util.Hashes;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -42,20 +39,17 @@ public class GuildJoinListener extends ListenerAdapter {
 		if(RankingSystem.SQLInsertGuild(guild_id, guild_name, false) == 0) {
 			logger.error("Guild ranking information couldn't be saved on join in guild {}", guild_id);
 		}
+		//insert into BotConfiguration tables
+		if(!BotConfiguration.SQLInsertBotConfigs(guild_id)) {
+			logger.error("Bot configurations couldn't be generated on join in guild {}", guild_id);
+		}
 		//insert all categories into table
 		Azrael.SQLBulkInsertCategories(e.getGuild().getCategories());
 		//insert all channels into table
 		Azrael.SQLBulkInsertChannels(e.getGuild().getTextChannels());
 		
-		FileSetting.createGuildDirectory(e.getGuild());
-		//check if guild ini file exists, else create a new one or verify content
-		if(!new File("./ini/"+guild_id+".ini").exists())
-			GuildIni.createIni(guild_id);
-		else
-			GuildIni.verifyIni(guild_id);
-		
 		//run server specific timers
-		ParseSubscription.runTask(e.getJDA(), guild_id);
+		ParseSubscription.runTask(e.getJDA());
 		
 		//set the default language for this server
 		Hashes.setLanguage(guild_id, "eng");
@@ -64,7 +58,7 @@ public class GuildJoinListener extends ListenerAdapter {
 		Hashes.initializeGuildMessagePool(guild_id, 1000);
 		
 		//collect all users in the server
-		new Thread(new CollectUsersGuilds(null, e)).start();
+		new Thread(new CollectUsersGuilds(e.getJDA())).start();
 		Azrael.SQLInsertActionLog("GUILD_JOIN", e.getGuild().getIdLong(), e.getGuild().getIdLong(), guild_name);
 	}
 }

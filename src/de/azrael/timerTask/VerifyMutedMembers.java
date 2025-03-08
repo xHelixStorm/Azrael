@@ -17,23 +17,17 @@ import de.azrael.sql.DiscordRoles;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.ReadyEvent;
-import net.dv8tion.jda.api.events.ReconnectedEvent;
-import net.dv8tion.jda.api.events.ResumedEvent;
 
 public class VerifyMutedMembers extends TimerTask {
 	private final static Logger logger = LoggerFactory.getLogger(VerifyMutedMembers.class);
 	
-	private ReadyEvent event;
-	private ReconnectedEvent event2;
-	private ResumedEvent event3;
+	private List<Guild> guilds;
 	private boolean delay;
 	
-	public VerifyMutedMembers(ReadyEvent _e, ReconnectedEvent _e2, ResumedEvent _e3, boolean _delay) {
-		this.event = _e;
-		this.event2 = _e2;
-		this.event3 = _e3;
+	public VerifyMutedMembers(List<Guild> guilds, boolean _delay) {
+		this.guilds = guilds;
 		this.delay = _delay;
 	}
 	
@@ -47,8 +41,7 @@ public class VerifyMutedMembers extends TimerTask {
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		var e = (event != null ? event : (event2 != null ? event2 : event3));
-		for(var guild : e.getJDA().getGuilds()) {
+		for(var guild : guilds) {
 			final boolean ROLE_MANAGEMENT = guild.getSelfMember().hasPermission(Permission.MANAGE_ROLES);
 			var mute_role = DiscordRoles.SQLgetRoles(guild.getIdLong()).parallelStream().filter(f -> f.getCategory_ABV().equals("mute")).findAny().orElse(null);
 			if(mute_role != null) {
@@ -75,13 +68,13 @@ public class VerifyMutedMembers extends TimerTask {
 		}
 	}
 	
-	public static void runTask(ReadyEvent e, ReconnectedEvent e2, ResumedEvent e3, boolean delay) {
+	public static void runTask(List<Guild> guilds, boolean delay) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		
 		Timer time = new Timer("VerifyMutedMembers");
 		STATIC.addTimer(time);
-		time.schedule(new VerifyMutedMembers(e, e2, e3, delay), calendar.getTime(), TimeUnit.HOURS.toMillis(1));
+		time.schedule(new VerifyMutedMembers(guilds, delay), calendar.getTime(), TimeUnit.HOURS.toMillis(1));
 	}
 }

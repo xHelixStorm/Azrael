@@ -3,15 +3,12 @@ package de.azrael.webserver;
 import java.io.PrintWriter;
 import java.util.Date;
 
-import de.azrael.fileManagement.IniFileReader;
-import de.azrael.util.STATIC;
-
 public class WebserviceUtils {
-	private static int PORT = STATIC.getPort();
+	private static int PORT = 0;
 	
 	public static int getPort() {
 		if(PORT == 0)
-			PORT = IniFileReader.getWebserverPort();
+			PORT = Integer.parseInt(System.getProperty("WEBSERVER_PORT"));
 		return PORT;
 		
 	}

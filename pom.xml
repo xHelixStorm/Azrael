@@ -2,18 +2,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>Azrael</groupId>
 	<artifactId>Azrael</artifactId>
-	<version>7.43.593</version>
+	<version>1.0.0-SNAPSHOT</version>
 	<name>Azrael</name>
 	<dependencies>
 		<dependency>
 		    <groupId>net.dv8tion</groupId>
 		    <artifactId>JDA</artifactId>
-		    <version>4.3.0_277</version>
-		</dependency>
-		<dependency>
-		    <groupId>org</groupId>
-		    <artifactId>jpastebin</artifactId>
-		    <version>1.0.1</version>
+		    <version>5.3.0</version>
 		</dependency>
 		<dependency>
 		    <groupId>org.twitter4j</groupId>
@@ -100,14 +95,23 @@
 		    <artifactId>commons-io</artifactId>
 		    <version>2.7</version>
 		</dependency>
+		<dependency>
+		  <groupId>org.jsoup</groupId>
+		  <artifactId>jsoup</artifactId>
+		  <version>1.14.3</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 		    <plugin>
-			    <artifactId>maven-compiler-plugin</artifactId>
-			    <version>3.8.1</version>
+			    <artifactId>maven-assembly-plugin</artifactId>
+			    <version>3.3.0</version>
 			    <configuration>
+			    	<descriptorRefs>
+			    		<descriptorRef>jar-with-dependencies</descriptorRef>
+			    	</descriptorRefs>
+			    	<appendAssemblyId>false</appendAssemblyId>
 			    	<archive>
 			    		<manifest>
 			    			<mainClass>de.azrael.core.Main</mainClass>
@@ -137,7 +141,7 @@
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>16</maven.compiler.target>
+		<maven.compiler.source>23</maven.compiler.source>
+		<maven.compiler.target>23</maven.compiler.target>
 	</properties>
 </project>

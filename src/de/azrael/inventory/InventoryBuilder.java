@@ -17,24 +17,25 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.InventoryContent;
+import de.azrael.enums.Directory;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
 
 public class InventoryBuilder {
 	private final static Logger logger = LoggerFactory.getLogger(InventoryBuilder.class);
 	
-	public static void DrawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
+	public static void drawInventory(Guild guild, Member member, TextChannel channel, String _inventory_tab, String _sub_tab, ArrayList<InventoryContent> _items, int _current_page, int _max_page, Guilds guild_settings) {
 		String lastItem = "";
-		if(new File("./files/RankingSystem/Inventory/inventory_blank.png").exists()) {
+		if(new File(Directory.INVENTORY.getPath()+"inventory_blank.png").exists()) {
 			try {
-				BufferedImage blank_inventory = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_blank.png"));
-				BufferedImage inventory_tab = ImageIO.read(new File("./files/RankingSystem/Inventory/inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
+				BufferedImage blank_inventory = ImageIO.read(new File(Directory.INVENTORY.getPath()+"inventory_blank.png"));
+				BufferedImage inventory_tab = ImageIO.read(new File(Directory.INVENTORY.getPath()+"inventory_"+_inventory_tab+"_"+_sub_tab+".png"));
 				
 				final int startX = guild_settings.getInventoryStartX();
 				final int startY = guild_settings.getInventoryStartY();
@@ -73,13 +74,13 @@ public class InventoryBuilder {
 					i++;
 					BufferedImage item;
 					if(inventory.getType() != null && inventory.getType().equals("ite"))
-						item = ImageIO.read(new File("./files/RankingSystem/Items/"+inventory.getDescription()+"."+inventory.getFileType()));
+						item = ImageIO.read(new File(Directory.ITEMS.getPath()+inventory.getDescription()+"."+inventory.getFileType()));
 					else if(inventory.getType() != null)
-						item = ImageIO.read(new File("./files/RankingSystem/Skins/"+inventory.getDescription()+"."+inventory.getFileType()));
+						item = ImageIO.read(new File(Directory.SKINS.getPath()+inventory.getDescription()+"."+inventory.getFileType()));
 					else if(inventory.getSkillDescription() == null)
-						item = ImageIO.read(new File("./files/RankingSystem/Weapons/"+inventory.getWeaponDescription()+".png"));
+						item = ImageIO.read(new File(Directory.WEAPONS.getPath()+inventory.getWeaponDescription()+".png"));
 					else
-						item = ImageIO.read(new File("./files/RankingSystem/Skills/"+inventory.getSkillDescription()+".png"));
+						item = ImageIO.read(new File(Directory.SKILLS.getPath()+inventory.getSkillDescription()+".png"));
 					g.drawImage(item, currentX+(boxSizeX/2)-(item.getWidth()/2), currentY+boxSizeY-(item.getHeight()/2), (itemSizeX != 0 ? itemSizeX : item.getWidth()), (itemSizeY != 0 ? itemSizeY : item.getHeight()), null);
 					g.drawString((inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+" "+inventory.getStat() : inventory.getSkillDescription())), currentX+getCenteredString(inventory.getDescription() != null ? inventory.getDescription() : (inventory.getWeaponDescription() != null ? inventory.getWeaponDescription()+ " "+inventory.getStat() : inventory.getSkillDescription()), boxSizeX, g), currentY+boxSizeY+descriptionY);
 					if(inventory.getType() == null || inventory.getType().equals("ite")){
@@ -103,14 +104,14 @@ public class InventoryBuilder {
 					}
 				}
 				
-				ImageIO.write(overlay, "png", new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
-				File upload = new File(IniFileReader.getTempDirectory()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
-				channel.sendFile(upload, "inventory.png").queue(m -> {
+				ImageIO.write(overlay, "png", new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png"));
+				File upload = new File(Directory.TEMP.getPath()+"inventory_gu"+guild.getId()+"us"+member.getUser().getId()+".png");
+				channel.sendFiles(FileUpload.fromData(upload, "inventory.png")).queue(m -> {
 					upload.delete();
 				});
 			} catch(IOException ioe) {
 				if(guild.getSelfMember().hasPermission(channel, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(guild, channel, EnumSet.of(Permission.MESSAGE_EMBED_LINKS)))
-					channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).build()).queue();
+					channel.sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(member, Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).build()).queue();
 				else
 					channel.sendMessage(STATIC.getTranslation(member, Translation.INVENTORY_DRAW_ERR)).queue();
 				logger.warn("Inventory couldn't be drawn for user {} and item {} in guild {}", member.getUser().getId(), lastItem, guild.getId(), ioe);

@@ -15,51 +15,50 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.CompMap;
 import de.azrael.constructors.Member;
 import de.azrael.constructors.Room;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Join implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Join.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getJoinCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getJoinLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.JOIN);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		if(profilePage(e, false)) {
-			joinMatchmaking(e, args);
+			joinMatchmaking(e, args, botConfig);
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Join command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Join command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.JOIN.getColumn(), out.toString().trim());
+		}
 	}
 	
-	public static boolean profilePage(GuildMessageReceivedEvent e, boolean clanCheck) {
+	public static boolean profilePage(MessageReceivedEvent e, boolean clanCheck) {
 		//retrieve all registered bot channels and check if the current channel is registered
 		final var all_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong());
 		
@@ -99,7 +98,7 @@ public class Join implements CommandPublic {
 			else {
 				final var result2 = Competitive.SQLgetCompServers(e.getGuild().getIdLong());
 				if(result2 == null) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Registered servers couldn't be retrieved in guild {}", e.getGuild().getId());
 					return false;
 				}
@@ -114,7 +113,7 @@ public class Join implements CommandPublic {
 						else
 							out.append(", **"+result2.get(i)+"**");
 					}
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_SERVER_MISSING)+out.toString()).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_SERVER_MISSING)+out.toString()).build()).queue();
 					Hashes.addTempCache("userProfile_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "server").setObject(result2));
 					return false;
 				}
@@ -124,15 +123,15 @@ public class Join implements CommandPublic {
 			//create a competitive user profile
 			final var result2 = Competitive.SQLgetCompServers(e.getGuild().getIdLong());
 			if(result2 != null && result2.size() == 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_NO_PROFILE)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_NO_PROFILE)).build()).queue();
 				Hashes.addTempCache("userProfile_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "name").setObject(result2));
 			}
 			else if(result2 != null && result2.size() > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_NO_PROFILE_2)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_NO_PROFILE_2)).build()).queue();
 				Hashes.addTempCache("userProfile_gu"+e.getGuild().getId()+"ch"+e.getChannel().getId()+"us"+e.getMember().getUser().getId(), new Cache(180000, "name").setObject(result2));
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("Registered servers couldn't be retrieved in guild {}", e.getGuild().getId());
 			}
 			return false;
@@ -143,7 +142,7 @@ public class Join implements CommandPublic {
 	}
 
 	
-	public static void joinMatchmaking(GuildMessageReceivedEvent e, String [] args) {
+	public static void joinMatchmaking(MessageReceivedEvent e, String [] args, BotConfigs botConfig) {
 		//join an existing matchmaking room
 		final var this_channel = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		if(this_channel != null && (this_channel.getChannel_Type().equals(Channel.CO1.getType()) || this_channel.getChannel_Type().equals(Channel.CO2.getType()) || this_channel.getChannel_Type().equals(Channel.CO4.getType()) || this_channel.getChannel_Type().equals(Channel.CO5.getType()))) {
@@ -151,36 +150,38 @@ public class Join implements CommandPublic {
 			switch(channelType) {
 				case "co1", "co4" -> {
 					//regular matchmaking room
-					join(e, 1);
+					join(e, 1, botConfig);
 				}
 				case "co2", "co5" -> {
 					//matchmaking room with picking
-					join(e, 2);
+					join(e, 2, botConfig);
 				}
 			}
 		}
 		else if(this_channel != null) {
 			//run help first, since nothing has been defined
 			if(args.length == 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_HELP)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_HELP)
+						.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_NORMAL))
+						.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PICKING))).build()).queue();
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_NORMAL))) {
-				join(e, 1);
+				join(e, 1, botConfig);
 			}
 			else if(args.length == 1 && args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PICKING))) {
-				join(e, 2);
+				join(e, 2, botConfig);
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Channel type couldn't be retrieved for channel {} in guild {}", e.getChannel().getId(), e.getGuild().getId());
 		}
 	}
 	
-	private static void join(GuildMessageReceivedEvent e, int type) {
+	private static void join(MessageReceivedEvent e, int type, BotConfigs botConfig) {
 		final var room = Competitive.SQLgetMatchmakingRoom(e.getGuild().getIdLong(), type, 1);
 		if(room != null && room.getRoomID() != 0 && (room.getLastJoined().getTime()+1800000)-System.currentTimeMillis() > 0) {
 			//verify that the user hasn't already joined a different room type
@@ -196,52 +197,52 @@ public class Join implements CommandPublic {
 						if(username != null) {
 							//join the queue
 							if(Competitive.SQLJoinRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong(), room.getRoomID()) > 0) {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+room.getRoomID()).replaceFirst("\\{\\}", ""+(room.getMembers()+1)).replace("{}", ""+members)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE).replaceFirst("\\{\\}", username).replaceFirst("\\{\\}", ""+room.getRoomID()).replaceFirst("\\{\\}", ""+(room.getMembers()+1)).replace("{}", ""+members)).build()).queue();
 								if(room.getMembers()+1 == members) {
 									//queue is full. Make preparations to start the match
-									queueFull(e, room, members);
+									queueFull(e, room, members, botConfig);
 								}
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 								logger.error("Queue of room {} couldn't be joined in guild {}", room.getRoomID(), e.getGuild().getId());
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 							logger.error("Username couldn't be retrieved for user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE_FULL)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_QUEUE_FULL)).build()).queue();
 					}
 				}
 				else if(members == 0) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_12)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_12)).build()).queue();
 				}
 				else {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Matchmaking member limit couldn't be retrieved in guild {}", e.getGuild().getId());
 				}
 			}
 			else if(result > 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_11)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_11)).build()).queue();
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("It couldn't be verified if user {} has already joined a room in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 		}
 		else if(room != null) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_10)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.JOIN_ERR_10)).build()).queue();
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("It couldn't be verified if an already existing matchmaking room exists with type {} in guild {}", type, e.getGuild().getId());
 		}
 	}
 	
-	static void queueFull(GuildMessageReceivedEvent e, Room room, int roomLimit) {
+	static void queueFull(MessageReceivedEvent e, Room room, int roomLimit, BotConfigs botConfig) {
 		final var queue = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong(), room.getRoomID());
 		if(queue != null && queue.size() > 0) {
 			//shuffle the queue
@@ -349,7 +350,7 @@ public class Join implements CommandPublic {
 					if(room.getMapID() != 0) {
 						map = Competitive.SQLgetMap(room.getMapID());
 						if(map == null) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
 							logger.error("Map details couldn't be retrieved for map {} in guild {}", room.getMapID(), e.getGuild().getId());
 						}
 					}
@@ -376,20 +377,20 @@ public class Join implements CommandPublic {
 								team2Out.append("`"+elo+"` "+team2[i].getUsername()+"\n");
 							}
 						}
-						final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild().getIdLong());
-						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild().getIdLong());
-						message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
-						message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
+						final String teamName1 = botConfig.getCompetitiveTeam1Name();
+						final String teamName2 = botConfig.getCompetitiveTeam2Name();
+						message.addField((teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
+						message.addField((teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2Out.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
 						if(master != null)
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
 						if(room.getMapID() != 0)
-							message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"changemap`", false);
-						e.getChannel().sendMessage(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
+							message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+botConfig.getCommandPrefix()+"changemap`", false);
+						e.getChannel().sendMessageEmbeds(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
 							Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 						});
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Teams for room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
 					}
 				}
@@ -447,7 +448,7 @@ public class Join implements CommandPublic {
 					if(room.getMapID() != 0) {
 						map = Competitive.SQLgetMap(room.getMapID());
 						if(map == null) {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ERR_4)).build()).queue();
 							logger.error("Map details couldn't be retrieved for map {} in guild {}", room.getMapID(), e.getGuild().getId());
 						}
 					}
@@ -457,10 +458,10 @@ public class Join implements CommandPublic {
 						message.setTitle(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ROOM)+"#"+room.getRoomID()+(server != null ? " - "+server : ""));
 						if(map != null)
 							message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_MAP)+"*"+map.getName()+"*").setThumbnail(map.getImage());
-						final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild().getIdLong());
-						final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild().getIdLong());
-						message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), ":crown: "+finalCaptain1.getUsername(), false);
-						message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), ":crown: "+finalCaptain2.getUsername(), false);
+						final String teamName1 = botConfig.getCompetitiveTeam1Name();
+						final String teamName2 = botConfig.getCompetitiveTeam2Name();
+						message.addField((teamName1.length() > 0 ? teamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), ":crown: "+finalCaptain1.getUsername(), false);
+						message.addField((teamName2.length() > 0 ? teamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), ":crown: "+finalCaptain2.getUsername(), false);
 						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICKING), finalCaptain1.getUsername(), false);
 						StringBuilder out = new StringBuilder();
 						for(int i = 0; i < pickQueue.size(); i++) {
@@ -470,23 +471,22 @@ public class Join implements CommandPublic {
 								out.append(", "+pickQueue.get(i).getUsername());
 						}
 						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PLAYER_POOL), out.toString(), false);
-						String commandPrefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 						if(master != null)
 							message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
-						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getMapID() != 0 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+commandPrefix+"changemap`\n"+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`" : "")+commandPrefix+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
-						e.getChannel().sendMessage(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
+						message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getMapID() != 0 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+botConfig.getCommandPrefix()+"changemap`\n"+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`" : "")+botConfig.getCommandPrefix()+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
+						e.getChannel().sendMessageEmbeds(message.build()).queueAfter(3, TimeUnit.SECONDS, m -> {
 							Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 						});
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Leaders for room {} couldn't be updated in guild {}", room.getRoomID(), e.getGuild().getId());
 					}
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Users in the room {} couldn't be retrieved in guild {}", room.getRoomID(), e.getGuild().getId());
 		}
 	}

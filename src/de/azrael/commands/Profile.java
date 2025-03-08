@@ -8,23 +8,23 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Guilds;
 import de.azrael.constructors.Ranking;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.rankingSystem.RankingMethods;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.RankingSystem;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Profile command prints the current profile of a user
@@ -38,20 +38,12 @@ public class Profile implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Profile.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getProfileCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getProfileLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.PROFILE);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//retrieve all registered bot channels
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
@@ -134,20 +126,18 @@ public class Profile implements CommandPublic {
 					
 					//print the profile page, if the current experience isn't in the negative area
 					if(currentExperience >= 0) {
-						if(user_details.getRankingProfile() > 0 && user_details.getRankingIcon() > 0) {
-							if(e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
+						if(user_details.getRankingProfile() > 0) {
+							if(e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_ATTACH_FILES) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_ATTACH_FILES))) {
 								RankingMethods.getProfile(e, name, avatar, convertedExperience, rank, (int)currentExperience, (int)rankUpExperience, user_details);
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MESSAGE_ATTACH_FILES.getName()).build()).queue();
 								logger.error("Permission MESSAGE_ATTACH_FILES required to display the profile page in channel {} for guild {}", e.getChannel().getId(), e.getGuild().getId());
 							}
 						}
 						else {
 							EmbedBuilder message = new EmbedBuilder();
-							if(user_details.getRankingRank() > 0 && user_details.getRankingIcon() == 0)
-								message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PROFILE_NO_ICONS));
-							e.getChannel().sendMessage(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PROFILE_TITLE))
+							e.getChannel().sendMessageEmbeds(message.setTitle(STATIC.getTranslation(e.getMember(), Translation.PROFILE_TITLE))
 								.setColor(Color.MAGENTA).setAuthor(name, avatar, avatar)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.USER_INFO_LEVEL), "**"+(user_details.getDisplayLevel() > 0 ? user_details.getDisplayLevel() : user_details.getLevel())+"**", true)
 								.addField(STATIC.getTranslation(e.getMember(), Translation.RANK_RANK), "**"+rank+"**", true)
@@ -160,7 +150,7 @@ public class Profile implements CommandPublic {
 					}
 					else {
 						EmbedBuilder error = new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR));
-						e.getChannel().sendMessage(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(error.setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						RankingSystem.SQLInsertActionLog("critical", user_id, guild_id, "negative experience value", "The user has less experience points in proportion to his level: "+currentExperience);
 						logger.error("Negative experience value for user {} in guild {}", user_id, e.getGuild().getId());
 					}
@@ -170,13 +160,20 @@ public class Profile implements CommandPublic {
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.LEVEL_SYSTEM_NOT_ENABLED)).build()).queue();
 			}
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Profile command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Profile command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PROFILE.getColumn(), out.toString().trim());
+		}
 	}
 }

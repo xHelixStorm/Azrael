@@ -5,5 +5,7 @@
 /message_log/
 /ini/
 /target/
-/config.ini
-config.ini
+.secret_data
+*.log
+/user_log/
+/cache/

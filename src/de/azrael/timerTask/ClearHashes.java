@@ -8,8 +8,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.core.Hashes;
-import de.azrael.sql.Azrael;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 
 /**
@@ -29,16 +28,17 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearWeaponShopContent();
 		Hashes.clearWeaponCategories();
 		Hashes.clearExpiredTempCache();
+		Hashes.clearBotConfiguration();
 		Hashes.clearTweetBlacklist();
 		Hashes.clearRankingLevels();
 		Hashes.clearReactionRoles();
+		Hashes.clearSubscriptions();
 		Hashes.clearDiscordRoles();
 		Hashes.clearURLBlacklist();
 		Hashes.clearURLWhitelist();
 		Hashes.clearProfileSkins();
 		Hashes.clearQueryResults();
 		Hashes.clearRankingRoles();
-		Hashes.clearWeaponStats();
 		Hashes.clearShopContent();
 		Hashes.clearLevelSkins();
 		Hashes.clearDailyItems();
@@ -50,16 +50,14 @@ public class ClearHashes extends TimerTask {
 		Hashes.clearRankSkins();
 		Hashes.clearChannels();
 		Hashes.clearStatus();
-		Hashes.clearFeeds();
 		
 		logger.info("Temporary cache has been cleared");
-		
-		//clear any expired subscription log
-		Azrael.SQLDeleteSubscriptionLog();
 	}
 	
 	public static void runTask(){
 		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		

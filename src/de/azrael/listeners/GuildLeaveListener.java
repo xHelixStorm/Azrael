@@ -8,14 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Bancollect;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -57,14 +56,14 @@ public class GuildLeaveListener extends ListenerAdapter {
 					Member member = e.getGuild().getMemberById(cache.getAdditionalInfo());
 					var kick_issuer = member.getAsMention();
 					var kick_reason = cache.getAdditionalInfo2();
-					EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
+					EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getKick()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
 					STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 					Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 					Hashes.clearTempCache("kick_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 					
 					//Run google service, if enabled
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), kick_reason);
 					}
 					
@@ -85,13 +84,13 @@ public class GuildLeaveListener extends ListenerAdapter {
 							//retrieve the user who kicked and the reason is available from the audit log entry
 							var kick_issuer = entry.getUser().getAsMention();
 							var kick_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
-							EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
+							EmbedBuilder kick = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getKick()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.KICK_TITLE));
 							STATIC.writeToRemoteChannel(e.getGuild(), kick, STATIC.getTranslation2(e.getGuild(), Translation.KICK_MESSAGE).replaceFirst("\\{\\}", user_name).replaceFirst("\\{\\}", e.getUser().getId()).replace("{}", kick_issuer)+kick_reason, Channel.LOG.getType());
 							Azrael.SQLInsertActionLog("MEMBER_KICK", e.getUser().getIdLong(), e.getGuild().getIdLong(), "User Kicked");
 							logger.info("User {} has been kicked in guild {}", e.getUser().getId(), e.getGuild().getId());
 							
 							//Run google service, if enabled
-							if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+							if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 								GoogleSheets.spreadsheetKickRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.KICK.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), user_name, (e.getMember() != null ? e.getMember().getEffectiveName() : e.getUser().getName()), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), kick_reason);
 							}
 							
@@ -106,7 +105,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 							Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 						}
 						//if leave messages are enabled, print a message that the user has left the server
-						else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
+						else if(BotConfiguration.SQLgetBotConfigs(guild_id).getLeaveMessage() && warnedUser.getBanID() == 1) {
 							EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 							STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name), Channel.LOG.getType());
 						}
@@ -120,7 +119,7 @@ public class GuildLeaveListener extends ListenerAdapter {
 						Azrael.SQLUpdateGuildLeft(user_id, guild_id, true);
 					}
 					//if leave messages are enabled, print a message that the user has left the server
-					else if(GuildIni.getLeaveMessage(guild_id) && warnedUser.getBanID() == 1) {
+					else if(BotConfiguration.SQLgetBotConfigs(guild_id).getLeaveMessage() && warnedUser.getBanID() == 1) {
 						EmbedBuilder message = new EmbedBuilder().setColor(Color.ORANGE).setThumbnail(e.getUser().getEffectiveAvatarUrl()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.LEFT_TITLE));
 						STATIC.writeToRemoteChannel(e.getGuild(), message, STATIC.getTranslation2(e.getGuild(), Translation.LEFT_MESSAGE_2).replace("{}", user_name), Channel.LOG.getType());
 					}
@@ -133,19 +132,16 @@ public class GuildLeaveListener extends ListenerAdapter {
 			}
 			
 			//check if a waiting room was set up for this user and if yes, remove the channel
-			final var categories = Azrael.SQLgetCategories(e.getGuild().getIdLong());
-			if(categories != null) {
-				final var verification = categories.parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
-				if(verification != null) {
-					final var textChannel = e.getGuild().getTextChannels().parallelStream().filter(f -> f.getName().equals(e.getUser().getId())).findAny().orElse(null);
-					if(textChannel != null) {
-						if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MANAGE_CHANNEL))) {
-							textChannel.delete().queue();
-						}
-						else {
-							STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MANAGE_CHANNEL.getName())+textChannel.getAsMention(), Channel.LOG.getType());
-							logger.error("MANAGE_CHANNEL permission required to remove the text channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
-						}
+			final var verification = Azrael.SQLgetCategories(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getType().equals("ver")).findAny().orElse(null);
+			if(verification != null) {
+				final var textChannel = e.getGuild().getTextChannels().parallelStream().filter(f -> f.getName().equals(e.getUser().getId())).findAny().orElse(null);
+				if(textChannel != null) {
+					if(e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MANAGE_CHANNEL))) {
+						textChannel.delete().queue();
+					}
+					else {
+						STATIC.writeToRemoteChannel(e.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(e.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MANAGE_CHANNEL.getName())+textChannel.getAsMention(), Channel.LOG.getType());
+						logger.error("MANAGE_CHANNEL permission required to remove the text channel {} in guild {}", textChannel.getId(), e.getGuild().getId());
 					}
 				}
 			}

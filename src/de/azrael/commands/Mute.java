@@ -6,19 +6,20 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Cache;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
 import de.azrael.sql.DiscordRoles;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Mute command allows the one who utilizes it to mute
@@ -32,31 +33,23 @@ public class Mute implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Mute.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getMuteCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getMuteLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.MUTE);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//confirm that the bot has the manage roles permission
 		if(e.getGuild().getSelfMember().hasPermission(Permission.MANAGE_ROLES)) {
 			//print the help message for this command
 			if(args.length == 0) {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_HELP)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_HELP)).build()).queue();
 			}
 			//mute all users that have passed in the parameters
 			else {
 				final String nameNotExists = STATIC.getTranslation(e.getMember(), Translation.MUTE_NAME_NOT_EXISTS);
 				final String idNotExists = STATIC.getTranslation(e.getMember(), Translation.MUTE_ID_NOT_EXISTS);
-				args = e.getMessage().getContentRaw().substring(GuildIni.getCommandPrefix(e.getGuild().getIdLong()).length()+5).split(" ");
+				args = e.getMessage().getContentRaw().substring(botConfig.getCommandPrefix().length()+5).split(" ");
 				boolean userFound = false;
 				StringBuilder reason = new StringBuilder();
 				ArrayList<Member> users = new ArrayList<Member>();
@@ -98,7 +91,7 @@ public class Mute implements CommandPublic {
 					}
 					else {
 						//interrupt command. Start parameter isn't correct
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_ERR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MUTE_ERR)).build()).queue();
 						break;
 					}
 				}
@@ -130,20 +123,27 @@ public class Mute implements CommandPublic {
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.NO_MUTE_ROLE)).build()).queue();
 					}
 				}
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_PERMISSIONS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.MISSING_PERMISSION)+Permission.MANAGE_ROLES.getName()).build()).queue();
 			logger.warn("MANAGE_ROLES permission required to mute users for guild {}", e.getGuild().getId());
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("The Mute command has been used from user {} in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Mute command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.MUTE.getColumn(), out.toString().trim());
+		}
 	}
 
 }

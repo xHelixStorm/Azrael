@@ -13,29 +13,31 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.CompMap;
 import de.azrael.constructors.Member;
 import de.azrael.constructors.Room;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
+import de.azrael.sql.Azrael;
 import de.azrael.sql.Competitive;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class Changemap implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Changemap.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		return true;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.CHANGEMAP);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		final int room_id = Competitive.SQLisUserInRoom(e.getGuild().getIdLong(), e.getMember().getUser().getIdLong());
 		if(room_id > 0) {
 			final var room = Competitive.SQLgetMatchmakingRoom(e.getGuild().getIdLong(), room_id);
@@ -50,13 +52,13 @@ public class Changemap implements CommandPublic {
 							if(room.getType() == 3) {
 								final var clanMemberLevel = Competitive.SQLgetClanMemberLevel(e.getMember().getUser().getIdLong(), room.getRoomID());
 								if(clanMemberLevel == 1) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.CW_ERR_7)).build()).queue();
-									return;
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation2(e.getGuild(), Translation.CW_ERR_7)).build()).queue();
+									return true;
 								}
 								else if(clanMemberLevel < 1) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 									logger.error("Clan Member Level of user {} couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
-									return;
+									return true;
 								}
 							}
 							
@@ -65,26 +67,26 @@ public class Changemap implements CommandPublic {
 								//retrieve random map
 								map = Competitive.SQLgetRandomMap(e.getGuild().getIdLong());
 								if(map == null) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 									logger.error("Random map couldn't be retrieved in guild {}", e.getGuild().getId());
-									return;
+									return true;
 								}
 							}
 							else {
 								map = Competitive.SQLgetMap(e.getGuild().getIdLong(), args[0]);
 								if(map != null && map.getMapID() == 0) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_ERR_2).replace("{}", args[0])).build()).queue();
-									return;
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_ERR_2).replace("{}", args[0])).build()).queue();
+									return true;
 								}
 								else if(map == null) {
-									e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+									e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 									logger.error("Map {} couldn't be retrieved in guild {}", args[0].toLowerCase(), e.getGuild().getId());
-									return;
+									return true;
 								}
 							}
 							if(map != null && map.getMapID() != 0) {
 								final var selectedMap = map;
-								if((e.getGuild().getSelfMember().hasPermission(e.getChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) && room.getType() != 3) {
+								if((e.getGuild().getSelfMember().hasPermission(e.getGuildChannel(), Permission.MESSAGE_HISTORY) || STATIC.setPermissions(e.getGuild(), e.getChannel().asTextChannel(), EnumSet.of(Permission.MESSAGE_HISTORY))) && room.getType() != 3) {
 									//retrieve message from history and replace it
 									e.getChannel().retrieveMessageById(room.getMessageID()).queue(m -> {
 										MessageEmbed embed = m.getEmbeds().get(0);
@@ -96,50 +98,57 @@ public class Changemap implements CommandPublic {
 										if(selectedMap.getImage() != null)
 											message.setThumbnail(selectedMap.getImage());
 										m.delete().queue();
-										e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", selectedMap.getName())).build()).queue();
-										e.getChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS, m2 -> {
+										e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", selectedMap.getName())).build()).queue();
+										e.getChannel().sendMessageEmbeds(message.build()).queueAfter(1, TimeUnit.SECONDS, m2 -> {
 											Competitive.SQLUpdateMatchmakingRoomMap(e.getGuild().getIdLong(), room.getRoomID(), selectedMap.getMapID());
 											Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m2.getIdLong());
 										});
 									}, err -> {
-										printMessage(e, room, selectedMap, true);
+										printMessage(e, room, selectedMap, true, botConfig);
 									});
 								}
 								else {
-									printMessage(e, room, selectedMap, true);
+									printMessage(e, room, selectedMap, true, botConfig);
 								}
 							}
 							else {
-								e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_ERR)).build()).queue();
+								e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_ERR)).build()).queue();
 							}
 						}
 						else {
-							e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MASTER_ERR).replace("{}", ""+room.getRoomID())).build()).queue();
+							e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.MASTER_ERR).replace("{}", ""+room.getRoomID())).build()).queue();
 						}
 					}
 					else {
-						e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+						e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 						logger.error("Information of user {} couldn't be retrieved in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 					}
 				}
 			}
 			else {
-				e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+				e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 				logger.error("It couldn't be verified if user {} has already joined a room in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 			}
 		}
 		else if(room_id == -1) {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("It couldn't be verified if user {} has already joined a room in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Changemap command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Changemap command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.CHANGEMAP.getColumn(), out.toString().trim());
+		}
 	}
 
-	public static void printMessage(GuildMessageReceivedEvent e, Room room, CompMap map, boolean updateMapMessage) {
+	public static void printMessage(MessageReceivedEvent e, Room room, CompMap map, boolean updateMapMessage, BotConfigs botConfig) {
 		//print new message
 		final var members = Competitive.SQLgetMatchmakingMembers(e.getGuild().getIdLong(), room.getRoomID());
 		if(members != null && members.size() > 0) {
@@ -205,17 +214,17 @@ public class Changemap implements CommandPublic {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ROOM)+"#"+room.getRoomID()+(server != null ? " - "+server : ""));
 				if(map != null)
 					message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_MAP)+"*"+map.getName()+"*").setThumbnail(map.getImage());
-				final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild().getIdLong());
-				final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild().getIdLong());
+				final String iniTeamName1 = botConfig.getCompetitiveTeam1Name();
+				final String iniTeamName2 = botConfig.getCompetitiveTeam2Name();
 				message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), team1.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam1, true);
 				message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), team2.toString()+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_AVG_ELO)+avgEloTeam2, true);
 				if(master != null)
 					message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
 				if(room.getRoomID() != 0)
-					message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+GuildIni.getCommandPrefix(e.getGuild().getIdLong())+"changemap`", false);
+					message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+botConfig.getCommandPrefix()+"changemap`", false);
 				if(updateMapMessage)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
-				e.getChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
+				e.getChannel().sendMessageEmbeds(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
 					Competitive.SQLUpdateMatchmakingRoomMap(e.getGuild().getIdLong(), room.getRoomID(), map.getMapID());
 					Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 				});
@@ -269,8 +278,8 @@ public class Changemap implements CommandPublic {
 				message.setTitle(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_ROOM)+"#"+room.getRoomID()+(server != null ? " - "+server : ""));
 				if(map != null)
 					message.setDescription(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_MAP)+"*"+map.getName()+"*").setThumbnail(map.getImage());
-				final String iniTeamName1 = GuildIni.getCompetitiveTeam1(e.getGuild().getIdLong());
-				final String iniTeamName2 = GuildIni.getCompetitiveTeam2(e.getGuild().getIdLong());
+				final String iniTeamName1 = botConfig.getCompetitiveTeam1Name();
+				final String iniTeamName2 = botConfig.getCompetitiveTeam2Name();
 				message.addField((iniTeamName1.length() > 0 ? iniTeamName1 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_1)), ":crown: "+captain1.getUsername()+team1.toString(), false);
 				message.addField((iniTeamName2.length() > 0 ? iniTeamName2 : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_TEAM_2)), ":crown: "+captain2.getUsername()+team2.toString(), false);
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICKING), picker.getUsername(), false);
@@ -282,13 +291,12 @@ public class Changemap implements CommandPublic {
 						out.append(", "+pickingPool.get(i).getUsername());
 				}
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PLAYER_POOL), out.toString(), false);
-				String commandPrefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
 				if(updateMapMessage)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
 				if(master != null)
 					message.addField(STATIC.getTranslation(e.getMember(), Translation.MASTER_TITLE), ":crown: "+master.getUsername(), false);
-				message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getRoomID() != 0 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+commandPrefix+"changemap`\n" : "")+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`"+commandPrefix+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
-				e.getChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
+				message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getRoomID() != 0 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+botConfig.getCommandPrefix()+"changemap`\n" : "")+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_PICK_USER)+"`"+botConfig.getCommandPrefix()+"pick "+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_USERNAME)+"`", false);
+				e.getChannel().sendMessageEmbeds(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
 					Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 				});
 			}
@@ -331,12 +339,12 @@ public class Changemap implements CommandPublic {
 				//retrieve the clan names
 				final String clanName1 = Competitive.SQLgetClanName(e.getGuild().getIdLong(), room.getClanID1());
 				if(clanName1 == null) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Clan name couldn't be retrieved for clan {} and guild {}", room.getClanID1(), e.getGuild().getId());
 				}
 				final String clanName2 = Competitive.SQLgetClanName(e.getGuild().getIdLong(), room.getClanID2());
 				if(clanName2 == null) {
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 					logger.error("Clan name couldn't be retrieved for clan {} and guild {}", room.getClanID2(), e.getGuild().getId());
 				}
 				
@@ -346,18 +354,18 @@ public class Changemap implements CommandPublic {
 					message.setDescription((room.getStatus() == 1 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_NOT_STARTED) : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_STARTED))+"\n"+STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_MAP)+"*"+map.getName()+"*").setThumbnail(map.getImage());
 				message.addField(clanName1, team1.toString(), true);
 				message.addField(clanName2, team2.toString(), true);
-				final String commandPrefix = GuildIni.getCommandPrefix(e.getGuild().getIdLong());
+				final String commandPrefix = botConfig.getCommandPrefix();
 				message.addField(STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_COMMANDS), (room.getStatus() == 1 ? STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CLAN_WAR_START)+"`"+commandPrefix+"cw "+STATIC.getTranslation(e.getMember(), Translation.PARAM_START)+"`" : STATIC.getTranslation(e.getMember(), Translation.MATCHMAKING_CHANGEMAP)+"`"+commandPrefix+"changemap`"), false);
 				if(updateMapMessage)
-					e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
-				e.getChannel().sendMessage(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
+					e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.BLUE).setDescription(STATIC.getTranslation(e.getMember(), Translation.CHANGEMAP_UPDATE).replace("{}", map.getName())).build()).queue();
+				e.getChannel().sendMessageEmbeds(message.build()).queueAfter(1, TimeUnit.SECONDS, m -> {
 					Competitive.SQLUpdateMatchmakingRoomMap(e.getGuild().getIdLong(), room.getRoomID(), map.getMapID());
 					Competitive.SQLUpdateRoomMessageID(e.getGuild().getIdLong(), room.getRoomID(), e.getChannel().getIdLong(), m.getIdLong());
 				});
 			}
 		}
 		else {
-			e.getChannel().sendMessage(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
+			e.getChannel().sendMessageEmbeds(new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_ERROR)).setDescription(STATIC.getTranslation(e.getMember(), Translation.GENERAL_ERROR)).build()).queue();
 			logger.error("Users in the room {} couldn't be retrieved for guild {}", room.getRoomID(), e.getGuild().getId());
 		}
 	}

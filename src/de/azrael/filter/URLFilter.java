@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,13 +34,13 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Cache;
 import de.azrael.constructors.Channels;
-import de.azrael.core.Hashes;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
@@ -51,13 +52,11 @@ public class URLFilter implements Runnable{
 
 	Message message;
 	Member member;
-	List<String> lang;
 	List<Channels> allChannels;
 	
-	public URLFilter(Message _message, Member _member, List<String> _lang, List<Channels> _allChannels) {
+	public URLFilter(Message _message, Member _member, List<Channels> _allChannels) {
 		this.message = _message;
 		this.member = _member;
-		this.lang = _lang;
 		this.allChannels = _allChannels;
 	}
 	
@@ -84,7 +83,7 @@ public class URLFilter implements Runnable{
 						shortURL = matcher2.group();
 					final var fqdn = shortURL;
 					//check if the bot is in full url delete mode for this server, if not, remove urls basing a blacklist table 
-					var fullBlacklist = GuildIni.getURLBlacklist(guild_id);
+					var fullBlacklist = BotConfiguration.SQLgetBotConfigs(member.getGuild().getIdLong()).getProhibitUrlsMode();
 					if(fullBlacklist) {
 						//remove url if that fqdn had been used before
 						if(Hashes.findGlobalURLBlacklist(fqdn)) {
@@ -174,13 +173,14 @@ public class URLFilter implements Runnable{
 	private static void printMessage(Message message, Member member, String foundURL, boolean defaultBlacklist, String [] output, List<Channels> allChannels) {
 		
 		//check if Bot has the manage messages permission
-		if(member.getGuild().getSelfMember().hasPermission(message.getTextChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(member.getGuild(), message.getTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_MANAGE))) {
-			Hashes.addTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getTextChannel().getId()+"us"+member.getUser().getId(), new Cache(180000));
+		if(member.getGuild().getSelfMember().hasPermission(message.getGuildChannel(), Permission.VIEW_CHANNEL, Permission.MESSAGE_MANAGE) || STATIC.setPermissions(member.getGuild(), message.getChannel().asTextChannel(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_MANAGE))) {
+			Hashes.addTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getChannel().getId()+"us"+member.getUser().getId(), new Cache(TimeUnit.MINUTES.toMillis(3)));
+			Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 			//delete message which contains the url
 			message.delete().queue(success -> {
 				//if the overall blacklist is enabled, print the message that urls are not allowed, else keep count of the removed messages and warn the user
-				if(defaultBlacklist) {message.getTextChannel().sendMessage(member.getAsMention()+output[2]).queue();}
-				else {STATIC.handleRemovedMessages(member, message.getTextChannel(), output);}
+				if(defaultBlacklist) {message.getChannel().sendMessage(member.getAsMention()+output[2]).queue();}
+				else {STATIC.handleRemovedMessages(member, message.getChannel().asTextChannel(), output);}
 				//retrieve the trash channel to print the removed message. If not available, don't print any message
 				STATIC.writeToRemoteChannel(member.getGuild()
 						, new EmbedBuilder()
@@ -189,7 +189,7 @@ public class URLFilter implements Runnable{
 						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_USER_ID), member.getUser().getId(), true)
 						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_NAME), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), true)
 						.addBlankField(true)
-						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_CHANNEL), message.getTextChannel().getAsMention(), true)
+						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_CHANNEL), message.getChannel().getAsMention(), true)
 						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_TYPE), STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_TYPE_NAME), true)
 						.addField(STATIC.getTranslation2(member.getGuild(), Translation.CENSOR_URL_FQDN), foundURL, true)
 						.setThumbnail(member.getUser().getEffectiveAvatarUrl())
@@ -197,12 +197,13 @@ public class URLFilter implements Runnable{
 			}, error -> {
 				//when the message already has been removed, usually by another bot
 				logger.info("Message containing the url {} has been already deleted in guild {}", foundURL, member.getGuild().getId());
-				Hashes.clearTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getTextChannel().getId()+"us"+member.getUser().getId());
+				Hashes.clearTempCache("message-removed-filter_gu"+member.getGuild().getId()+"ch"+message.getChannel().getId()+"us"+member.getUser().getId());
+				Hashes.addTempCache("messageDeleted_me"+message.getId(), new Cache(TimeUnit.MINUTES.toMillis(1)));
 			});
 		}
 		else {
-			STATIC.writeToRemoteChannel(member.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(member.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(member.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+message.getTextChannel().getAsMention(), Channel.LOG.getType());
-			logger.error("MESSAGE MANAGE permission required to remove a message in channel {} in guild {}", message.getTextChannel().getId(), member.getGuild().getId());
+			STATIC.writeToRemoteChannel(member.getGuild(), new EmbedBuilder().setColor(Color.RED).setTitle(STATIC.getTranslation2(member.getGuild(), Translation.EMBED_TITLE_PERMISSIONS)), STATIC.getTranslation2(member.getGuild(), Translation.MISSING_PERMISSION_IN).replace("{}", Permission.MESSAGE_MANAGE.getName())+message.getChannel().getAsMention(), Channel.LOG.getType());
+			logger.error("MESSAGE MANAGE permission required to remove a message in channel {} in guild {}", message.getChannel().getId(), member.getGuild().getId());
 		}
 	}
 }

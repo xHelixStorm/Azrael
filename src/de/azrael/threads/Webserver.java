@@ -13,11 +13,10 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.azrael.util.STATIC;
 import de.azrael.webserver.HandlerGET;
 import de.azrael.webserver.HandlerPOST;
 import de.azrael.webserver.WebserviceUtils;
-import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 
 public class Webserver implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(Webserver.class);
@@ -30,8 +29,9 @@ public class Webserver implements Runnable {
 
 	@Override
 	public void run() {
+		ServerSocket connect = null;
 		try {
-			ServerSocket connect = new ServerSocket(WebserviceUtils.getPort(), 100);
+			connect = new ServerSocket(WebserviceUtils.getPort(), 100);
 			connect.setSoTimeout(0);
 			while(true) {
 				//create a socket and lock on to it until a request has been received
@@ -85,7 +85,7 @@ public class Webserver implements Runnable {
 									final String header = in.readLine();
 									if(header.startsWith("Token:")) {
 										String [] token = header.split(" ");
-										if(token.length == 2 && STATIC.getToken().equals(token[1])) {
+										if(token.length == 2 && System.getProperty("TOKEN").equals(token[1])) {
 											tokenVerified = true;
 											break;
 										}

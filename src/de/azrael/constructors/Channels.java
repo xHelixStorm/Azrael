@@ -7,6 +7,7 @@ public class Channels {
 	private String channel_name;
 	private String channel_type;
 	private String channel_type_name;
+	private int registerType;
 	private String lang_filter;
 	private boolean url_censoring;
 	private boolean txt_removal;
@@ -28,6 +29,9 @@ public class Channels {
 	}
 	public void setChannel_Type_Name(String _channel_type_name) {
 		this.channel_type_name = _channel_type_name;
+	}
+	public void setRegisterType(int _registerType) {
+		this.registerType = _registerType;
 	}
 	public void setLang_Filter(String _lang_filter) {
 		this.lang_filter = _lang_filter;
@@ -56,6 +60,9 @@ public class Channels {
 	}
 	public String getChannel_Type_Name() {
 		return this.channel_type_name;
+	}
+	public int getRegisterType() {
+		return this.registerType;
 	}
 	public String getLang_Filter() {
 		return this.lang_filter;

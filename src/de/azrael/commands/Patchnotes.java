@@ -7,16 +7,18 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.azrael.constructors.BotConfigs;
 import de.azrael.constructors.Patchnote;
-import de.azrael.core.UserPrivs;
 import de.azrael.enums.Channel;
+import de.azrael.enums.Command;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
 import de.azrael.interfaces.CommandPublic;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
 import de.azrael.util.STATIC;
+import de.azrael.util.UserPrivs;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * The Patchnotes command allows a user to display past 
@@ -30,27 +32,19 @@ public class Patchnotes implements CommandPublic {
 	private final static Logger logger = LoggerFactory.getLogger(Patchnotes.class);
 
 	@Override
-	public boolean called(String[] args, GuildMessageReceivedEvent e) {
-		//check if the command is enabled and that the user has enough permissions
-		if(GuildIni.getPatchnotesCommand(e.getGuild().getIdLong())) {
-			final var commandLevel = GuildIni.getPatchnotesLevel(e.getGuild().getIdLong());
-			if(UserPrivs.comparePrivilege(e.getMember(), commandLevel) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong())
-				return true;
-			else if(!GuildIni.getIgnoreMissingPermissions(e.getGuild().getIdLong()))
-				UserPrivs.throwNotEnoughPrivilegeError(e, commandLevel);
-		}
-		return false;
+	public boolean called(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
+		return STATIC.commandValidation(e, botConfig, Command.PATCHNOTES);
 	}
 
 	@Override
-	public void action(String[] args, GuildMessageReceivedEvent e) {
+	public boolean action(String[] args, MessageReceivedEvent e, BotConfigs botConfig) {
 		//retrieve all channels where patchnotes can be printed
 		var bot_channels = Azrael.SQLgetChannels(e.getGuild().getIdLong()).parallelStream().filter(f -> f.getChannel_Type() != null && f.getChannel_Type().equals(Channel.BOT.getType())).collect(Collectors.toList());
 		var this_channel = bot_channels.parallelStream().filter(f -> f.getChannel_ID() == e.getChannel().getIdLong()).findAny().orElse(null);
 		
 		var modRights = false;
 		//is user mod?
-		if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || GuildIni.getAdmin(e.getGuild().getIdLong()) == e.getMember().getUser().getIdLong()) {
+		if(UserPrivs.isUserMod(e.getMember()) || UserPrivs.isUserAdmin(e.getMember()) || BotConfiguration.SQLisAdministrator(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong())) {
 			modRights = true;
 		}
 		
@@ -73,7 +67,7 @@ public class Patchnotes implements CommandPublic {
 			
 			//if there's no single patch note, throw a message
 			if(priv_notes == null && publ_notes == null && game_notes == null) {
-				e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
+				e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
 			}
 			//execute this block if there are any public and private patch notes but no game related patch notes (e.g. url to a patchnote)
 			else if((priv_notes != null || publ_notes != null) && game_notes == null) {
@@ -81,7 +75,9 @@ public class Patchnotes implements CommandPublic {
 				if(modRights) {
 					//check if a parameter has been passed, else notify the user
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_1)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_1)
+								.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC))
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE))).build()).queue();
 					//execute if the parameter equals 'private' or 'public'
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -92,7 +88,7 @@ public class Patchnotes implements CommandPublic {
 						
 						//print patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
 						}
 						else {
 							collectPatchNotes(e, display_notes, message);
@@ -106,14 +102,14 @@ public class Patchnotes implements CommandPublic {
 						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)))
 							note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
 						}
 						else {
 							printPatchNotes(e, note, message);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 					}
 				}
 				else {
@@ -123,7 +119,7 @@ public class Patchnotes implements CommandPublic {
 					else if(args.length == 1) {
 						var note = publ_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
 						if(note == null) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
 						}
 						else {
 							printPatchNotes(e, note, message);
@@ -141,7 +137,7 @@ public class Patchnotes implements CommandPublic {
 				else if(args.length == 1) {
 					var note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[0])).findAny().orElse(null);
 					if(note == null) {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
 					}
 					else {
 						printPatchNotes(e, note, message);
@@ -154,7 +150,10 @@ public class Patchnotes implements CommandPublic {
 				if(modRights) {
 					//Without parameter, give the user a choice to which patch notes the user wishes to access
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_2)
+								.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC))
+								.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE))
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME))).build()).queue();
 					//enter this block if either 'private', 'public' or 'game' has been written
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PRIVATE)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_PUBLIC)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -167,7 +166,7 @@ public class Patchnotes implements CommandPublic {
 						
 						//print the patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
 						}
 						else {
 							collectPatchNotes(e, display_notes, message);
@@ -183,21 +182,23 @@ public class Patchnotes implements CommandPublic {
 						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))
 							note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
 						}
 						else {
 							printPatchNotes(e, note, message);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 					}
 				}
 				//if the user doesn't have any elevated position
 				else {
 					//if there's no parameter, give the user a choice to select between 'bot' for public patch notes and 'game' for game patch notes
 					if(args.length == 0)
-						e.getChannel().sendMessage(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_3)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.BLUE).setTitle(STATIC.getTranslation(e.getMember(), Translation.EMBED_TITLE_DETAILS)).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_CHOICE_3)
+								.replaceFirst("\\{\\}", STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT))
+								.replace("{}", STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME))).build()).queue();
 					//list all available patch notes, if either 'bot' or 'game' has been selected
 					else if(args.length == 1 && (args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_BOT)) || args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))) {
 						ArrayList<Patchnote> display_notes = null;
@@ -208,7 +209,7 @@ public class Patchnotes implements CommandPublic {
 						
 						//print the patch notes list
 						if(display_notes == null || display_notes.size() == 0) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_FOUND)).build()).queue();
 						}
 						else {
 							collectPatchNotes(e, display_notes, message);
@@ -222,26 +223,33 @@ public class Patchnotes implements CommandPublic {
 						else if(args[0].equalsIgnoreCase(STATIC.getTranslation(e.getMember(), Translation.PARAM_GAME)))
 							note = game_notes.parallelStream().filter(f -> f.getTitle().equalsIgnoreCase(args[1])).findAny().orElse(null);
 						if(note == null) {
-							e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
+							e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_NOT_AVAILABLE)).build()).queue();
 						}
 						else {
 							printPatchNotes(e, note, message);
 						}
 					}
 					else {
-						e.getChannel().sendMessage(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
+						e.getChannel().sendMessageEmbeds(message.setColor(Color.RED).setDescription(STATIC.getTranslation(e.getMember(), Translation.PARAM_NOT_FOUND)).build()).queue();
 					}
 				}
 			}
 		}
+		return true;
 	}
 
 	@Override
-	public void executed(boolean success, GuildMessageReceivedEvent e) {
-		logger.trace("{} has used Patchnotes command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+	public void executed(String[] args, boolean success, MessageReceivedEvent e, BotConfigs botConfig) {
+		if(success) {
+			logger.trace("{} has used Patchnotes command in guild {}", e.getMember().getUser().getId(), e.getGuild().getId());
+			StringBuilder out = new StringBuilder();
+			for(String arg : args)
+				out.append(arg+" ");
+			Azrael.SQLInsertCommandLog(e.getMember().getUser().getIdLong(), e.getGuild().getIdLong(), Command.PATCHNOTES.getColumn(), out.toString().trim());
+		}
 	}
 
-	private void collectPatchNotes(GuildMessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
+	private void collectPatchNotes(MessageReceivedEvent e, ArrayList<Patchnote> display_notes, EmbedBuilder message) {
 		StringBuilder out = new StringBuilder();
 		StringBuilder out2 = new StringBuilder();
 		//iterate through the patch notes and convert it into readable text list
@@ -251,18 +259,18 @@ public class Patchnotes implements CommandPublic {
 		}
 		//print message
 		message.setColor(Color.BLUE);
-		e.getChannel().sendMessage(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_HELP))
+		e.getChannel().sendMessageEmbeds(message.setDescription(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_HELP))
 			.addField(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_TITLE), out.toString(), true)
 			.addField(STATIC.getTranslation(e.getMember(), Translation.PATCHNOTES_DATE), out2.toString(), true).build()).queue();
 	}
 	
-	private void printPatchNotes(GuildMessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
+	private void printPatchNotes(MessageReceivedEvent e, Patchnote note, EmbedBuilder message) {
 		//print the selected patch notes
 		message.setColor(Color.MAGENTA).setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl()).setTitle("**"+note.getTitle()+"** "+note.getDate());
-		e.getChannel().sendMessage(message.setDescription(note.getMessage1()).build()).queue();
+		e.getChannel().sendMessageEmbeds(message.setDescription(note.getMessage1()).build()).queue();
 		if(note.getMessage2() != null && note.getMessage2().length() > 0) {
 			message.setTitle("");
-			e.getChannel().sendMessage(message.setDescription(note.getMessage2()).build()).queue();
+			e.getChannel().sendMessageEmbeds(message.setDescription(note.getMessage2()).build()).queue();
 		}
 	}
 

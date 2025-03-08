@@ -9,21 +9,20 @@ import org.slf4j.LoggerFactory;
 
 import de.azrael.constructors.Bancollect;
 import de.azrael.constructors.Channels;
-import de.azrael.core.Hashes;
 import de.azrael.enums.Channel;
 import de.azrael.enums.GoogleEvent;
 import de.azrael.enums.Translation;
-import de.azrael.fileManagement.GuildIni;
-import de.azrael.fileManagement.IniFileReader;
 import de.azrael.google.GoogleSheets;
 import de.azrael.sql.Azrael;
+import de.azrael.sql.BotConfiguration;
+import de.azrael.util.Hashes;
 import de.azrael.util.STATIC;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.audit.ActionType;
 import net.dv8tion.jda.api.audit.AuditLogEntry;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.GuildBanEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.restaction.pagination.AuditLogPaginationAction;
@@ -80,7 +79,7 @@ public class BanListener extends ListenerAdapter {
 			
 			if(log_channel != null) {
 				final TextChannel textChannel = e.getGuild().getTextChannelById(log_channel.getChannel_ID());
-				if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_READ, Permission.MESSAGE_WRITE, Permission.MESSAGE_EMBED_LINKS)))) {
+				if(textChannel != null && (e.getGuild().getSelfMember().hasPermission(textChannel, Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS) || STATIC.setPermissions(e.getGuild(), textChannel, EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND, Permission.MESSAGE_EMBED_LINKS)))) {
 					//retrieve reason and applier if it has been cached, else retrieve the user from the audit log
 					var cache = Hashes.getTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 					if(cache != null) {
@@ -89,23 +88,23 @@ public class BanListener extends ListenerAdapter {
 						var ban_issuer = member.getAsMention();
 						var ban_reason = cache.getAdditionalInfo2();
 						
-						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+						EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 						//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 						int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
 						if(user.getWarningID() == 0) {
-							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
+							textChannel.sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 						}
 						else if(user.getWarningID() < max_warning_id) {
-							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
+							textChannel.sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
 						}
 						else if(user.getWarningID() == max_warning_id) {
-							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
+							textChannel.sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 						}
 						//clear cache afterwards
 						Hashes.clearTempCache("ban_gu"+e.getGuild().getId()+"us"+e.getUser().getId());
 						
 						//Run google service, if enabled
-						if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+						if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 							GoogleSheets.spreadsheetBanRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), member.getUser().getName()+"#"+member.getUser().getDiscriminator(), member.getEffectiveName(), ban_reason, ""+user.getWarningID());
 						}
 					}
@@ -115,8 +114,8 @@ public class BanListener extends ListenerAdapter {
 							getBanAuditLog(e, user_id, guild_id, log_channel, user);
 						}
 						else {
-							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
-							textChannel.sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
+							EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+							textChannel.sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_4).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", STATIC.getTranslation2(e.getGuild(), Translation.NOT_AVAILABLE)).replace("{}", STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON))).build()).queue();
 							logger.warn("VIEW AUDIT LOGS permission required in guild {}", e.getGuild().getId());
 						}
 					}
@@ -141,21 +140,21 @@ public class BanListener extends ListenerAdapter {
 					ban_issuer = entry.getUser().getAsMention();
 					ban_reason = (entry.getReason() != null && entry.getReason().length() > 0 ? entry.getReason() : STATIC.getTranslation2(e.getGuild(), Translation.DEFAULT_REASON));
 				
-					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(IniFileReader.getKickThumbnail()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
+					EmbedBuilder ban = new EmbedBuilder().setColor(Color.RED).setThumbnail(BotConfiguration.SQLgetThumbnails(e.getGuild().getIdLong()).getBan()).setTitle(STATIC.getTranslation2(e.getGuild(), Translation.BAN_TITLE));
 					//retrieve max allowed warnings per guild and print a message depending on the applied warnings before ban
 					int max_warning_id = Azrael.SQLgetMaxWarning(guild_id);
 					if(user.getWarningID() == 0) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_1).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() < max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_2).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replaceFirst("\\{\\}", ""+user.getWarningID()).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					else if(user.getWarningID() == max_warning_id) {
-						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessage(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
+						e.getGuild().getTextChannelById(log_channel.getChannel_ID()).sendMessageEmbeds(ban.setDescription(STATIC.getTranslation2(e.getGuild(), Translation.BAN_MESSAGE_3).replaceFirst("\\{\\}", e.getUser().getName()+"#"+e.getUser().getDiscriminator()).replaceFirst("\\{\\}", ""+user_id).replace("{}", ban_issuer)+ban_reason).build()).queue();
 					}
 					
 					//Run google service, if enabled
-					if(GuildIni.getGoogleFunctionalitiesEnabled(guild_id) && GuildIni.getGoogleSpreadsheetsEnabled(guild_id)) {
+					if(BotConfiguration.SQLgetBotConfigs(guild_id).getGoogleFunctionalities()) {
 						GoogleSheets.spreadsheetBanRequest(Azrael.SQLgetGoogleFilesAndEvent(guild_id, 2, GoogleEvent.BAN.id, ""), e.getGuild(), "", ""+user_id, new Timestamp(System.currentTimeMillis()), e.getUser().getName()+"#"+e.getUser().getDiscriminator(), e.getUser().getName(), entry.getUser().getName()+"#"+entry.getUser().getDiscriminator(), e.getGuild().getMemberById(entry.getUser().getIdLong()).getEffectiveName(), ban_reason, ""+user.getWarningID());
 					}
 				}
